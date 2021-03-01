@@ -1,4 +1,4 @@
-project(SENSEI Fortran)
+project(Q1D Fortran)
 cmake_minimum_required(VERSION 3.6)
 
 #=============================================================================80
