@@ -4,4 +4,4 @@ add_subdirectory(constants)
 add_lib_sources( set_precision.f90 )
 
 # Add sources for executables
-add_exe_sources( speed_calc speed_calc.f90 )
+add_exe_sources( calc_sound_speed calc_sound_speed.f90 )
