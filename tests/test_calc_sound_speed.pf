@@ -1,0 +1,33 @@
+module test_calc_sound_speed
+
+  use set_precision, only : prec
+  use pfunit_mod
+
+  implicit none
+
+  real(prec), parameter :: toler = 1.0e-14_prec
+
+  contains
+
+  @test
+    subroutine calc_sound_speed_test
+
+      real(prec) :: speed_of_sound, speed_of_sound_expected, R_gas, temperature
+      real(prec) :: gamma
+
+      continue
+
+      gamma = 1.4_prec
+      R_gas = 287.057_prec
+      temperature = 288.15_prec
+      speed_of_sound_expected = 340.2964360230650_prec
+
+      speed_of_sound = calc_sound_speed(gamma, R_gas, Temp)
+
+      @assertequal(speed_of_sound_expected, speed_of_sound, toler)
+
+    end subroutine calc_sound_speed_test
+
+    include 'calc_sound_speed.f90'
+
+end module test_calc_sound_speed
