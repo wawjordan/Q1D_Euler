@@ -1,10 +1,12 @@
-!=========================== calc_sound_speed ================================80
+!============================= speed_of_sound ================================80
 !>
 !!
 !<
 !=============================================================================80
+module speed_of_sound_mod
+contains
 
-function calc_sound_speed(gamma,R_gas,Temp)
+function speed_of_sound(gamma,R_gas,Temp)
 
   use set_precision, only : prec
   implicit none
@@ -14,4 +16,6 @@ function calc_sound_speed(gamma,R_gas,Temp)
 
   speed_of_sound = sqrt(gamma*R_gas*temperature)
 
-end function calc_sound_speed
+end function speed_of_sound
+
+end module speed_of_sound_mod
