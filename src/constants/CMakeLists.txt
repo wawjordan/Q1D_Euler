@@ -1,3 +1,1 @@
-add_lib_sources(
-  set_constants.f90
-)
+add_lib_sources( set_constants.f90 )
