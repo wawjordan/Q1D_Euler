@@ -75,11 +75,11 @@ set_target_properties( sample PROPERTIES
                                  COMPILE_FLAGS "${CMAKE_Fortran_FLAGS}"
                                  LINK_FLAGS    "${CMAKE_FORTRAN_LINK_FLAGS}" )
 
-add_executable( speed_calc ${speed_calc_sources} )
-target_link_libraries( speed_calc sample )
-set_target_properties( speed_calc PROPERTIES
-                              COMPILE_FLAGS "${CMAKE_Fortran_FLAGS}"
-                              LINK_FLAGS    "${CMAKE_FORTRAN_LINK_FLAGS}" )
+#add_executable( speed_calc ${speed_calc_sources} )
+#target_link_libraries( speed_calc sample )
+#set_target_properties( speed_calc PROPERTIES
+#                              COMPILE_FLAGS "${CMAKE_Fortran_FLAGS}"
+#                              LINK_FLAGS    "${CMAKE_FORTRAN_LINK_FLAGS}" )
 
 #=============================================================================80
 # Testing: enable with -DPFUNIT=/path/to/pfunit
