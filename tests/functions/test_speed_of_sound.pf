@@ -13,18 +13,18 @@ module test_speed_of_sound
   @test
     subroutine speed_of_sound_test
 
-      real(prec) :: a, a_expected, R_gas, temperature
+      real(prec) :: a, a_expected, pressure, rho
       real(prec) :: gamma
       real(prec) :: toler
       real(prec) :: eps
       continue
 
       gamma = 1.4_prec
-      R_gas = 287.057_prec
-      temperature = 288.15_prec
-      a_expected = 340.2964360230650_prec
+      pressure = 101325.0_prec
+      rho = 1.225_prec
+      a_expected = 340.29399054347107_prec
 
-      a = speed_of_sound(gamma, R_gas, temperature)
+      a = speed_of_sound(gamma, pressure, rho)
 
       eps = epsilon(a_expected)
       toler = a_expected*eps
