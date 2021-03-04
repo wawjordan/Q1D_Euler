@@ -6,7 +6,7 @@
 module speed_of_sound_mod
 contains
 
-function speed_of_sound(gamma,R_gas,Temp)
+function speed_of_sound(gamma,R_gas,temperature)
 
   use set_precision, only : prec
   implicit none
