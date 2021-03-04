@@ -1,30 +1,41 @@
 module test_speed_of_sound
 
   use set_precision, only : prec
+  use speed_of_sound_mod
   use pfunit_mod
 
   implicit none
 
-  real(prec), parameter :: toler = 1.0e-14_prec
+  !real(prec), parameter :: toler = 1.0e-14_prec
 
   contains
 
   @test
     subroutine speed_of_sound_test
 
-      real(prec) :: speed_of_sound, speed_of_sound_expected, R_gas, temperature
+      real(prec) :: a, a_expected, R_gas, temperature
       real(prec) :: gamma
-
+      real(prec) :: toler
+      real(prec) :: eps
       continue
 
       gamma = 1.4_prec
       R_gas = 287.057_prec
       temperature = 288.15_prec
-      speed_of_sound_expected = 340.2964360230650_prec
+      a_expected = 340.2964360230650_prec
 
-      speed_of_sound = speed_of_sound(gamma, R_gas, temperature)
+      a = speed_of_sound(gamma, R_gas, temperature)
 
-      @assertequal(speed_of_sound_expected, speed_of_sound, toler)
+      eps = epsilon(a_expected)
+      toler = a_expected*eps
+
+      write(*,*)
+      write(*,*) 'a     = ', a
+      write(*,*) 'a_exp = ', a_expected
+      write(*,*) 'eps   = ', eps
+      write(*,*) 'toler = ', toler
+      write(*,*) 'diff  = ', a - a_expected
+      @assertequal(a_expected, a, toler)
 
     end subroutine speed_of_sound_test
 
