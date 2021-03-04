@@ -33,3 +33,6 @@
 
 # Data Files
 *.dat
+
+# Build Folders
+build/*
