@@ -1,6 +1,7 @@
 module test_speed_of_sound
 
-  use set_precision, only : prec
+  use set_precision,   only : prec
+  use fluid_constants, only : gamma
   use speed_of_sound_mod
   use pfunit_mod
 
@@ -14,17 +15,15 @@ module test_speed_of_sound
     subroutine speed_of_sound_test
 
       real(prec) :: a, a_expected, pressure, rho
-      real(prec) :: gamma
       real(prec) :: toler
       real(prec) :: eps
       continue
 
-      gamma = 1.4_prec
       pressure = 101325.0_prec
       rho = 1.225_prec
       a_expected = 340.29399054347107_prec
 
-      a = speed_of_sound(gamma, pressure, rho)
+      a = speed_of_sound( pressure, rho)
 
       eps = epsilon(a_expected)
       toler = a_expected*eps
