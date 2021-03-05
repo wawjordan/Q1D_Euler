@@ -9,7 +9,7 @@ module set_inputs
 
   public :: set_derived_inputs, read_in
   public :: iq, iSS, max_newton_iter, newton_tol, eps
-  public :: p0, T0, Astar, g, R, a0, rho0, Aq, xq
+  public :: p0, T0, Astar, a0, rho0, Aq, xq
 
   integer :: max_newton_iter = 20
   integer :: iq = 5
@@ -20,10 +20,6 @@ module set_inputs
   real(prec) :: p0         = 300.0_prec
   real(prec) :: T0         = 600.0_prec
   real(prec) :: Astar      = 0.2_prec
-  real(prec) :: g          = 1.4_prec
-  real(prec) :: Ru         = 8314.0_prec
-  real(prec) :: Mair       = 28.96_prec
-  real(prec) :: R          = zero
   real(prec) :: a0         = zero
   real(prec) :: rho0       = zero
   real(prec) :: xmin       = -one
@@ -136,7 +132,6 @@ module set_inputs
     do i = i1,iq
       Aq(i) = area(xq(i))
     end do
-    R    = Ru/Mair
     a0   = sqrt(g*R*T0)
     rho0 = 1000.0_prec*p0/(R*T0)
 
