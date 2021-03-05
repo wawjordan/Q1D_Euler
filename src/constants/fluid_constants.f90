@@ -20,6 +20,6 @@ module fluid_constants
 
     R_gas = R_u/M_air
 
-  end suboutine set_fluid_constants
+  end subroutine set_fluid_constants
 
 end module fluid_constants
