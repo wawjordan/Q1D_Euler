@@ -1,7 +1,8 @@
 module set_inputs
 
-  use set_precision, only : prec
-  use set_constants, only : zero, one, two, half, pi
+  use set_precision,   only : prec
+  use set_constants,   only : zero, one, two, half, pi
+  use fluid_constants, only : R_gas, gamma
 
   implicit none
 
@@ -132,16 +133,16 @@ module set_inputs
     do i = i1,iq
       Aq(i) = area(xq(i))
     end do
-    a0   = sqrt(g*R*T0)
-    rho0 = 1000.0_prec*p0/(R*T0)
+    a0   = sqrt(g*R_gas*T0)
+    rho0 = 1000.0_prec*p0/(R_gas*T0)
 
-    write(*,'(A8,F20.14,A13)') 'R     = ', R, ' [J/(kmol*K)]'
-    write(*,'(A8,F20.14)') 'gamma = ', g
-    write(*,'(A8,F20.14,A6)') 'a_0   = ', a0, ' [m/s]'
-    write(*,'(A8,F20.14,A9)') 'rho_0 = ', rho0, ' [kg/m^3]'
-    write(*,'(A8,F20.14,A6)') 'P_0   = ', p0, ' [kPa]'
-    write(*,'(A8,F20.14,A4)') 'T_0   = ', T0, ' [K]'
-    write(*,'(A8,F20.14,A6)') 'A*    = ', Astar, ' [m^2]'
+    write(*,'(A8,F20.14,A13)') 'R     = ', R_gas, ' [J/(kmol*K)]'
+    write(*,'(A8,F20.14)')     'gamma = ', gamma
+    write(*,'(A8,F20.14,A6)')  'a_0   = ', a0, ' [m/s]'
+    write(*,'(A8,F20.14,A9)')  'rho_0 = ', rho0, ' [kg/m^3]'
+    write(*,'(A8,F20.14,A6)')  'P_0   = ', p0, ' [kPa]'
+    write(*,'(A8,F20.14,A4)')  'T_0   = ', T0, ' [K]'
+    write(*,'(A8,F20.14,A6)')  'A*    = ', Astar, ' [m^2]'
 
   end subroutine set_derived_inputs
 
