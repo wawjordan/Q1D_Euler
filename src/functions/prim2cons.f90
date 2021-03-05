@@ -1,8 +1,9 @@
 ! converts primitive variable vector to conserved variable vector
 function prim2cons(U,V)
-  use set_precision, only : prec
-  use set_constants, only : one, half
-  use set_inputs,    only : gamma
+
+  use set_precision,      only : prec
+  use set_constants,      only : one, half
+  use fluid_constants,    only : gamma
 
   implicit none
 
