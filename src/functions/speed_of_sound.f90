@@ -4,18 +4,21 @@
 !<
 !=============================================================================80
 module speed_of_sound_mod
-contains
 
-function speed_of_sound(gamma,pressure,rho)
+  contains
 
-  use set_precision, only : prec
-  implicit none
+  function speed_of_sound(pressure,rho)
 
-  real(prec), intent(in) :: gamma, pressure, rho
-  real(prec)             :: speed_of_sound
+    use set_precision, only   : prec
+    use fluid_constants, only : gamma
 
-  speed_of_sound = sqrt(gamma*pressure/rho)
+    implicit none
 
-end function speed_of_sound
+    real(prec), intent(in) :: pressure, rho
+    real(prec)             :: speed_of_sound
+
+    speed_of_sound = sqrt(gamma*pressure/rho)
+
+  end function speed_of_sound
 
 end module speed_of_sound_mod
