@@ -2,7 +2,6 @@ module test_speed_of_sound
 
   use set_precision,   only : prec
   use fluid_constants, only : gamma
-  use speed_of_sound_mod
   use pfunit_mod
 
   implicit none
@@ -37,5 +36,7 @@ module test_speed_of_sound
       @assertequal(a_expected, a, toler)
 
     end subroutine speed_of_sound_test
+
+    include 'speed_of_sound.f90'
 
 end module test_speed_of_sound
