@@ -8,7 +8,8 @@ module fluid_constants
   private
 
   public :: M_air, R_u, R_gas, gamma
-
+  public :: set_fluid_constants
+  
   real(prec) :: M_air = 28.96_prec
   real(prec) :: R_u   = 8314.0_prec
   real(prec) :: R_gas = zero
