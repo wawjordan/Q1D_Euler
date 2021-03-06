@@ -23,14 +23,14 @@ module test_isentropic_relations
       real(prec) :: eps
       continue
       call set_fluid_constants
-      M = 0.7_prec
+      M = 1.0_prec
 
       
 
-      V_expected(1,1) = 1.225_prec
-      V_expected(1,2) = 340.29399054347107_prec
-      V_expected(1,3) = 101325.0_prec
-      T_expected      = 100.0_prec
+      V_expected(1,1) = 1.104092415609047_prec 
+      V_expected(1,2) = 4.482855616137789e+02_prec 
+      V_expected(1,3) = 1.584845363151522e+05_prec
+      T_expected      = 500.0_prec
 
 
       call isentropic_relations(M,V,T)
