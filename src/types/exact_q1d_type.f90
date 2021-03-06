@@ -16,9 +16,7 @@ module exact_q1d_type
 
     real(prec), allocatable, dimension(:) :: M
     real(prec), allocatable, dimension(:) :: T
-    real(prec), allocatable, dimension(:) :: rho
-    real(prec), allocatable, dimension(:) :: u
-    real(prec), allocatable, dimension(:) :: p
+    real(prec), allocatable, dimension(:,:) :: U
 
   end type exact_q1d_t
 
@@ -35,21 +33,18 @@ contains
   !<
   !===========================================================================80
   subroutine allocate_exact_q1d( soln )
-    use set_inputs, only : imax
+    use set_inputs, only : imax, neq
     implicit none
     type(exact_q1d_t), intent(inout) :: soln
     integer :: i1, i2
 
     i1 = 1
     i2 = imax
-
-    allocate( soln%M(i1:i2), soln%T(i1:i2), soln%rho(i1:i2), &
-              soln%u(i1:i2), soln%p(i1:i2) )
+    
+    allocate( soln%M(i1:i2), soln%T(i1:i2), soln%U(i1:i2,neq) )
     soln%M = zero
     soln%T = zero
-    soln%rho = zero
-    soln%u = zero
-    soln%p = zero
+    soln%U = zero
   end subroutine allocate_exact_q1d
 
   !====================== deallocate_exact_q1d ===============================80
@@ -64,7 +59,7 @@ contains
   subroutine deallocate_exact_q1d( soln )
     implicit none
     type(exact_q1d_t), intent(inout) :: soln
-    deallocate( soln%M, soln%T, soln%rho, soln%u, soln%p )
+    deallocate( soln%M, soln%T, soln%U )
   end subroutine deallocate_exact_q1d
 
   !============================ calc_variables ===============================80
