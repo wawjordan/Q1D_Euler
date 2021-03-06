@@ -9,11 +9,11 @@ module set_inputs
   private
 
   public :: set_derived_inputs
-  public :: iq, iSS, max_newton_iter, newton_tol, eps
-  public :: p0, T0, Astar, a0, rho0, Aq, xq
+  public :: imax, iSS, max_newton_iter, newton_tol, eps
+  public :: p0, T0, Astar, a0, rho0, Aq, xq, neq
 
   integer :: max_newton_iter = 20
-  integer :: iq = 5
+  integer :: imax = 5
   integer :: iSS = 1
 
   real(prec) :: newton_tol = 1.0e-15_prec
@@ -25,6 +25,7 @@ module set_inputs
   real(prec) :: rho0       = zero
   real(prec) :: xmin       = -one
   real(prec) :: xmax       = one
+  integer :: neq        = 3
   real(prec), dimension(:), allocatable :: xq
   real(prec), dimension(:), allocatable :: Aq
 
@@ -64,13 +65,13 @@ module set_inputs
     ! real(prec), external :: area
     i  = 1
     i1 = 1
-    i2 = iq
-    allocate(xq(i1:iq), Aq(i1:iq))
+    i2 = imax
+    allocate(xq(i1:imax), Aq(i1:imax))
 
-    do i = i1,iq
-      xq(i) = xmin + float(i-1)*(xmax-xmin)/float(iq-1)
+    do i = i1,imax
+      xq(i) = xmin + float(i-1)*(xmax-xmin)/float(imax-1)
     end do
-    do i = i1,iq
+    do i = i1,imax
       Aq(i) = area(xq(i))
     end do
     a0   = sqrt(gamma*R_gas*T0)
