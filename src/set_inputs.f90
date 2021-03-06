@@ -8,7 +8,7 @@ module set_inputs
 
   private
 
-  public :: set_derived_inputs
+  public :: set_derived_inputs, xmin, xmax
   public :: imax, iSS, max_newton_iter, newton_tol, eps
   public :: p0, T0, Astar, a0, rho0, Aq, xq, neq
 
