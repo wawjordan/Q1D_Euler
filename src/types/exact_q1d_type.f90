@@ -1,8 +1,8 @@
 module exact_q1d_type
 
   use set_precision, only : prec
-  use set_constants, only : half, one, two
-  use set_inputs,    only : g, gp1, gm1, Aq, Astar, iSS, eps
+  use set_constants, only : zero, one, two, half
+  use fluid_constants, only : R_gas, gamma
 
   implicit none
 
@@ -34,7 +34,6 @@ contains
   !<
   !===========================================================================80
   subroutine allocate_exact_q1d( soln )
-    use set_constants, only : zero, one
     use set_inputs, only : iq
     implicit none
     type(exact_q1d_t), intent(inout) :: soln
@@ -76,19 +75,16 @@ contains
   !! Outputs:     soln:    exact_q1d_t.
   !<
   !===========================================================================80
-  subroutine calc_variables( soln )
-    use set_precision, only : prec
-    use set_constants, only : half
-    use set_inputs, only : g, gm1, R, p0, T0
-    implicit none
-    type(exact_q1d_t), intent(inout) :: soln
-
-    soln%T = T0/( 1 + half*gm1*soln%M**2 )
-    soln%p = p0/( 1 + half*gm1*soln%M**2 )**(g/gm1)
-    soln%rho = soln%p/(R*soln%T)
-    soln%u = soln%M*sqrt(g*R*soln%T)
-
-  end subroutine calc_variables
+!  subroutine calc_variables( soln )
+!    use set_inputs, only : gamma, 
+!    use set_constants, only : half
+!
+!    soln%T = T0/( 1 + half*gm1*soln%M**2 )
+!    soln%p = p0/( 1 + half*gm1*soln%M**2 )**(g/gm1)
+!    soln%rho = soln%p/(R*soln%T)
+!    soln%u = soln%M*sqrt(g*R*soln%T)
+!
+!  end subroutine calc_variables
 
   !=========================== solve_exact_q1d ===============================80
   !>
@@ -100,10 +96,8 @@ contains
   !<
   !===========================================================================80
   subroutine solve_exact_q1d(soln)
-    use set_precision, only : prec
-    use set_constants, only : zero
     use set_inputs, only : iq, Astar, Aq, iSS, eps, max_newton_iter
-    use subroutines
+    use isentropic_relations 
     implicit none
 
     type(exact_q1d_t), intent(inout) :: soln
@@ -118,7 +112,6 @@ contains
 
     x0 = eps
     x1 = one
-    ! call newton_safe( f, df, x0, x1, soln%M(1), xk, e)
     call newton_safe2( Aq(1), f1, df1, x0, x1, soln%M(1), xk, e)
     do i = 2,iq
       if ( (iSS==1).and.(Aq(i) > Aq(i-1)) ) then
@@ -134,7 +127,7 @@ contains
         call newton_safe2( Aq(i), f1, df1, x0, x1, soln%M(i), xk, e)
       endif
 
-      call calc_variables( soln )
+      call isentropic_relations( soln, )
       ! write(*,'(F20.14)') xk
       ! write(*,*) '_____________________________________________________________________'
     end do
@@ -152,7 +145,7 @@ contains
   function f (M)
     real(prec) :: f
     real(prec), intent (in) :: M
-    f = ((two/gp1)*(one+half*gm1*M**2))**(gp1/gm1) - ((one/Astar)**2)*M**2
+    f = ((two/(gamma+1))*(one+half*(gamma-1)*M**2))**((gamma+1)/(gamma-1)) - ((one/Astar)**2)*M**2
     return
   end function f
 
@@ -168,7 +161,7 @@ contains
   function df (M)
     real(prec) :: df
     real(prec), intent (in) :: M
-    df = two*M*( ((two/gp1)*(one+half*gm1*M**2))**(two/gm1) - (one/Astar)**2 )
+    df = two*M*( ((two/(gamma+1))*(one+half*(gamma-1)*M**2))**(two/(gamma-1)) - (one/Astar)**2 )
     return
   end function df
 
@@ -187,7 +180,7 @@ contains
     real(prec) :: f1
     real(prec), intent (in) :: M
     real(prec), intent (in) :: A1
-    f1 = ((two/gp1)*(one+half*gm1*M**2))**(gp1/gm1) - ((A1/Astar)**2)*M**2
+    f1 = ((two/(gamma+1))*(one+half*(gamma-1)*M**2))**((gamma+1)/(gamma-1)) - ((A1/Astar)**2)*M**2
     return
   end function f1
 
@@ -206,7 +199,7 @@ contains
     real(prec) :: df1
     real(prec), intent (in) :: M
     real(prec), intent (in) :: A1
-    df1 = two*M*( ((two/gp1)*(one+half*gm1*M**2))**(two/gm1) - (A1/Astar)**2 )
+    df1 = two*M*( ((two/(gamma+1))*(one+half*(gamma-1)*M**2))**(two/(gamma-1)) - (A1/Astar)**2 )
     return
   end function df1
 
