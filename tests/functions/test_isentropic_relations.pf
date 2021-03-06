@@ -1,0 +1,55 @@
+module test_isentropic_relations
+
+  use set_precision,   only : prec
+  use fluid_constants, only : gamma
+  use pfunit_mod
+
+  implicit none
+
+  real(prec), parameter :: toler = 1.0e-14_prec
+
+  contains
+
+  @test
+    subroutine isentropic_relations_test
+
+      real(prec)                 :: M
+      real(prec), dimension(1,3) :: V_expected
+      real(prec), dimension(1,3) :: V
+      real(prec)                 :: T
+      real(prec)                 :: T_expected
+
+      
+      real(prec) :: eps
+      continue
+      M = 0.7_prec
+
+      
+
+      V_expected(1,1) = 1.225_prec
+      V_expected(1,2) = 340.29399054347107_prec
+      V_expected(1,3) = 101325.0_prec
+      T_expected      = 100.0_prec
+
+
+      call isentropic_relations(M,V,T)
+
+      write(*,*)
+      write(*,*) 'V(1)     = ', V(1,1)
+      write(*,*) 'V(2)     = ', V(1,2)
+      write(*,*) 'V(3)     = ', V(1,3)
+      write(*,*) 'T        = ', T
+      write(*,*) 'V_exp(1) = ', V_expected(1,1)
+      write(*,*) 'V_exp(2) = ', V_expected(1,2)
+      write(*,*) 'V_exp(3) = ', V_expected(1,3)
+      write(*,*) 'T_exp    = ', T_expected
+      write(*,*) 'toler = ', toler
+      @assertequal(1.0_prec, V(1,1)/V_expected(1,1), toler, message='(density)')
+      @assertequal(1.0_prec, V(1,2)/V_expected(1,2), toler, message='(velocity)')
+      @assertequal(1.0_prec, V(1,3)/V_expected(1,3), toler, message='(pressure)')
+      @assertequal(1.0_prec, T/T_expected, toler, message='(temperature)')
+    end subroutine isentropic_relations_test
+
+    include 'isentropic_relations.f90'
+
+end module test_isentropic_relations
