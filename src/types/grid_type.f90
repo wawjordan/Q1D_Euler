@@ -8,8 +8,9 @@ module grid_type
 
     integer :: imax
 
-    real(prec) :: x_min
-    real(prec) :: x_max
+    real(prec) :: xmin
+    real(prec) :: xmax
+    real(prec) :: dx
     
     real(prec), allocatable, dimension(:) :: xi
     real(prec), allocatable, dimension(:) :: xc
@@ -18,11 +19,13 @@ module grid_type
     real(prec), allocatable, dimension(:) :: dAc
     
   end type grid_t
+
+contains
   
   subroutine allocate_grid( grid )
     
-    use set_constants, only : zero, one
-    use set_inputs   , only : imax, x_min, x_max
+    use set_constants, only : zero, one, half
+    use set_inputs   , only : imax, xmin, xmax
     
     implicit none
     
@@ -32,7 +35,7 @@ module grid_type
     i_low  = 1
     i_high = imax
     
-    grid%dx = (x_max - x_min)/float(imax)
+    grid%dx = (xmax - xmin)/float(imax)
 
     allocate( grid%xi(i_low:i_high+1), &
               grid%xc(i_low:i_high)  , &
@@ -40,8 +43,8 @@ module grid_type
               grid%Ac(i_low:i_high)  , &
               grid%dAc(i_low:i_high)   )
     
-    grid%xi = [ (x_min + float(i-1)/float(imax-1)*(x_max-x_min),i=1,i=imax) ]
-    grid%xc = [ (half*(grid%xi(i) + grid%xi(i+1)),i=1,i=imax )
+    grid%xi = [ (xmin + float(i-1)/float(imax-1)*(xmax-xmin),i=1,imax) ]
+    grid%xc = [ (half*(grid%xi(i) + grid%xi(i+1)),i=1,imax) ]
     grid%Ai = one
     grid%Ac = one
     grid%dAc =  zero
