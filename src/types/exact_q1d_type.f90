@@ -3,7 +3,8 @@ module exact_q1d_type
   use set_precision, only : prec
   use set_constants, only : zero, one, two, half
   use fluid_constants, only : R_gas, gamma
-
+  use set_inputs, only : imax, Astar, Aq, iSS, eps, max_newton_iter
+  
   implicit none
 
 !============================== exact_q1d_t ==================================80
@@ -34,13 +35,13 @@ contains
   !<
   !===========================================================================80
   subroutine allocate_exact_q1d( soln )
-    use set_inputs, only : iq
+    use set_inputs, only : imax
     implicit none
     type(exact_q1d_t), intent(inout) :: soln
     integer :: i1, i2
 
     i1 = 1
-    i2 = iq
+    i2 = imax
 
     allocate( soln%M(i1:i2), soln%T(i1:i2), soln%rho(i1:i2), &
               soln%u(i1:i2), soln%p(i1:i2) )
@@ -96,8 +97,10 @@ contains
   !<
   !===========================================================================80
   subroutine solve_exact_q1d(soln)
-    use set_inputs, only : iq, Astar, Aq, iSS, eps, max_newton_iter
-    use isentropic_relations 
+
+    use set_inputs, only : imax, Astar, Aq, iSS, eps, max_newton_iter
+
+    !use isentropic_relations 
     implicit none
 
     type(exact_q1d_t), intent(inout) :: soln
@@ -113,7 +116,7 @@ contains
     x0 = eps
     x1 = one
     call newton_safe2( Aq(1), f1, df1, x0, x1, soln%M(1), xk, e)
-    do i = 2,iq
+    do i = 2,imax
       if ( (iSS==1).and.(Aq(i) > Aq(i-1)) ) then
         x0 = one - eps
         x1 = 10.0_prec
@@ -127,7 +130,7 @@ contains
         call newton_safe2( Aq(i), f1, df1, x0, x1, soln%M(i), xk, e)
       endif
 
-      call isentropic_relations( soln, )
+      !call isentropic_relations( soln, )
       ! write(*,'(F20.14)') xk
       ! write(*,*) '_____________________________________________________________________'
     end do
