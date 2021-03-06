@@ -30,7 +30,7 @@ subroutine isentropic_relations(M,V,T)
   
   psi = one + half*(gamma - one)*M**2
   T   = T0/psi
-  p   = p0/psi**(gamma/(gamma - one))
+  p   = 1000.0_prec*p0/psi**(gamma/(gamma - one))
   rho = p/(R_gas*T)
   a   = speed_of_sound(p,rho)
   u   = M*a
