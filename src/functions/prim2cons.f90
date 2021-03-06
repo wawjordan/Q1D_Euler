@@ -1,5 +1,5 @@
 ! converts primitive variable vector to conserved variable vector
-function prim2cons(U,V)
+subroutine prim2cons(U,V)
 
   use set_precision,      only : prec
   use set_constants,      only : one, half
@@ -14,4 +14,4 @@ function prim2cons(U,V)
   U(:,2) = V(:,1)*V(:,2)
   U(:,3) = ( V(:,3)/(gamma - one) ) + half*V(:,1)*V(:,2)**2
 
-end function prim2cons
+end subroutine prim2cons
