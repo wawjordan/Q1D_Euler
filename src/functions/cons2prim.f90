@@ -1,5 +1,5 @@
 ! converts conserved variables to primitve variables
-function cons2prim(U,V)
+subroutine cons2prim(U,V)
 
   use set_precision,      only : prec
   use set_constants,      only : one, half
@@ -14,4 +14,4 @@ function cons2prim(U,V)
   V(:,2) = U(:,2)/U(:,1)
   V(:,3) = (gamma - one)*U(:,3) - half*(gamma - one)*U(:,2)**2/U(:,1)
 
-end function cons2prim
+end subroutine cons2prim
