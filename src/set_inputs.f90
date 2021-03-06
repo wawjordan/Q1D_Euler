@@ -73,7 +73,7 @@ module set_inputs
     do i = i1,iq
       Aq(i) = area(xq(i))
     end do
-    a0   = sqrt(g*R_gas*T0)
+    a0   = sqrt(gamma*R_gas*T0)
     rho0 = 1000.0_prec*p0/(R_gas*T0)
 
     write(*,'(A8,F20.14,A13)') 'R     = ', R_gas, ' [J/(kmol*K)]'
