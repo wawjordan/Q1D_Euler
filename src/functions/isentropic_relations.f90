@@ -1,16 +1,18 @@
 ! Calculates primitive variable vector for given Mach number and stagnation
 ! conditions
-function isentropic_relations(M,V)
+subroutine isentropic_relations(M,V,T)
   use set_precision, only : prec
   use set_constants, only : one, half
-  use set_inputs,    only : gamma, T0, p0, R_gas
+  use fluid_constants, only : set_fluid_constants, gamma, R_gas
+  use set_inputs,    only : T0, p0
+  use speed_of_sound
 
   implicit none
 
   real(prec), dimension(:), intent(in)      :: M
-  real(prec), dimension(:,:), intent(out) :: V
+  real(prec), dimension(:,:), intent(inout) :: V
+  real(prec), dimension(:), intent(inout) :: T
   real(prec), dimension(:) :: psi
-  real(prec), dimension(:) :: T
   real(prec), dimension(:) :: p
   real(prec), dimension(:) :: rho
   real(prec), dimension(:) :: a
@@ -27,4 +29,4 @@ function isentropic_relations(M,V)
   V(:,2) = u
   V(:,3) = p
 
-end function isentropic_relations
+end subroutine isentropic_relations
