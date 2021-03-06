@@ -1,7 +1,7 @@
 module test_isentropic_relations
 
   use set_precision,   only : prec
-  use fluid_constants, only : gamma
+  use fluid_constants, only : gamma, set_fluid_constants
   use pfunit_mod
 
   implicit none
@@ -22,6 +22,7 @@ module test_isentropic_relations
       
       real(prec) :: eps
       continue
+      call set_fluid_constants
       M = 0.7_prec
 
       
