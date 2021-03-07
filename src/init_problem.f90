@@ -6,6 +6,7 @@ module init_problem
   use set_inputs,      only : p0, T0
   use soln_type
   use grid_type
+  use variable_conversion
   
   implicit none
   
