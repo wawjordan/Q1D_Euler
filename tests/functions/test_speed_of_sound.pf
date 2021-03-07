@@ -1,7 +1,8 @@
 module test_speed_of_sound
 
-  use set_precision,   only : prec
-  use fluid_constants, only : gamma
+  use set_precision,       only : prec
+  use fluid_constants,     only : gamma
+  use variable_conversion, only : speed_of_sound
   use pfunit_mod
 
   implicit none
@@ -12,24 +13,21 @@ module test_speed_of_sound
 
   @test
     subroutine speed_of_sound_test
-
-      real(prec) :: a, a_expected, pressure, rho
-      continue
-
-      pressure = 101325.0_prec
-      rho = 1.225_prec
+      
+      real(prec) :: a(1), a_expected(1), pressure(1), rho(1)
+      
+      pressure   = 101325.0_prec
+      rho        = 1.225_prec
       a_expected = 340.29399054347107_prec
-      write(*,*) gamma
-      a = speed_of_sound( pressure, rho )
-
+      
+      call speed_of_sound(pressure,rho,a)
+      
       write(*,*)
-      write(*,*) 'a     = ', a
-      write(*,*) 'a_exp = ', a_expected
-      write(*,*) 'toler = ', toler
+      write(*,*) 'a        = ', a
+      write(*,*) 'a_exp    = ', a_expected
       @assertequal(1.0_prec,a/a_expected,toler)
-    
+      write(*,*) 'toler    = ', toler
+      
     end subroutine speed_of_sound_test
-
-    include 'speed_of_sound.f90'
-
+    
 end module test_speed_of_sound
