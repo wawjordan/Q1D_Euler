@@ -2,7 +2,7 @@ subroutine calc_time_step( lambda, dt,  V )
   
   use set_precision, only : prec
   use fluid_constants, only : gamma
-  use set_inputs, only : CFL
+  use set_inputs, only : CFL, dx
   
   implicit none
   
