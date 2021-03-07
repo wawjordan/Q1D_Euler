@@ -10,18 +10,10 @@ subroutine isentropic_relations(M,V,T)
   implicit none
   
   real(prec), external :: speed_of_sound
-!  real(prec), dimension(:,:), intent(inout) :: V
-!  real(prec), dimension(:),   intent(inout) :: M
-!  real(prec), dimension(:),   intent(inout) :: T
-  real(prec), intent(inout) :: V(:,:)
-  real(prec), intent(inout) :: M
-  real(prec), intent(inout) :: T
+  real(prec), dimension(:,:), intent(inout) :: V
+  real(prec), dimension(:),   intent(inout) :: M
+  real(prec), dimension(:),   intent(inout) :: T
   
-  real(prec) :: psi
-  real(prec) :: p
-  real(prec) :: rho
-  real(prec) :: a
-  real(prec) :: u
 !  real(prec), dimension(:), allocatable :: psi
 !  real(prec), dimension(:), allocatable :: p
 !  real(prec), dimension(:), allocatable :: rho
@@ -34,21 +26,21 @@ subroutine isentropic_relations(M,V,T)
 !           a(size(M,1)),   &
 !           u(size(M,1))    )
   
-  psi = one + half*(gamma - one)*M**2
-  T   = T0/psi
-  p   = 1000.0_prec*p0/psi**(gamma/(gamma - one))
-  rho = p/(R_gas*T)
-  a   = speed_of_sound(p,rho)
-  u   = M*a
+!  psi = one + half*(gamma - one)*M**2
+!  T   = T0/psi
+!  p   = 1000.0_prec*p0/psi**(gamma/(gamma - one))
+!  rho = p/(R_gas*T)
+!  a   = speed_of_sound(p,rho)
+!  u   = M*a
 
-!  T = T0/(one + half*(gamma - one)*M**2)
-!  V(:,3) = p0/(one + half*(gamma - one)*M**2)**(gamma/(gamma-1))
-!  V(:,1) = V(:,3)/(R_gas*T)
-!  V(:,2) = M*speed_of_sound(V(:,3),V(:,1))
+  T = T0/(one + half*(gamma - one)*M**2)
+  V(:,3) = 1000.0_prec*p0/(one + half*(gamma - one)*M**2)**(gamma/(gamma-1))
+  V(:,1) = V(:,3)/(R_gas*T)
+  V(:,2) = M*speed_of_sound(V(:,3),V(:,1))
 
-  V(:,1) = rho
-  V(:,2) = u
-  V(:,3) = p
+!  V(:,1) = rho
+!  V(:,2) = u
+!  V(:,3) = p
   
 !  deallocate(psi, p, rho, a, u )
 
