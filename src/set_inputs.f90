@@ -10,10 +10,10 @@ module set_inputs
 
   public :: set_derived_inputs, xmin, xmax, CFL, dx
   public :: imax, iSS, max_newton_iter, newton_tol, eps
-  public :: p0, T0, Astar, a0, rho0, Aq, xq, neq
+  public :: p0, T0, Astar, a0, rho0, Aq, xq, neq, area
 
   integer :: max_newton_iter = 1000
-  integer :: imax = 5
+  integer :: imax = 10
   integer :: iSS = 1
 
   real(prec) :: newton_tol = 1.0e-15_prec
@@ -63,19 +63,19 @@ module set_inputs
 
     implicit none
 
-    integer :: i, i1, i2
+!    integer :: i, i1, i2
     ! real(prec), external :: area
-    i  = 1
-    i1 = 1
-    i2 = imax
-    allocate(xq(i1:imax), Aq(i1:imax))
+!    i  = 1
+!    i1 = 1
+!    i2 = imax
+!    allocate(xq(i1:imax), Aq(i1:imax))
 
-    do i = i1,imax
-      xq(i) = xmin + float(i-1)*(xmax-xmin)/float(imax-1)
-    end do
-    do i = i1,imax
-      Aq(i) = area(xq(i))
-    end do
+!    do i = i1,imax
+!      xq(i) = xmin + float(i-1)*(xmax-xmin)/float(imax-1)
+!    end do
+!    do i = i1,imax
+!      Aq(i) = area(xq(i))
+!    end do
     a0   = sqrt(gamma*R_gas*T0)
     rho0 = 1000.0_prec*p0/(R_gas*T0)
     dx   = (xmax-xmin)/float(imax-1)
