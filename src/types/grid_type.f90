@@ -25,7 +25,7 @@ contains
   subroutine allocate_grid( grid )
     
     use set_constants, only : zero, one, half
-    use set_inputs   , only : imax, xmin, xmax
+    use set_inputs   , only : imax, xmin, xmax, dx
     
     implicit none
     
@@ -35,7 +35,7 @@ contains
     i_low  = 1
     i_high = imax
     
-    grid%dx = (xmax - xmin)/float(imax)
+    grid%dx = (xmax - xmin)/real(imax,prec)
 
     allocate( grid%xi(i_low:i_high+1), &
               grid%xc(i_low:i_high)  , &
@@ -43,7 +43,7 @@ contains
               grid%Ac(i_low:i_high)  , &
               grid%dAc(i_low:i_high)   )
     
-    grid%xi = [ (xmin + float(i-1)/float(imax-1)*(xmax-xmin),i=1,imax+1) ]
+    grid%xi = [ (xmin + real(i-1,prec)/real(imax,prec)*(xmax-xmin),i=1,imax+1) ]
     grid%xc = [ (half*(grid%xi(i) + grid%xi(i+1)),i=1,imax) ]
     grid%Ai = one
     grid%Ac = one
