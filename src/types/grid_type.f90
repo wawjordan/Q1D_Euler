@@ -43,7 +43,7 @@ contains
               grid%Ac(i_low:i_high)  , &
               grid%dAc(i_low:i_high)   )
     
-    grid%xi = [ (xmin + float(i-1)/float(imax-1)*(xmax-xmin),i=1,imax) ]
+    grid%xi = [ (xmin + float(i-1)/float(imax-1)*(xmax-xmin),i=1,imax+1) ]
     grid%xc = [ (half*(grid%xi(i) + grid%xi(i+1)),i=1,imax) ]
     grid%Ai = one
     grid%Ac = one
