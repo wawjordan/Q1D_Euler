@@ -11,8 +11,8 @@ subroutine isentropic_relations(M,V,T)
   
   real(prec), external :: speed_of_sound
   real(prec), dimension(:,:), intent(inout) :: V
-  real(prec), dimension(:),   intent(inout) :: M
-  real(prec), dimension(:),   intent(inout) :: T
+  real(prec), dimension(:),   intent(in) :: M
+  real(prec), dimension(:),   intent(out) :: T
   
 !  real(prec), dimension(:), allocatable :: psi
 !  real(prec), dimension(:), allocatable :: p
@@ -32,8 +32,11 @@ subroutine isentropic_relations(M,V,T)
 !  rho = p/(R_gas*T)
 !  a   = speed_of_sound(p,rho)
 !  u   = M*a
-
+  write(*,*) 'T = ',T
+  write(*,*) 'M = ',M
   T = T0/(one + half*(gamma - one)*M**2)
+  write(*,*) 'T = ',T
+  
   V(:,3) = 1000.0_prec*p0/(one + half*(gamma - one)*M**2)**(gamma/(gamma-1))
   V(:,1) = V(:,3)/(R_gas*T)
   V(:,2) = M*speed_of_sound(V(:,3),V(:,1))
