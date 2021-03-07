@@ -8,7 +8,7 @@ module set_inputs
 
   private
 
-  public :: set_derived_inputs, xmin, xmax
+  public :: set_derived_inputs, xmin, xmax, CFL, dx
   public :: imax, iSS, max_newton_iter, newton_tol, eps
   public :: p0, T0, Astar, a0, rho0, Aq, xq, neq
 
@@ -25,6 +25,8 @@ module set_inputs
   real(prec) :: rho0       = zero
   real(prec) :: xmin       = -one
   real(prec) :: xmax       = one
+  real(prec) :: dx         = zero
+  real(prec) :: CFL        = one
   integer :: neq        = 3
   real(prec), dimension(:), allocatable :: xq
   real(prec), dimension(:), allocatable :: Aq
@@ -76,6 +78,7 @@ module set_inputs
     end do
     a0   = sqrt(gamma*R_gas*T0)
     rho0 = 1000.0_prec*p0/(R_gas*T0)
+    dx   = (xmax-xmin)/float(imax-1)
 
     write(*,'(A8,F20.14,A13)') 'R     = ', R_gas, ' [J/(kmol*K)]'
     write(*,'(A8,F20.14)')     'gamma = ', gamma
