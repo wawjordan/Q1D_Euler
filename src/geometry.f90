@@ -11,29 +11,35 @@ module geometry
   
   private
   
-  public : setup_geometry, teardown_geometry
-  
+  public :: setup_geometry, teardown_geometry
   
 
 
   contains
   
-  subroutine setup_geometry
-    
+  subroutine setup_geometry( grid, soln )
+    use set_inputs, only : area
     implicit none
     
-    type( soln_t ) :: soln
-    type( grid_t ) :: grid
+    integer :: i
+    type( soln_t ), intent(inout) :: soln
+    type( grid_t ), intent(inout) :: grid
+    !real(prec), external :: area
     
     call allocate_grid( grid )
     call allocate_soln( soln )
     
-    grid%Ai = area( grid%xi )
-    grid%Ac = area( grid%xc )
+    do i = 1,size(grid%xi)
+      grid%Ai(i) = area( grid%xi(i) )
+    end do
+    write(*,*)
+    do i = 1,size(grid%xc)
+      grid%Ac(i) = area( grid%xc(i) )
+    end do
     
   end subroutine setup_geometry
   
-  subroutine teardown_geometry
+  subroutine teardown_geometry( grid, soln )
     
     implicit none
     
