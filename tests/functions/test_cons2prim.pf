@@ -2,6 +2,7 @@ module test_cons2prim
 
   use set_precision,   only : prec
   use fluid_constants, only : gamma
+  use variable_conversion, only : cons2prim
   use pfunit_mod
 
   implicit none
@@ -17,8 +18,6 @@ module test_cons2prim
       real(prec), dimension(3,3) :: V_expected
       real(prec), dimension(3,3) :: V
       
-      real(prec) :: eps
-      continue
       U(1,1) = 1.225_prec
       U(1,2) = 416.8601384157521_prec
       U(1,3) = 3.242400000000001e+05_prec
@@ -32,21 +31,18 @@ module test_cons2prim
 
       call cons2prim(U,V)
 
-      eps = epsilon(V_expected)
-
       write(*,*)
       write(*,*) 'V(1)     = ', V(1,1)
-      write(*,*) 'V(2)     = ', V(1,2)
-      write(*,*) 'V(3)     = ', V(1,3)
       write(*,*) 'V_exp(1) = ', V_expected(1,1)
-      write(*,*) 'V_exp(2) = ', V_expected(1,2)
-      write(*,*) 'V_exp(3) = ', V_expected(1,3)
-      write(*,*) 'toler = ', toler
       @assertequal(1.0_prec, V(1,1)/V_expected(1,1), toler, message='(density)')
+      write(*,*) 'V(2)     = ', V(1,2)
+      write(*,*) 'V_exp(2) = ', V_expected(1,2)
       @assertequal(1.0_prec, V(1,2)/V_expected(1,2), toler, message='(velocity)')
+      write(*,*) 'V(3)     = ', V(1,3)
+      write(*,*) 'V_exp(3) = ', V_expected(1,3)
       @assertequal(1.0_prec, V(1,3)/V_expected(1,3), toler, message='(pressure)')
+      write(*,*) 'toler    = ', toler
+      
     end subroutine cons2prim_test
-
-    include 'cons2prim.f90'
 
 end module test_cons2prim
