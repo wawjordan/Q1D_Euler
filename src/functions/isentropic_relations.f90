@@ -34,12 +34,12 @@ subroutine isentropic_relations(M,V,T)
 !  u   = M*a
   write(*,*) 'T = ',T
   write(*,*) 'M = ',M
-  T = T0/(one + half*(gamma - one)*M**2)
-  write(*,*) 'T = ',T
+  T(:) = T0/(one + half*(gamma - one)*M(:)**2)
+  write(*,*) 'T = ',T(:)
   
-  V(:,3) = 1000.0_prec*p0/(one + half*(gamma - one)*M**2)**(gamma/(gamma-1))
-  V(:,1) = V(:,3)/(R_gas*T)
-  V(:,2) = M*speed_of_sound(V(:,3),V(:,1))
+  V(:,3) = 1000.0_prec*p0/(one + half*(gamma - one)*M(:)**2)**(gamma/(gamma-1))
+  V(:,1) = V(:,3)/(R_gas*T(:))
+  V(:,2) = M(:)*speed_of_sound(V(:,3),V(:,1))
 
 !  V(:,1) = rho
 !  V(:,2) = u
