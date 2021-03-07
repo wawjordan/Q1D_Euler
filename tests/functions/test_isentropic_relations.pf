@@ -31,7 +31,7 @@ module test_isentropic_relations
       T_expected      = 500.0_prec
 
 
-      call isentropic_relations(M,V,T)
+      call isentropic_relations(M(1),V,T(1))
 
       write(*,*)
       write(*,*) 'V(1)     = ', V(1,1)
