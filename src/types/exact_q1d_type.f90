@@ -3,7 +3,7 @@ module exact_q1d_type
   use set_precision, only : prec
   use set_constants, only : zero, one, two, half
   use fluid_constants, only : R_gas, gamma
-  use set_inputs, only : imax, Astar, Aq, iSS, eps, max_newton_iter
+  use set_inputs, only : imax, Aq, iSS, eps
   
   implicit none
   
@@ -104,7 +104,7 @@ contains
   !===========================================================================80
   subroutine solve_exact_q1d(soln)
 
-    use set_inputs, only : imax, Astar, Aq, iSS, eps, max_newton_iter
+    use set_inputs, only : imax, Aq, iSS, eps
 
     !use isentropic_relations 
     implicit none
@@ -162,7 +162,9 @@ contains
   !! Outputs:     f:    f(M).
   !<
   !===========================================================================80
-  function f1 (M,A1)
+  function f1 (M,A1) 
+    use set_inputs, only : Astar
+    implicit none
     real(prec) :: f1
     real(prec), intent (in) :: M
     real(prec), intent (in) :: A1
@@ -182,6 +184,8 @@ contains
   !<
   !===========================================================================80
   function df1 (M,A1)
+    use set_inputs, only : Astar
+    implicit none
     real(prec) :: df1
     real(prec), intent (in) :: M
     real(prec), intent (in) :: A1
@@ -233,7 +237,7 @@ contains
 
     if ( (xk(2) < a2).or.(xk(2) > b2) ) then
       xk(2) = a2 + half*(b2-a2)
-      if ( sign(one,f1(a2,A1)) == sign(one,f1(xk(2),A1)) ) then
+      if ( int(sign(one,f1(a2,A1))) == int(sign(one,f1(xk(2),A1))) ) then
         a2 = xk(2)
       else
         b2 = xk(2)
@@ -246,7 +250,7 @@ contains
       x_new = xk(2) - f1(xk(2),A1)/df1(xk(2),A1)
       if ( (x_new < a2).or.(x_new > b2) ) then
         x_new = a2 + half*(b2-a2)
-        if ( sign(one,f1(a2,A1)) == sign(one,f1(x_new,A1)) ) then
+        if ( int(sign(one,f1(a2,A1))) == int(sign(one,f1(x_new,A1))) ) then
           a2 = x_new
         else
           b2 = x_new
