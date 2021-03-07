@@ -126,8 +126,8 @@ contains
     x1 = one
     call newton_safe( Aq(1), f1, df1, x0, x1, soln%M(1), xk, e)
     
+    call isentropic_relations( soln%M, soln%V, soln%T )
     write(*,*) lbound(soln%T), ubound(soln%T)
-  !  call isentropic_relations( soln%M(:), soln%V(:,:), soln%T(:) )
     do i = 2,imax
       if ( (iSS==1).and.(Aq(i) > Aq(i-1)) ) then
         x0 = one - eps
