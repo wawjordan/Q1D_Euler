@@ -11,7 +11,7 @@ module init_problem
   
   private
   
-  !public :: 
+  public :: initialize
   
   contains
   
@@ -24,7 +24,8 @@ module init_problem
     type( soln_t ), intent(inout) :: soln
     type( grid_t ), intent(inout) :: grid
     
-    soln%M = 0.9_prec*grid%xc + one
+    soln%M(:) = 0.9_prec*grid%xc(:) + one
+    call isentropic_relations(soln%M,soln%V,soln%T)
     
   end subroutine initialize
 
