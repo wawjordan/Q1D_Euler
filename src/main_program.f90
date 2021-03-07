@@ -5,6 +5,7 @@ program main_program
   use fluid_constants, only : set_fluid_constants
   use set_inputs, only : set_derived_inputs
   use geometry, only : setup_geometry, teardown_geometry
+  use init_problem, only : initialize
   use grid_type
   use soln_type
   implicit none
@@ -19,12 +20,9 @@ program main_program
   call set_derived_inputs
   call setup_geometry(grid,soln)
   
-  do i = 1, size(grid%xi)
-    write(*,*) grid%xi(i), grid%Ai(i)
-  enddo
-  write(*,*)
+  call initialize(grid,soln)
   do i = 1, size(grid%xc)
-    write(*,*) grid%xc(i), grid%Ac(i)
+    write(*,*) grid%xc(i), grid%Ac(i), soln%M(i)
   enddo
   !call allocate_exact_q1d( ex_soln )
   
