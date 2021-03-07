@@ -24,7 +24,7 @@ program main_program
   call allocate_exact_q1d( ex_soln )
   
   call solve_exact_q1d(ex_soln)
- ! call isentropic_relations(ex_soln%M, ex_soln%V, ex_soln%T)
+  !call isentropic_relations(ex_soln%M(1), ex_soln%V(1,1), ex_soln%T(1))
   write(header_str,*) '|    x   |    A    |         M         |'// &
   &  '        rho        |         u        |         p        |'
   100 format(2(F9.4),4(F20.14))
@@ -32,7 +32,7 @@ program main_program
   do i = 1,imax
     write(*,100) xq(i), Aq(i), ex_soln%M(i), ex_soln%V(i,1), ex_soln%V(i,2), ex_soln%V(i,3)
   end do
-  
+  write(*,*) 'T = ', ex_soln%T
   call deallocate_exact_q1d( ex_soln )
   !call deallocate_soln( soln )
   !call deallocate_grid( grid )
