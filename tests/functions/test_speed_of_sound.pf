@@ -6,7 +6,7 @@ module test_speed_of_sound
 
   implicit none
 
-  !real(prec), parameter :: toler = 1.0e-14_prec
+  real(prec), parameter :: toler = 1.0e-14_prec
 
   contains
 
@@ -14,27 +14,20 @@ module test_speed_of_sound
     subroutine speed_of_sound_test
 
       real(prec) :: a, a_expected, pressure, rho
-      real(prec) :: toler
-      real(prec) :: eps
       continue
 
       pressure = 101325.0_prec
       rho = 1.225_prec
       a_expected = 340.29399054347107_prec
-
-      a = speed_of_sound( pressure, rho)
-
-      eps = epsilon(a_expected)
-      toler = a_expected*eps
+      write(*,*) gamma
+      a = speed_of_sound( pressure, rho )
 
       write(*,*)
       write(*,*) 'a     = ', a
       write(*,*) 'a_exp = ', a_expected
-      write(*,*) 'eps   = ', eps
       write(*,*) 'toler = ', toler
-      write(*,*) 'diff  = ', a - a_expected
-      @assertequal(a_expected, a, toler)
-
+      @assertequal(1.0_prec,a/a_expected,toler)
+    
     end subroutine speed_of_sound_test
 
     include 'speed_of_sound.f90'
