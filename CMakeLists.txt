@@ -26,7 +26,7 @@ set(
   USER_DEBUG_FLAGS
   "-O0 -fopenmp -Wall -Wextra -fimplicit-none -fcheck=all \
    -ffpe-trap=zero,underflow,overflow,invalid --coverage -fbacktrace \
-   -fstack-protector"
+   -fstack-protector -fbounds-check"
 )
 set( USER_RELEASE_FLAGS "-O3 -march=native -fopenmp" )
 
