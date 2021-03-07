@@ -12,7 +12,7 @@ module set_inputs
   public :: imax, iSS, max_newton_iter, newton_tol, eps
   public :: p0, T0, Astar, a0, rho0, Aq, xq, neq
 
-  integer :: max_newton_iter = 20
+  integer :: max_newton_iter = 1000
   integer :: imax = 5
   integer :: iSS = 1
 
