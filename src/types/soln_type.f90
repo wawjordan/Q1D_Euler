@@ -24,7 +24,7 @@ contains
 
   subroutine allocate_soln( soln )
 
-    use set_constants, only : zero, one
+    use set_constants, only : zero
     use set_inputs,    only : imax, neq
     
     implicit none
