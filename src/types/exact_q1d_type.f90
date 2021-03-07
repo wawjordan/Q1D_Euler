@@ -1,10 +1,13 @@
 module exact_q1d_type
 
-  use set_precision, only : prec
-  use set_constants, only : zero, one, two, half
-  use fluid_constants, only : R_gas, gamma
-  use set_inputs, only : imax, Aq, iSS, eps
-  
+  use set_precision      , only : prec
+  use set_constants      , only : zero, one, two, half
+  use fluid_constants    , only : R_gas, gamma
+  use set_inputs         , only : imax, neq, Astar, iSS, eps
+  use set_inputs         , only : max_newton_iter, newton_tol
+  use variable_conversion, only : isentropic_relations
+  use grid_type
+   
   implicit none
   
   private
@@ -20,9 +23,9 @@ module exact_q1d_type
 !=============================================================================80
   type exact_q1d_t
 
-    real(prec), allocatable, dimension(:)   :: M
-    real(prec), allocatable, dimension(:)   :: T
-    real(prec), allocatable, dimension(:,:) :: V
+    real(prec), allocatable, dimension(:)   :: Mc, Mi
+    real(prec), allocatable, dimension(:)   :: Tc, Ti
+    real(prec), allocatable, dimension(:,:) :: Vc, Vi
 
   end type exact_q1d_t
 
@@ -38,19 +41,29 @@ contains
   !! Outputs:     soln:    exact_q1d_t type (allocated).
   !<
   !===========================================================================80
-  subroutine allocate_exact_q1d( soln )
-    use set_inputs, only : imax, neq
-    implicit none
-    type(exact_q1d_t), intent(inout) :: soln
-    integer :: i1, i2
-
-    i1 = 1
-    i2 = imax
+  subroutine allocate_exact_q1d( soln, grid )
     
-    allocate( soln%M(i1:i2), soln%T(i1:i2), soln%V(i1:i2,neq) )
-    soln%M = zero
-    soln%T = zero
-    soln%V = zero
+    type(exact_q1d_t), intent(inout) :: soln
+    type(grid_t), intent(in) :: grid
+    integer :: i_low, i_high
+
+    i_low = 1
+    i_high = imax
+    
+    allocate( soln%Mc(i_low:i_high), &
+              soln%Tc(i_low:i_high), &
+              soln%Vc(i_low:i_high,neq) )
+    allocate( soln%Mi(i_low:i_high+1), &
+              soln%Ti(i_low:i_high+1), &
+              soln%Vi(i_low:i_high+1,neq) )
+    
+    soln%Mc = zero
+    soln%Tc = zero
+    soln%Vc = zero
+    
+    soln%Mi = zero
+    soln%Ti = zero
+    soln%Vi = zero
     
   end subroutine allocate_exact_q1d
 
@@ -65,33 +78,12 @@ contains
   !===========================================================================80
   subroutine deallocate_exact_q1d( soln )
     
-    implicit none
-    
     type(exact_q1d_t), intent(inout) :: soln
     
-    deallocate( soln%M, soln%T, soln%V )
+    deallocate( soln%Mc, soln%Tc, soln%Vc )
+    deallocate( soln%Mi, soln%Ti, soln%Vi )
     
   end subroutine deallocate_exact_q1d
-
-  !============================ calc_variables ===============================80
-  !>
-  !! Description: Calculates primitive variables from isentropic relations.
-  !!
-  !! Inputs:      soln:    exact_q1d_t type.
-  !!
-  !! Outputs:     soln:    exact_q1d_t.
-  !<
-  !===========================================================================80
-!  subroutine calc_variables( soln )
-!    use set_inputs, only : gamma, 
-!    use set_constants, only : half
-!
-!    soln%T = T0/( 1 + half*gm1*soln%M**2 )
-!    soln%p = p0/( 1 + half*gm1*soln%M**2 )**(g/gm1)
-!    soln%rho = soln%p/(R*soln%T)
-!    soln%u = soln%M*sqrt(g*R*soln%T)
-!
-!  end subroutine calc_variables
 
   !=========================== solve_exact_q1d ===============================80
   !>
@@ -102,96 +94,113 @@ contains
   !! Outputs:     soln:    exact_q1d_t type.
   !<
   !===========================================================================80
-  subroutine solve_exact_q1d(soln)
-
-    use set_inputs, only : imax, Aq, iSS, eps
-
-    !use isentropic_relations 
-    implicit none
-
+  subroutine solve_exact_q1d( soln, grid )
+    
     type(exact_q1d_t), intent(inout) :: soln
-    real(prec) :: x0
-    real(prec) :: x1
-    real(prec), dimension(2) :: xk
-    real(prec) :: e
+    type(grid_t), intent(in) :: grid
+    real(prec) :: M0
+    real(prec) :: M1
+    real(prec), dimension(2) :: Mk
+    real(prec) :: err
     integer :: i
-
-    xk = -9999.99_prec
-    e = -9999.99_prec
     
-    write(*,*) lbound(soln%M), ubound(soln%M)
-    write(*,*) lbound(soln%T), ubound(soln%T)
+!====================== Solution at cell centers =========================80
+    Mk = -9999.99_prec
+    err  = -9999.99_prec
     
-    x0 = eps
-    x1 = one
-    call newton_safe( Aq(1), f1, df1, x0, x1, soln%M(1), xk, e)
+    M0 = eps
+    M1 = one
+    call newton_safe( grid%Ac(1), fun, dfun, M0, M1, soln%Mc(1), Mk, err )
     
-    call isentropic_relations( soln%M, soln%V, soln%T )
-    write(*,*) lbound(soln%T), ubound(soln%T)
-    do i = 2,imax
-      if ( (iSS==1).and.(Aq(i) > Aq(i-1)) ) then
-        x0 = one - eps
-        x1 = 10.0_prec
+    call isentropic_relations( soln%Mc, soln%Vc, soln%Tc )
+    do i = 2,size(grid%Ac)
+      if ( (iSS==1).and.(grid%Ac(i) > grid%Ac(i-1)) ) then
+        M0 = one - eps
+        M1 = 10.0_prec
       else
-        x0 = eps
-        x1 = one+eps
+        M0 = eps
+        M1 = one+eps
       endif
-!      if (Aq(i)==Astar) then
-!        soln%M(i) = one
-!      else
-        call newton_safe( Aq(i), f1, df1, x0, x1, soln%M(i), xk, e)
-!      endif
+      if (grid%Ac(i)==Astar) then
+        soln%Mc(i) = one
+      else
+        call newton_safe( grid%Ac(i), fun, dfun, M0, M1, soln%Mc(i), Mk, err )
+      endif
 
-      !call isentropic_relations( soln%M(i), soln%V(i,:), soln%T(i) )
-      ! write(*,'(F20.14)') xk
-      ! write(*,*) '_____________________________________________________________________'
     end do
     
-!    call isentropic_relations( soln%M(i), soln%V(i,:), soln%T(i) )
+    call isentropic_relations( soln%Mc, soln%Vc, soln%Tc )
+    
+!====================== Solution at cell interfaces =========================80
+    Mk = -9999.99_prec
+    err  = -9999.99_prec
+    
+    M0 = eps
+    M1 = one
+    call newton_safe( grid%Ai(1), fun, dfun, M0, M1, soln%Mi(1), Mk, err )
+    
+    call isentropic_relations( soln%Mi, soln%Vi, soln%Ti )
+    do i = 2,size(grid%Ai)
+      if ( (iSS==1).and.(grid%Ai(i) > grid%Ai(i-1)) ) then
+        M0 = one - eps
+        M1 = 10.0_prec
+      else
+        M0 = eps
+        M1 = one+eps
+      endif
+      if (grid%Ai(i)==Astar) then
+        soln%Mi(i) = one
+      else
+        call newton_safe( grid%Ai(i), fun, dfun, M0, M1, soln%Mi(i), Mk, err )
+      endif
+
+    end do
+    
+    call isentropic_relations( soln%Mi, soln%Vi, soln%Ti )
     
   end subroutine solve_exact_q1d
 
-  !=================================== f1 ====================================80
+  !================================== fun ====================================80
   !>
   !! Description: Fixed-point form of Area-Mach number relation as a function
   !!              of Mach number and area.
   !!
   !! Inputs:      M:    Mach number.
-  !!              A1:   Local area.
+  !!              A:   Local area.
   !!
-  !! Outputs:     f:    f(M).
+  !! Outputs:     fun:    f(M,A).
   !<
   !===========================================================================80
-  function f1 (M,A1) 
-    use set_inputs, only : Astar
-    implicit none
-    real(prec) :: f1
+  function fun (M,A) 
+    
+    real(prec) :: fun
     real(prec), intent (in) :: M
-    real(prec), intent (in) :: A1
-    f1 = ((two/(gamma+1))*(one+half*(gamma-1)*M**2))**((gamma+1)/(gamma-1)) - ((A1/Astar)**2)*M**2
+    real(prec), intent (in) :: A
+    fun = ((two/(gamma+1))*(one+half*(gamma-1)*M**2))**((gamma+1)/(gamma-1)) - ((A/Astar)**2)*M**2
     return
-  end function f1
+    
+  end function fun
 
-  !================================== df1 ====================================80
+  !================================= dfun ====================================80
   !>
   !! Description: Derivative of fixed-point form of Area-Mach number relation
   !!              as a function of Mach number and area.
   !!
   !! Inputs:      M:    Mach number.
-  !!              A1:   Local area.
+  !!              A:   Local area.
   !!
-  !! Outputs:     df1:    df(M)/dM.
+  !! Outputs:     dfun:    df(M,A)/dM.
   !<
   !===========================================================================80
-  function df1 (M,A1)
-    use set_inputs, only : Astar
-    implicit none
-    real(prec) :: df1
+  function dfun (M,A)
+    
+    real(prec) :: dfun
     real(prec), intent (in) :: M
-    real(prec), intent (in) :: A1
-    df1 = two*M*( ((two/(gamma+1))*(one+half*(gamma-1)*M**2))**(two/(gamma-1)) - (A1/Astar)**2 )
+    real(prec), intent (in) :: A
+    dfun = two*M*( ((two/(gamma+1))*(one+half*(gamma-1)*M**2))**(two/(gamma-1)) - (A/Astar)**2 )
     return
-  end function df1
+    
+  end function dfun
 
 
   !============================== newton_safe3 ===============================80
@@ -200,68 +209,65 @@ contains
   !!              parameter 'A1' and reduced memory overhead because I'm dumb
   !!              and hard-coded array sizes in a previous version of the code.
   !!
-  !! Inputs:      A1:   Area.
-  !!              f:    two variable function f(x,A1).
-  !!              df:   Derivative of f(x) w.r.t. x.
-  !!              a:    Beginning of bracketing interval.
-  !!              b:    End of bracketing interval.
+  !! Inputs:      A      :  Area.
+  !!              fun    :  two variable function f(x,A1).
+  !!              dfun   :  Derivative of f(x) w.r.t. x.
+  !!              bnd_a1 :  Beginning of bracketing interval.
+  !!              bnd_b1 :  End of bracketing interval.
   !!
-  !! Outputs:     x:    Zero of f(x).
-  !!              xk:   Array of last two iterates.
-  !!              e:    approximate relative iterative error.
+  !! Outputs:     M      :  zero of f(x).
+  !!              Mk     :  Array of last two iterates.
+  !!              err    :  approximate relative iterative error.
   !<
   !===========================================================================80
-  subroutine newton_safe( A1, f1, df1, a, b, x, xk, e)
+  subroutine newton_safe( A, fun, dfun, bnd_a1, bnd_b1, M, Mk, err )
 
-    use set_precision, only : prec
-    use set_constants, only : half, one, zero
-    use set_inputs
+    real(prec), external :: fun, dfun
+    
+    real(prec), intent(in)  :: bnd_a1, bnd_b1, A
+    real(prec), intent(out) :: M
+    real(prec), intent(out) :: err
+    
+    real(prec), dimension(2), intent(out) :: Mk
+    
+    real(prec) :: M_new
+    real(prec) :: bnd_a, bnd_b
+    integer    :: k = 1
 
-    implicit none
+    Mk = zero
 
-    integer :: k = 1
-    real(prec), external :: f1, df1
-    real(prec), intent(in) :: a, b, A1
-    real(prec)             :: a2, b2
-    real(prec), intent(out) :: x
-    real(prec) :: x_new
-    real(prec), intent(out), dimension(2) :: xk
-    real(prec), intent(out) :: e
+    bnd_a = bnd_a1
+    bnd_b = bnd_b1
+    Mk(1)  = bnd_a
+    Mk(2)  = Mk(1) - fun(Mk(1),A)/dfun(Mk(1),A)
 
-    xk = zero
-
-    a2 = a
-    b2 = b
-    xk(1) = a2
-    xk(2) = xk(1) - f1(xk(1),A1)/df1(xk(1),A1)
-
-    if ( (xk(2) < a2).or.(xk(2) > b2) ) then
-      xk(2) = a2 + half*(b2-a2)
-      if ( int(sign(one,f1(a2,A1))) == int(sign(one,f1(xk(2),A1))) ) then
-        a2 = xk(2)
+    if ( (Mk(2) < bnd_a).or.(Mk(2) > bnd_b) ) then
+      Mk(2) = bnd_a + half*(bnd_b-bnd_a)
+      if ( int(sign(one,fun(bnd_a,A))) == int(sign(one,fun(Mk(2),A))) ) then
+        bnd_a = Mk(2)
       else
-        b2 = xk(2)
+        bnd_b = Mk(2)
       endif
     endif
 
-    e = abs(xk(2)-xk(1))/abs(xk(2))
+    err = abs(Mk(2)-Mk(1))/abs(Mk(2))
     do k = 2, max_newton_iter
-      if (e < newton_tol) exit
-      x_new = xk(2) - f1(xk(2),A1)/df1(xk(2),A1)
-      if ( (x_new < a2).or.(x_new > b2) ) then
-        x_new = a2 + half*(b2-a2)
-        if ( int(sign(one,f1(a2,A1))) == int(sign(one,f1(x_new,A1))) ) then
-          a2 = x_new
+      if (err < newton_tol) exit
+      M_new = Mk(2) - fun(Mk(2),A)/dfun(Mk(2),A)
+      if ( (M_new < bnd_a).or.(M_new > bnd_b) ) then
+        M_new = bnd_a + half*(bnd_b-bnd_a)
+        if ( int(sign(one,fun(bnd_a,A))) == int(sign(one,fun(M_new,A))) ) then
+          bnd_a = M_new
         else
-          b2 = x_new
+          bnd_b = M_new
         endif
       endif
-      xk(1) = xk(2)
-      xk(2) = x_new
-      e = abs(xk(2)-xk(1))/abs(xk(2))
+      Mk(1) = Mk(2)
+      Mk(2) = M_new
+      err = abs(Mk(2)-Mk(1))/abs(Mk(2))
     end do
 
-    x = xk(2)
+    M = Mk(2)
 
   end subroutine newton_safe
 
