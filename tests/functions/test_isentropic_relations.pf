@@ -19,8 +19,6 @@ module test_isentropic_relations
       real(prec), dimension(1)   :: T
       real(prec), dimension(1)   :: T_expected
 
-      
-      real(prec) :: eps
       continue
       call set_fluid_constants
       M = 1.0_prec
