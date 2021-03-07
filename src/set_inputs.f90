@@ -10,7 +10,7 @@ module set_inputs
 
   public :: set_derived_inputs, xmin, xmax, CFL, dx
   public :: imax, iSS, max_newton_iter, newton_tol, eps
-  public :: p0, T0, Astar, a0, rho0, Aq, xq, neq, area
+  public :: p0, T0, Astar, a0, rho0, xq, neq, area
 
   integer :: max_newton_iter = 1000
   integer :: imax = 10
