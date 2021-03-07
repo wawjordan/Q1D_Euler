@@ -1,7 +1,7 @@
 program main_program
   
-  use set_precision, only : prec
-  use set_constants, only : zero, set_derived_constants
+ ! use set_precision, only : prec
+  use set_constants, only : set_derived_constants
   use fluid_constants, only : set_fluid_constants
   use set_inputs
   use soln_type
