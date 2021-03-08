@@ -1,20 +1,23 @@
 module set_inputs
 
   use set_precision,   only : prec
-  use set_constants,   only : zero, one, two, half, pi
+  use set_constants,   only : zero, one, pi
   use fluid_constants, only : R_gas, gamma
 
   implicit none
 
   private
 
-  public :: set_derived_inputs, xmin, xmax, CFL, dx
-  public :: imax, iSS, max_newton_iter, newton_tol, eps
-  public :: p0, T0, Astar, a0, rho0, xq, neq, area
+  public :: imax, neq, xmin, xmax, dx, area, darea, Astar
+  public :: iSS, CFL, max_newton_iter, newton_tol, eps
+  public :: p0, T0, a0, rho0
+  public :: set_derived_inputs
+  
+  integer :: imax = 10
+  integer :: neq  = 3
+  integer :: iSS  = 1
 
   integer :: max_newton_iter = 1000
-  integer :: imax = 10
-  integer :: iSS = 1
 
   real(prec) :: newton_tol = 1.0e-15_prec
   real(prec) :: eps        = 1.0e-3_prec
@@ -27,9 +30,6 @@ module set_inputs
   real(prec) :: xmax       = one
   real(prec) :: dx         = zero
   real(prec) :: CFL        = one
-  integer :: neq        = 3
-  real(prec), dimension(:), allocatable :: xq
-  real(prec), dimension(:), allocatable :: Aq
 
   contains
 
@@ -38,20 +38,38 @@ module set_inputs
   !>
   !! Description: Calculates area distribution for nozzle.
   !!
-  !! Inputs:      xq:   Position coordinate along x-axis.
+  !! Inputs:      x:   Position coordinate along x-axis.
   !!
   !! Outputs:     area: Area at specified coordinate.
   !<
   !===========================================================================80
-  function area(xq)
+  function area(x)
 
     real(prec) :: area
-    real(prec), intent(in) :: xq
+    real(prec), intent(in) :: x
 
-    area = 0.2_prec + 0.4_prec*( one + sin(pi*(xq-0.5_prec)))
+    area = 0.2_prec + 0.4_prec*( one + sin(pi*(x-0.5_prec)))
 
   end function area
+  
 
+  !=================================== darea =================================80
+  !>
+  !! Description: Calculates area derivative distribution for nozzle.
+  !!
+  !! Inputs:      x:   Position coordinate along x-axis.
+  !!
+  !! Outputs:     darea: analytic dA/dx evaluated at specified coordinate.
+  !<
+  !===========================================================================80
+  function darea(x)
+
+    real(prec) :: darea
+    real(prec), intent(in) :: x
+
+    darea = 0.4_prec*pi*cos(pi*(x-0.5_prec))
+
+  end function darea
 
   !=========================== set_derived_inputs ============================80
   !>
@@ -61,21 +79,6 @@ module set_inputs
   !===========================================================================80
   subroutine set_derived_inputs
 
-    implicit none
-
-!    integer :: i, i1, i2
-    ! real(prec), external :: area
-!    i  = 1
-!    i1 = 1
-!    i2 = imax
-!    allocate(xq(i1:imax), Aq(i1:imax))
-
-!    do i = i1,imax
-!      xq(i) = xmin + float(i-1)*(xmax-xmin)/float(imax-1)
-!    end do
-!    do i = i1,imax
-!      Aq(i) = area(xq(i))
-!    end do
     a0   = sqrt(gamma*R_gas*T0)
     rho0 = 1000.0_prec*p0/(R_gas*T0)
     dx   = (xmax-xmin)/float(imax-1)
