@@ -25,15 +25,13 @@ contains
   subroutine allocate_grid( grid )
     
     use set_constants, only : zero, one, half
-    use set_inputs   , only : imax, xmin, xmax, dx
-    
-    implicit none
+    use set_inputs   , only : imax, xmin, xmax, n_ghost_cells
     
     type( grid_t ), intent( inout ) :: grid
     integer :: i, i_low, i_high
     
-    i_low  = 1
-    i_high = imax
+    i_low  = 1-n_ghost_cells
+    i_high = imax-n_ghost_cells
     
     grid%dx = (xmax - xmin)/real(imax,prec)
 
