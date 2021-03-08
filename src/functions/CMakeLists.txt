@@ -9,4 +9,5 @@
 add_lib_sources(
      variable_conversion.f90
      calc_time_step.f90
+     fluxes.f90
 )
