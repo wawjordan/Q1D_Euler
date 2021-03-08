@@ -8,7 +8,8 @@ module set_inputs
 
   private
 
-  public :: imax, neq, xmin, xmax, dx, area, darea, Astar
+  public :: imax, neq, xmin, xmax, n_ghost_cells
+  public :: Astar, area, darea
   public :: iSS, CFL, max_newton_iter, newton_tol, eps
   public :: p0, T0, a0, rho0
   public :: set_derived_inputs
@@ -16,7 +17,7 @@ module set_inputs
   integer :: imax = 10
   integer :: neq  = 3
   integer :: iSS  = 1
-
+  integer :: n_ghost_cells   = 2
   integer :: max_newton_iter = 1000
 
   real(prec) :: newton_tol = 1.0e-15_prec
@@ -28,11 +29,9 @@ module set_inputs
   real(prec) :: rho0       = zero
   real(prec) :: xmin       = -one
   real(prec) :: xmax       = one
-  real(prec) :: dx         = zero
   real(prec) :: CFL        = one
 
   contains
-
 
   !=================================== area ==================================80
   !>
@@ -81,7 +80,6 @@ module set_inputs
 
     a0   = sqrt(gamma*R_gas*T0)
     rho0 = 1000.0_prec*p0/(R_gas*T0)
-    dx   = (xmax-xmin)/float(imax-1)
 
     write(*,'(A8,F20.14,A13)') 'R     = ', R_gas, ' [J/(kmol*K)]'
     write(*,'(A8,F20.14)')     'gamma = ', gamma
