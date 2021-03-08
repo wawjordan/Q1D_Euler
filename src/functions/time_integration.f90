@@ -16,8 +16,6 @@ subroutine calc_time_step( lambda, dt,  V )
   use fluid_constants,     only : gamma
   use set_inputs,          only : CFL, dx
 
-  implicit none
-
   real(prec), dimension(:),   intent(inout) :: lambda
   real(prec), dimension(:),   intent(inout) :: dt
   real(prec), dimension(:,:), intent(inout) :: V
