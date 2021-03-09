@@ -31,12 +31,12 @@ module geometry
     write(*,*) "i_low=",i_low
     write(*,*) "i_high=",i_high
     
-    grid%Ai(i_low:1) = area( grid%xi(1) )
-    do i = 2,imax
+    grid%Ai(i_low:0) = area( grid%xi(0) )
+    do i = 1,imax
       grid%Ai(i) = area( grid%xi(i) )
       write(*,*) "Ai(i)",grid%Ai(i)
     end do
-    grid%Ai(imax+1:i_high) = area( grid%xi(imax+1) )
+    grid%Ai(imax:i_high) = area( grid%xi(imax) )
     
     
     i_low  = lbound(grid%xc,1)
