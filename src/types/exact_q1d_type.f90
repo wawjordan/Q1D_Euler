@@ -47,15 +47,15 @@ contains
     type(grid_t), intent(in) :: grid
     integer :: i_low, i_high
 
-    i_low = 1-n_ghost_cells
-    i_high = imax+n_ghost_cells
+    i_low = 1
+    i_high = imax
     
     allocate( soln%Mc(i_low:i_high), &
               soln%Tc(i_low:i_high), &
               soln%Vc(i_low:i_high,neq) )
-    allocate( soln%Mi(i_low:i_high+1), &
-              soln%Ti(i_low:i_high+1), &
-              soln%Vi(i_low:i_high+1,neq) )
+    allocate( soln%Mi(i_low-1:i_high), &
+              soln%Ti(i_low-1:i_high), &
+              soln%Vi(i_low-1:i_high,neq) )
     
     soln%Mc = zero
     soln%Tc = zero
@@ -106,8 +106,8 @@ contains
     
 !====================== Solution at cell centers =========================80
     
-    i_low  = lbound(grid%xc,1)
-    i_high = ubound(grid%xc,1)
+    i_low  = 1
+    i_high = imax
     
     Mk = -9999.99_prec
     err  = -9999.99_prec
@@ -125,23 +125,20 @@ contains
         M0 = eps
         M1 = one+eps
       endif
-      if (grid%Ac(i)==Astar) then
-        soln%Mc(i) = one
-      else
-        call newton_safe( grid%Ac(i), fun, dfun, M0, M1, soln%Mc(i), Mk, err )
-      endif
+      
+      call newton_safe( grid%Ac(i), fun, dfun, M0, M1, soln%Mc(i), Mk, err )
 
     end do
-    soln%Mc(i_low:1) = soln%Mc(1)
-    soln%Mc(imax:i_high) = soln%Mc(imax)
+    !soln%Mc(i_low:1) = soln%Mc(1)
+    !soln%Mc(imax:i_high) = soln%Mc(imax)
     
     !call isentropic_relations( soln%Mc, soln%Vc, soln%Tc )
     call isentropic_relations( soln%Mc, soln%Vc )
     
 !====================== Solution at cell interfaces =========================80
     
-    i_low  = lbound(grid%xi,1)
-    i_high = ubound(grid%xi,1)
+    i_low  = 0
+    i_high = imax
     
     Mk = -9999.99_prec
     err  = -9999.99_prec
@@ -150,8 +147,7 @@ contains
     M1 = one
     call newton_safe( grid%Ai(i_low), fun, dfun, M0, M1, soln%Mi(i_low), Mk, err )
     
-    !call isentropic_relations( soln%Mi, soln%Vi, soln%Ti )
-    do i = 1,imax+1
+    do i = 0,imax
       if ( (iSS==1).and.(grid%Ai(i) > grid%Ai(i-1)) ) then
         M0 = one - eps
         M1 = 10.0_prec
@@ -159,15 +155,12 @@ contains
         M0 = eps
         M1 = one+eps
       endif
-      !if (grid%Ai(i)==Astar) then
-      !  soln%Mi(i) = one
-      !else
-        call newton_safe( grid%Ai(i), fun, dfun, M0, M1, soln%Mi(i), Mk, err )
-      !endif
-
+      
+      call newton_safe( grid%Ai(i), fun, dfun, M0, M1, soln%Mi(i), Mk, err )
+      
     end do
-    soln%Mi(i_low:1) = soln%Mi(1)
-    soln%Mi(imax+1:i_high) = soln%Mi(imax+1)
+    !soln%Mi(i_low:0) = soln%Mi(0)
+    !soln%Mi(imax:i_high) = soln%Mi(imax)
     !call isentropic_relations( soln%Mi, soln%Vi, soln%Ti )
     call isentropic_relations( soln%Mi, soln%Vi )
     
