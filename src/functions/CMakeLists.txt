@@ -10,4 +10,5 @@ add_lib_sources(
      variable_conversion.f90
      time_integration.f90
      fluxes.f90
+     other_subroutines.f90
 )
