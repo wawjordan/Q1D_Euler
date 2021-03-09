@@ -10,13 +10,13 @@ module soln_type
     real(prec), allocatable, dimension(:,:) :: V
     real(prec), allocatable, dimension(:,:) :: U
     real(prec), allocatable, dimension(:,:) :: F
-    real(prec), allocatable, dimension(:,:) :: D
-    real(prec), allocatable, dimension(:) :: M
-    real(prec), allocatable, dimension(:) :: T
+    real(prec), allocatable, dimension(:,:) :: d
+    real(prec), allocatable, dimension(:)   :: M
+    real(prec), allocatable, dimension(:)   :: T
     real(prec), allocatable, dimension(:,:) :: R
-    real(prec), allocatable, dimension(:) :: dt
-    real(prec), allocatable, dimension(:,:) :: eps
-    real(prec), allocatable, dimension(:) :: lambda
+    real(prec), allocatable, dimension(:)   :: dt
+    !real(prec), allocatable, dimension(:,:) :: eps
+    real(prec), allocatable, dimension(:)   :: lambda
 
   end type soln_t
 
@@ -30,21 +30,35 @@ contains
     implicit none
     
     type(soln_t), intent(inout) :: soln
-    integer :: i_low, i_high
+    integer :: i_low1, i_high1
+    integer :: i_low2, i_high2
     
-    i_low  = 1 - n_ghost_cells
-    i_high = imax + n_ghost_cells
-    
-    allocate(soln%U(i_low:i_high,neq),      &
-             soln%V(i_low:i_high,neq),      &
-             soln%F(i_low:i_high,neq),      &
-             soln%D(i_low:i_high,neq),      &
-             soln%M(i_low:i_high),      &
-             soln%T(i_low:i_high),      &
-             soln%R(i_low:i_high,neq),      &
-             soln%dt(i_low:i_high),     &
-             soln%eps(i_low:i_high,neq),    &
-             soln%lambda(i_low:i_high)  )
+    i_low1  = 1 - n_ghost_cells
+    i_high1 = imax + n_ghost_cells
+    i_low2  = 1
+    i_high2 = imax
+
+    allocate(soln%U(     i_low1 : i_high1,neq),      &
+             soln%V(     i_low1 : i_high1,neq),      &
+             soln%M(     i_low1 : i_high1),      &
+             soln%T(     i_low1 : i_high1),      &
+             soln%dt(    i_low1 : i_high1),     &
+             soln%lambda(i_low1 : i_high1),     &
+             soln%R(     i_low2 : i_high2,neq),      &
+             soln%F(     i_low2-1 : i_high2,neq),      &
+             soln%D(     i_low2-1 : i_high2,neq),      )
+
+
+!    allocate(soln%U(i_low:i_high,neq),      &
+!             soln%V(i_low:i_high,neq),      &
+!             soln%F(i_low:i_high,neq),      &
+!             soln%D(i_low:i_high,neq),      &
+!             soln%M(i_low:i_high),      &
+!             soln%T(i_low:i_high),      &
+!             soln%R(i_low:i_high,neq),      &
+!             soln%dt(i_low:i_high),     &
+!             soln%eps(i_low:i_high,neq),    &
+!             soln%lambda(i_low:i_high)  )
 
     soln%U   = zero
     soln%V   = zero
@@ -54,7 +68,6 @@ contains
     soln%T   = zero
     soln%R   = zero
     soln%dt  = zero
-    soln%eps = zero
     soln%lambda = zero
 
   end subroutine allocate_soln
@@ -73,7 +86,6 @@ contains
                soln%T,      &
                soln%R,      &
                soln%dt,     &
-               soln%eps,    &
                soln%lambda  )
     
   end subroutine deallocate_soln
