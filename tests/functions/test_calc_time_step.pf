@@ -1,9 +1,8 @@
 module test_calc_time_step
   
-  use set_precision,   only : prec
-  use fluid_constants, only : gamma
-  use set_inputs,      only : dx
-  use time_integration, only calc_time_step
+  use set_precision,    only : prec
+  use fluid_constants,  only : gamma
+  use time_integration, only :calc_time_step
   use pfunit_mod
   
   implicit none
@@ -18,7 +17,7 @@ module test_calc_time_step
       real(prec), dimension(2) :: dt_expected
       real(prec), dimension(2)   :: lambda_expected
       real(prec), dimension(2,3) :: V
-      
+      real(prec) :: dx
       real(prec), dimension(2) :: dt
       real(prec), dimension(2) :: lambda
       
@@ -37,7 +36,7 @@ module test_calc_time_step
       dt_expected(1)     = 9.7954516564039e-05_prec
       dt_expected(2)     = 0.00019590903312808_prec
       
-      call calc_time_step(lambda,dt,V)
+      call calc_time_step(dx,V,lambda,dt)
       
       write(*,*)
       write(*,*) 'lambda(1)     = ', lambda(1)
