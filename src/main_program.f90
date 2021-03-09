@@ -42,7 +42,10 @@ program main_program
   !call sup_out_bndry( soln%U, soln%V )
     
   call central_flux(soln%U, soln%F)
-  !call jst_damping(soln%lambda,soln%U,soln%V,soln%d)
+  call cons2prim(soln%U,soln%V)
+  call prim2cons(soln%U,soln%V)
+  write(*,*) 'soln%U:  ','low = ',lbound(soln%U,1),'  high= ',ubound(soln%U,1)
+  call jst_damping(soln%lambda,soln%U,soln%V,soln%d)
    
   write(*,*) 'Exact solution at cell interfaces:'
   write(header_str,*) '|    x   |    A    |         M         |'// &
