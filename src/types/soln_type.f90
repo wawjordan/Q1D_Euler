@@ -25,15 +25,15 @@ contains
   subroutine allocate_soln( soln )
 
     use set_constants, only : zero
-    use set_inputs,    only : imax, neq
+    use set_inputs,    only : imax, neq, n_ghost_cells
     
     implicit none
     
     type(soln_t), intent(inout) :: soln
     integer :: i_low, i_high
     
-    i_low  = 1
-    i_high = imax
+    i_low  = 1 - n_ghost_cells
+    i_high = imax + n_ghost_cells
     
     allocate(soln%U(i_low:i_high,neq),      &
              soln%V(i_low:i_high,neq),      &
