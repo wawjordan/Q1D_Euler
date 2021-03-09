@@ -116,7 +116,7 @@ contains
     M1 = one
     call newton_safe( grid%Ac(i_low), fun, dfun, M0, M1, soln%Mc(i_low), Mk, err )
     
-    call isentropic_relations( soln%Mc, soln%Vc, soln%Tc )
+    !call isentropic_relations( soln%Mc, soln%Vc, soln%Tc )
     do i = 1,imax
       if ( (iSS==1).and.(grid%Ac(i) > grid%Ac(i-1)) ) then
         M0 = one - eps
@@ -135,7 +135,8 @@ contains
     soln%Mc(i_low:1) = soln%Mc(1)
     soln%Mc(imax:i_high) = soln%Mc(imax)
     
-    call isentropic_relations( soln%Mc, soln%Vc, soln%Tc )
+    !call isentropic_relations( soln%Mc, soln%Vc, soln%Tc )
+    call isentropic_relations( soln%Mc, soln%Vc )
     
 !====================== Solution at cell interfaces =========================80
     
@@ -149,7 +150,7 @@ contains
     M1 = one
     call newton_safe( grid%Ai(i_low), fun, dfun, M0, M1, soln%Mi(i_low), Mk, err )
     
-    call isentropic_relations( soln%Mi, soln%Vi, soln%Ti )
+    !call isentropic_relations( soln%Mi, soln%Vi, soln%Ti )
     do i = 1,imax+1
       if ( (iSS==1).and.(grid%Ai(i) > grid%Ai(i-1)) ) then
         M0 = one - eps
@@ -167,7 +168,8 @@ contains
     end do
     soln%Mi(i_low:1) = soln%Mi(1)
     soln%Mi(imax+1:i_high) = soln%Mi(imax+1)
-    call isentropic_relations( soln%Mi, soln%Vi, soln%Ti )
+    !call isentropic_relations( soln%Mi, soln%Vi, soln%Ti )
+    call isentropic_relations( soln%Mi, soln%Vi )
     
   end subroutine solve_exact_q1d
 
