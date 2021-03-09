@@ -43,11 +43,12 @@ subroutine cons2prim(U,V)
 end subroutine cons2prim
 
 
-subroutine isentropic_relations(M,V,T)
+subroutine isentropic_relations(M,V)
 
   real(prec), dimension(:,:), intent(inout) :: V
   real(prec), dimension(:),   intent(in) :: M
-  real(prec), dimension(:),   intent(out) :: T
+  !real(prec), dimension(:),   intent(out) :: T
+  real(prec), dimension(size(V,1))  :: T
   
   T(:) = T0/(one + half*(gamma - one)*M(:)**2)
   V(:,3) = 1000.0_prec*p0/(one + half*(gamma - one)*M(:)**2)**(gamma/(gamma-1))
