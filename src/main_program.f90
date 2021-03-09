@@ -3,7 +3,7 @@ program main_program
  ! use set_precision, only : prec
   use set_constants, only : set_derived_constants
   use fluid_constants, only : set_fluid_constants
-  use set_inputs, only : set_derived_inputs
+  use set_inputs, only : imax, set_derived_inputs
   use variable_conversion
   use geometry, only : setup_geometry, teardown_geometry
   use init_problem, only : initialize
@@ -13,11 +13,11 @@ program main_program
   implicit none
   
   character(len=100) :: header_str
-  integer :: i
+  integer :: i, i_low, i_high
   type( grid_t )      :: grid
   type( soln_t )      :: soln
-  type( exact_q1d_t ) :: ex_soln
-  
+  type( exact_q1d_t ) :: ex_soln  
+
   call set_derived_constants
   call set_fluid_constants
   call set_derived_inputs
@@ -26,14 +26,17 @@ program main_program
   call initialize(grid,soln)
   call allocate_exact_q1d( ex_soln, grid )
   
-  call solve_exact_q1d(ex_soln, grid)
+  call solve_exact_q1d( ex_soln, grid)
   
+  i_low  = lbound(grid%xc,1)
+  i_high = ubound(grid%xc,1)
+   
   write(*,*) 'Exact solution at cell interfaces:'
   write(header_str,*) '|    x   |    A    |         M         |'// &
   &  '        rho        |         u        |         p        |'
   100 format(2(F9.4),4(F20.14))
   write(*,*) trim(adjustl(header_str))
-  do i = 1,size(grid%xi)
+  do i = i_low,i_high+1
     write(*,100) grid%xi(i), grid%Ai(i), ex_soln%Mi(i), &
                  ex_soln%Vi(i,1), ex_soln%Vi(i,2), ex_soln%Vi(i,3)/1000.0_prec
   end do
@@ -44,7 +47,7 @@ program main_program
   write(header_str,*) '|    x   |    A    |         M         |'// &
   &  '        rho        |         u        |         p        |'
   write(*,*) trim(adjustl(header_str))
-  do i = 1,size(grid%xc)
+  do i = i_low,i_high
     write(*,100) grid%xc(i), grid%Ac(i), ex_soln%Mc(i), &
                  ex_soln%Vc(i,1), ex_soln%Vc(i,2), ex_soln%Vc(i,3)/1000.0_prec
   end do
@@ -55,7 +58,7 @@ program main_program
   write(header_str,*) '|    x   |    A    |         M         |'// &
   &  '        rho        |         u        |         p        |'
   write(*,*) trim(adjustl(header_str))
-  do i = 1,size(grid%xc)
+  do i = i_low,i_high
     write(*,100) grid%xc(i), grid%Ac(i), soln%M(i), soln%V(i,1), soln%V(i,2), soln%V(i,3)/1000.0_prec
   end do
   
