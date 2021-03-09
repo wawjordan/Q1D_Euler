@@ -11,13 +11,14 @@ module time_integration
   
 contains
 
-subroutine calc_time_step( grid, V, lambda, dt )
+subroutine calc_time_step( dx, V, lambda, dt )
 
   use fluid_constants,     only : gamma
   use set_inputs,          only : CFL
 
   real(prec), dimension(:,:), intent(in)  :: V
-  type(grid_t),               intent(in)  :: grid
+  !type(grid_t),               intent(in)  :: grid
+  real(prec), intent(in) :: dx
   real(prec), dimension(:),   intent(out) :: lambda
   real(prec), dimension(:),   intent(out) :: dt
   
@@ -26,8 +27,8 @@ subroutine calc_time_step( grid, V, lambda, dt )
   call speed_of_sound(V(:,3),V(:,1),sound_speed)
 
   lambda(:) = abs(V(:,2)) + sound_speed
-  dt(:)     = CFL*grid%dx/lambda(:)
-
+  !dt(:)     = CFL*grid%dx/lambda(:)
+  dt(:) = CFL*dx/lambda(:)
 end subroutine calc_time_step
 
  
