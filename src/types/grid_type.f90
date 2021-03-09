@@ -30,8 +30,8 @@ contains
     type( grid_t ), intent( inout ) :: grid
     integer :: i, i_low, i_high
     
-    i_low  = 1-n_ghost_cells
-    i_high = imax-n_ghost_cells
+    i_low  = 1 - n_ghost_cells
+    i_high = imax + n_ghost_cells
     
     grid%dx = (xmax - xmin)/real(imax,prec)
 
@@ -41,8 +41,8 @@ contains
               grid%Ac(i_low:i_high)  , &
               grid%dAc(i_low:i_high)   )
     
-    grid%xi = [ (xmin + real(i-1,prec)/real(imax,prec)*(xmax-xmin),i=1,imax+1) ]
-    grid%xc = [ (half*(grid%xi(i) + grid%xi(i+1)),i=1,imax) ]
+    grid%xi = [ (xmin + real(i-1,prec)/real(imax,prec)*(xmax-xmin),i=i_low,i_high+1) ]
+    grid%xc = [ (half*(grid%xi(i) + grid%xi(i+1)),i=i_low,i_high) ]
     grid%Ai = one
     grid%Ac = one
     grid%dAc =  zero
