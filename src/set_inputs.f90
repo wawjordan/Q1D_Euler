@@ -9,13 +9,18 @@ module set_inputs
   private
 
   public :: imax, neq, xmin, xmax, n_ghost_cells
+  public :: i_high, i_low, ig_high, ig_low
   public :: Astar, area, darea
   public :: CFL, k2, k4, eps
   public :: iSS, max_newton_iter, newton_tol
   public :: p0, T0, a0, rho0, pb
   public :: set_derived_inputs
   
-  integer :: imax = 10
+  integer :: imax    = 10
+  integer :: i_low   = 10
+  integer :: i_high  = 10
+  integer :: ig_low  = 10
+  integer :: ig_high = 10
   integer :: neq  = 3
   integer :: iSS  = 1
   integer :: n_ghost_cells   = 2
@@ -84,6 +89,10 @@ module set_inputs
 
     a0   = sqrt(gamma*R_gas*T0)
     rho0 = 1000.0_prec*p0/(R_gas*T0)
+    i_low = 1
+    i_high = imax
+    ig_low  = 1 - n_ghost_cells
+    ig_high = imax + n_ghost_cells
 
     write(*,'(A8,F20.14,A13)') 'R     = ', R_gas, ' [J/(kmol*K)]'
     write(*,'(A8,F20.14)')     'gamma = ', gamma
