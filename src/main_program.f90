@@ -8,6 +8,7 @@ program main_program
   use time_integration
   use basic_boundaries
   use fluxes
+  use other_subroutines
   use geometry, only : setup_geometry, teardown_geometry
   use init_problem, only : initialize
   use grid_type
