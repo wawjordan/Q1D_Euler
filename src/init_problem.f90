@@ -31,8 +31,8 @@ module init_problem
         soln%M(i) = eps
       end if
     end do
-    call isentropic_relations(soln%M,soln%V,soln%T)
-    
+    call isentropic_relations(soln%M,soln%V)
+    call prim2cons(soln%U,soln%V)
   end subroutine initialize
 
 end module init_problem
