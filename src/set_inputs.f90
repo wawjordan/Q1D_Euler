@@ -11,7 +11,7 @@ module set_inputs
   public :: imax, neq, xmin, xmax, n_ghost_cells
   public :: Astar, area, darea
   public :: iSS, CFL, max_newton_iter, newton_tol, eps
-  public :: p0, T0, a0, rho0
+  public :: p0, T0, a0, rho0, pb
   public :: set_derived_inputs
   
   integer :: imax = 10
@@ -30,6 +30,8 @@ module set_inputs
   real(prec) :: xmin       = -one
   real(prec) :: xmax       = one
   real(prec) :: CFL        = one
+  real(prec) :: pb         = 1000_prec
+
 
   contains
 
