@@ -5,6 +5,9 @@ program main_program
   use fluid_constants, only : set_fluid_constants
   use set_inputs, only : imax, set_derived_inputs
   use variable_conversion
+  use time_integration
+  use basic_boundaries
+  use fluxes
   use geometry, only : setup_geometry, teardown_geometry
   use init_problem, only : initialize
   use grid_type
@@ -23,36 +26,44 @@ program main_program
   call set_derived_inputs
   call setup_geometry(grid,soln)
   
+  i_low  = lbound(grid%xc,1)
+  i_high = ubound(grid%xc,1)
+
   call initialize(grid,soln)
   call allocate_exact_q1d( ex_soln, grid )
   
   call solve_exact_q1d( ex_soln, grid)
   
-  i_low  = lbound(grid%xc,1)
-  i_high = ubound(grid%xc,1)
+  call calc_time_step(grid%dx,soln%V,soln%lambda,soln%dt)
+  
+  call sub_in_bndry( soln%M, soln%U, soln%V )
+  call sup_out_bndry( soln%U, soln%V )
+    
+  call central_flux(soln%U,soln%F)
+  
    
-  write(*,*) 'Exact solution at cell interfaces:'
-  write(header_str,*) '|    x   |    A    |         M         |'// &
-  &  '        rho        |         u        |         p        |'
+!  write(*,*) 'Exact solution at cell interfaces:'
+!  write(header_str,*) '|    x   |    A    |         M         |'// &
+!  &  '        rho        |         u        |         p        |'
   100 format(2(F9.4),4(F20.14))
-  write(*,*) trim(adjustl(header_str))
-  do i = i_low,i_high+1
-    write(*,100) grid%xi(i), grid%Ai(i), ex_soln%Mi(i), &
-                 ex_soln%Vi(i,1), ex_soln%Vi(i,2), ex_soln%Vi(i,3)/1000.0_prec
-  end do
-  
-  write(*,*)
-  
-  write(*,*) 'Exact solution at cell centers:'
-  write(header_str,*) '|    x   |    A    |         M         |'// &
-  &  '        rho        |         u        |         p        |'
-  write(*,*) trim(adjustl(header_str))
-  do i = i_low,i_high
-    write(*,100) grid%xc(i), grid%Ac(i), ex_soln%Mc(i), &
-                 ex_soln%Vc(i,1), ex_soln%Vc(i,2), ex_soln%Vc(i,3)/1000.0_prec
-  end do
-  
-  write(*,*)
+!  write(*,*) trim(adjustl(header_str))
+!  do i = i_low,i_high+1
+!    write(*,100) grid%xi(i), grid%Ai(i), ex_soln%Mi(i), &
+!                 ex_soln%Vi(i,1), ex_soln%Vi(i,2), ex_soln%Vi(i,3)/1000.0_prec
+!  end do
+!  
+!  write(*,*)
+!  
+!  write(*,*) 'Exact solution at cell centers:'
+!  write(header_str,*) '|    x   |    A    |         M         |'// &
+!  &  '        rho        |         u        |         p        |'
+!  write(*,*) trim(adjustl(header_str))
+!  do i = i_low,i_high
+!    write(*,100) grid%xc(i), grid%Ac(i), ex_soln%Mc(i), &
+!                 ex_soln%Vc(i,1), ex_soln%Vc(i,2), ex_soln%Vc(i,3)/1000.0_prec
+!  end do
+!  
+!  write(*,*)
   
   write(*,*) 'Initial solution values at cell centers:'
   write(header_str,*) '|    x   |    A    |         M         |'// &
@@ -60,6 +71,21 @@ program main_program
   write(*,*) trim(adjustl(header_str))
   do i = i_low,i_high
     write(*,100) grid%xc(i), grid%Ac(i), soln%M(i), soln%V(i,1), soln%V(i,2), soln%V(i,3)/1000.0_prec
+  end do
+  
+!  write(*,*)
+  
+!  write(*,*) 'Conserved values at cell centers:'
+!  write(header_str,*) '|    x   |    A    |         M         |'// &
+!  &  '        U(1)        |        U(2)       |        U(3)       |'
+!  write(*,*) trim(adjustl(header_str))
+!  do i = i_low,i_high
+!    write(*,100) grid%xc(i), grid%Ac(i), soln%M(i), soln%U(i,1), soln%U(i,2), soln%U(i,3)
+!  end do
+
+  write(*,*)
+  do i = i_low,i_high
+    write(*,*) 'x  ', grid%xc(i), 'dt  ', soln%dt(i)
   end do
   
   call deallocate_exact_q1d( ex_soln )
