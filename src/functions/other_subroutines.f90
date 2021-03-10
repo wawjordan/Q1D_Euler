@@ -18,7 +18,7 @@ subroutine calculate_sources(V,dA,S)
   real(prec), dimension(:), intent(in) :: dA
   real(prec), dimension(lbound(V,1):ubound(V,1)), intent(out) :: S
   
-  S(:) = V(:,3)*dA(:)
+  S(:) = zero !V(:,3)*dA(:)
   
 end subroutine calculate_sources
 
