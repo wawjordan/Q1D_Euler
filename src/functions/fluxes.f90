@@ -7,20 +7,34 @@ module fluxes
   
   implicit none
   
-contains
-  
-subroutine central_flux(U,F)
-  
-  real(prec), dimension(ig_low:ig_high,neq), intent(inout)  :: U 
-  real(prec), dimension(i_low-1:i_high,neq), intent(inout)  :: F
-  real(prec), dimension(i_low-1:i_high,neq)  :: Ui
+  contains
 
-  Ui(i_low-1:i_high,:) = half*(U(i_low:i_high+1,:) + U(i_low-1:i_high,:))
+  !================================= central_flux ============================80
+  !>
+  !! Description: 
+  !!
+  !! Inputs:      U : 
+  !!              F : 
+  !!
+  !! Outputs:     U :
+  !!              F :
+  !<
+  !===========================================================================80
+  subroutine central_flux(U,F)
+    
+    real(prec), dimension(ig_low:ig_high,neq), intent(inout)  :: U 
+    real(prec), dimension(i_low-1:i_high,neq), intent(inout)  :: F
+    real(prec), dimension(i_low-1:i_high,neq)  :: Ui
+    
+    Ui(i_low-1:i_high,:) = half*(U(i_low:i_high+1,:) + U(i_low-1:i_high,:))
+    
+    F(:,1) = Ui(:,2)
+    F(:,2) = half*(three-gamma)*( Ui(:,2)**2 )/Ui(:,1) &
+           + (gamma-one)*Ui(:,3)
+    F(:,3) = Ui(:,3)*Ui(:,2)/Ui(:,1) &
+           + Ui(:,2)/Ui(:,1)*( (gamma-one)*Ui(:,3) &
+           - half*(gamma-one)*Ui(:,2)**2/Ui(:,1) )
+    
+  end subroutine central_flux
   
-  F(:,1) = Ui(:,2)
-  F(:,2) = half*(three-gamma)*( Ui(:,2)**2 )/Ui(:,1) + (gamma-one)*Ui(:,3)
-  F(:,3) = Ui(:,3)*Ui(:,2)/Ui(:,1) + Ui(:,2)/Ui(:,1)*( (gamma-one)*Ui(:,3) - half*(gamma-one)*Ui(:,2)**2/Ui(:,1) )
-  
-end subroutine central_flux
-
 end module fluxes
