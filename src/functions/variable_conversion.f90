@@ -68,7 +68,6 @@ subroutine limit_primitives(U,V)
     if (V(i,3)<500.0_prec) then
       V(i,3) = 500.0_prec
     end if
-    write(*,*) 'mask: ',mask(i)
     if (mask(i)) then
       call prim2cons(U,V)
     end if
