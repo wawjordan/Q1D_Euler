@@ -2,6 +2,7 @@ module time_integration
   
   use set_precision, only : prec
   use set_constants, only : one, half
+  use set_inputs,    only : neq, i_low, i_high, ig_low, ig_high
   use grid_type
   use soln_type
   use variable_conversion
@@ -35,21 +36,20 @@ end subroutine calc_time_step
 subroutine explicit_euler(grid,S,dt,F,U,R)
   
   type(grid_t),               intent(in)    :: grid
-  real(prec), dimension(:,:), intent(inout) :: U
-  real(prec), dimension(:,:), intent(in)    :: F
-  real(prec), dimension(:)  , intent(in)    :: S,dt
-  real(prec), dimension(:,:), intent(out)   :: R
+  real(prec), dimension(ig_low:ig_high,neq), intent(inout) :: U
+  real(prec), dimension(i_low-1:i_high,neq), intent(in)    :: F
+  real(prec), dimension(ig_low:ig_high)  , intent(in)    :: S,dt
+  real(prec), dimension(i_low:i_high,neq), intent(out)   :: R
   integer :: i
   
-  i = size(F,1)
+  R(:,1) = F(i_low:i_high,1)*grid%Ai(i_low:i_high) - F(i_low-1:i_high-1,1)*grid%Ai(i_low-1:i_high-1)
+  R(:,2) = F(i_low:i_high,2)*grid%Ai(i_low:i_high) - F(i_low-1:i_high-1,2)*grid%Ai(i_low-1:i_high-1) &
+                                                   - S(i_low:i_high)*grid%xc(i_low:i_high)
+  R(:,3) = F(i_low:i_high,3)*grid%Ai(i_low:i_high) - F(i_low-1:i_high-1,3)*grid%Ai(i_low-1:i_high-1)
   
-  R(:,1) = F(2:i+1,1)*grid%Ai(2:i+1) - F(1:i,1)*grid%Ai(1:i)
-  R(:,2) = F(2:i+1,2)*grid%Ai(2:i+1) - F(1:i,2)*grid%Ai(1:i) - S*grid%xc
-  R(:,3) = F(2:i+1,3)*grid%Ai(2:i+1) - F(1:i,3)*grid%Ai(1:i)
-  
-  U(:,1) = U(:,1) + dt/(grid%Ac*grid%dx)*R(:,1)
-  U(:,2) = U(:,2) + dt/(grid%Ac*grid%dx)*R(:,2)
-  U(:,3) = U(:,3) + dt/(grid%Ac*grid%dx)*R(:,3)
+  U(i_low:i_high,1) = U(i_low:i_high,1) + dt(i_low:i_high)/(grid%Ac(i_low:i_high)*grid%dx)*R(:,1)
+  U(i_low:i_high,2) = U(i_low:i_high,2) + dt(i_low:i_high)/(grid%Ac(i_low:i_high)*grid%dx)*R(:,2)
+  U(i_low:i_high,3) = U(i_low:i_high,3) + dt(i_low:i_high)/(grid%Ac(i_low:i_high)*grid%dx)*R(:,3)
   
 end subroutine explicit_euler
 
