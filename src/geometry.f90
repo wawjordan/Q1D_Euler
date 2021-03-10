@@ -28,13 +28,10 @@ module geometry
     
     i_low  = lbound(grid%xi,1)
     i_high = ubound(grid%xi,1)
-    write(*,*) "i_low=",i_low
-    write(*,*) "i_high=",i_high
     
     grid%Ai(i_low:0) = area( grid%xi(0) )
     do i = 1,imax
       grid%Ai(i) = area( grid%xi(i) )
-      write(*,*) "Ai(i)",grid%Ai(i)
     end do
     grid%Ai(imax:i_high) = area( grid%xi(imax) )
     
