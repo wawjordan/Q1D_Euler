@@ -16,6 +16,17 @@ module init_problem
   
   contains
   
+  !================================ initialize  ==============================80
+  !>
+  !! Description: 
+  !!
+  !! Inputs:      grid : 
+  !!              soln : 
+  !!
+  !! Outputs:     grid :
+  !!              soln :
+  !<
+  !===========================================================================80
   subroutine initialize( grid, soln )
     
     implicit none
@@ -25,16 +36,19 @@ module init_problem
     type( grid_t ), intent(inout) :: grid
     
     soln%M(:) = 0.9_prec*grid%xc(:) + one
+    
     do i = ig_low,ig_high
       if ( soln%M(i) < eps ) then
         soln%M(i) = eps
       end if
     end do
+    
     call isentropic_relations(soln%M,soln%V)
     call prim2cons(soln%U,soln%V)
+    
     write(*,*) 'grid%xc:  ','low = ',lbound(grid%xc,1),'  high= ',ubound(grid%xc,1)
     write(*,*) 'grid%xi:  ','low = ',lbound(grid%xi,1),'  high= ',ubound(grid%xi,1)
-    write(*,*) 'soln%U:  ','low = ',lbound(soln%U,1),'  high= ',ubound(soln%U,1)
+    write(*,*) 'soln%U:   ','low = ',lbound(soln%U,1), '  high= ',ubound(soln%U,1)
 
   end subroutine initialize
 
