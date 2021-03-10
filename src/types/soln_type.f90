@@ -20,8 +20,18 @@ module soln_type
 
   end type soln_t
 
-contains
-
+  contains
+  
+  
+  !============================= allocate_soln ===============================80
+  !>
+  !! Description: 
+  !!
+  !! Inputs:      soln : 
+  !!
+  !! Outputs:     soln : 
+  !<
+  !===========================================================================80
   subroutine allocate_soln( soln )
 
     use set_constants, only : zero
@@ -73,6 +83,16 @@ contains
 
   end subroutine allocate_soln
   
+  
+  !=========================== deallocate_soln ===============================80
+  !>
+  !! Description: 
+  !!
+  !! Inputs:      soln : 
+  !!
+  !! Outputs:     soln : 
+  !<
+  !===========================================================================80
   subroutine deallocate_soln( soln )
   
     implicit none
