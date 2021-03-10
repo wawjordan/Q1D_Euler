@@ -20,8 +20,17 @@ module grid_type
     
   end type grid_t
 
-contains
+  contains
   
+  !============================= allocate_grid ===============================80
+  !>
+  !! Description: 
+  !!
+  !! Inputs:      grid :  
+  !!
+  !! Outputs:     grid : 
+  !<
+  !===========================================================================80
   subroutine allocate_grid( grid )
     
     use set_constants, only : zero, one, half
@@ -41,14 +50,25 @@ contains
               grid%Ac(ig_low:ig_high)  , &
               grid%dAc(ig_low:ig_high)   )
     
-    grid%xi = [ (xmin + real(i,prec)/real(imax,prec)*(xmax-xmin),i=ig_low-1,ig_high) ]
+    grid%xi = [ (xmin + real(i,prec)/real(imax,prec)*(xmax-xmin), &
+               i=ig_low-1,ig_high) ]
     grid%xc = [ (half*(grid%xi(i) + grid%xi(i+1)),i=ig_low-1,ig_high-1) ]
     grid%Ai = one
     grid%Ac = one
-    grid%dAc =  zero
+    grid%dAc = zero
     
   end subroutine allocate_grid
   
+  
+  !============================= deallocate_grid =============================80
+  !>
+  !! Description: 
+  !!
+  !! Inputs:      grid :
+  !!
+  !! Outputs:     grid : 
+  !<
+  !===========================================================================80
   subroutine deallocate_grid( grid )
     
     implicit none
