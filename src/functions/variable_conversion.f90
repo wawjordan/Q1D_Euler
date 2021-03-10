@@ -32,16 +32,49 @@ end subroutine prim2cons
 
 
 subroutine cons2prim(U,V)
-
-  real(prec), dimension(:,:), intent(in)    :: U
+  
+  real(prec), dimension(:,:), intent(inout) :: U
   real(prec), dimension(:,:), intent(inout) :: V
 
   V(:,1) = U(:,1)
   V(:,2) = U(:,2)/U(:,1)
   V(:,3) = (gamma - one)*U(:,3) - half*(gamma - one)*U(:,2)**2/U(:,1)
-
+  
+  call limit_primitives(U,V)
+  
 end subroutine cons2prim
 
+
+subroutine limit_primitives(U,V)
+  
+  real(prec), dimension(:,:), intent(inout) :: U
+  real(prec), dimension(:,:), intent(inout) :: V
+  integer :: i
+  logical, dimension(lbound(U,1):ubound(U,1)) :: mask
+  
+  mask = .false.
+  
+  where ( (V(:,1)<0.001_prec).or.(V(:,2)<10.0_prec).or.(V(:,3)<500.0_prec) )
+    mask = .true.
+  end where
+  
+  do i = lbound(U,1),ubound(U,1)
+    if (V(i,1)<0.001_prec) then
+      V(i,1) = 0.001_prec
+    end if
+    if (V(i,2)<10.0_prec) then
+      V(i,2) = 10.0_prec
+    end if
+    if (V(i,3)<500.0_prec) then
+      V(i,3) = 500.0_prec
+    end if
+    write(*,*) 'mask: ',mask(i)
+    if (mask(i)) then
+      call prim2cons(U,V)
+    end if
+  end do
+  
+end subroutine limit_primitives
 
 subroutine isentropic_relations(M,V)
 
