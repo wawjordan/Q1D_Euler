@@ -38,32 +38,40 @@ program main_program
   call sup_out_bndry( soln%U, soln%V )
   call cons2prim( soln%U, soln%V )
   
-  do j = 1,10
-  call calc_time_step(grid%dx,soln%V,soln%lambda,soln%dt)
+  do j = 1,100
+   
+    call calculate_sources(soln%V,grid%dAc,soln%S)
+    
+    call calc_time_step(grid%dx,soln%V,soln%lambda,soln%dt)
   
-  call cons2prim( soln%U, soln%V )
+    !call cons2prim( soln%U, soln%V )
   
-  call central_flux(soln%U, soln%F)
+    call central_flux(soln%U, soln%F)
   
-  call jst_damping(soln%lambda,soln%U,soln%V,soln%d)
+    !call jst_damping(soln%lambda,soln%U,soln%V,soln%d)
   
-  soln%F = soln%F + soln%d
+    soln%F = soln%F! + soln%d
+    
+    call explicit_euler(grid,soln%S,soln%dt,soln%F,soln%U,soln%R)
+    
+    call update_mach(soln%V,soln%M)
+    
+    call sub_in_bndry( soln%M, soln%U, soln%V )
+    
+    call sup_out_bndry( soln%U, soln%V )
+    
+    call cons2prim(soln%U,soln%V)
+ ! 100 format(2(F9.4),4(F20.14))
+ ! write(*,*) 'Initial solution values at cell centers:'
+ ! write(header_str,*) '|    x   |    A    |         M         |'// &
+ ! &  '        rho        |         u        |         p        |'
+ ! write(*,*) trim(adjustl(header_str))
+ ! do i = ig_low,ig_high
+ !   write(*,100) grid%xc(i), grid%Ac(i), soln%M(i), soln%V(i,1), soln%V(i,2), soln%V(i,3)/1000.0_prec
+  !end do
   
-  call calculate_sources(soln%V,grid%dAc,soln%S)
-  call explicit_euler(grid,soln%S,soln%dt,soln%F,soln%U,soln%R)
-  call update_mach(soln%V,soln%M)
-  call sub_in_bndry( soln%M, soln%U, soln%V )
-  call sup_out_bndry( soln%U, soln%V )
-  call cons2prim(soln%U,soln%V) 
-  100 format(2(F9.4),4(F20.14))
-  write(*,*) 'Initial solution values at cell centers:'
-  write(header_str,*) '|    x   |    A    |         M         |'// &
-  &  '        rho        |         u        |         p        |'
-  write(*,*) trim(adjustl(header_str))
-  do i = ig_low,ig_high
-    write(*,100) grid%xc(i), grid%Ac(i), soln%M(i), soln%V(i,1), soln%V(i,2), soln%V(i,3)/1000.0_prec
-  end do
-
+  call output_soln(grid,soln,j)
+  
   end do
   !call prim2cons(soln%U,soln%V)
   !write(*,*) 'soln%U:  ','low = ',lbound(soln%U,1),'  high= ',ubound(soln%U,1)
@@ -101,18 +109,18 @@ program main_program
 !    write(*,100) grid%xc(i), grid%Ac(i), soln%M(i), soln%U(i,1), soln%U(i,2), soln%U(i,3)
 !  end do
 
-!  write(*,*)
-!  do i = i_low,i_high
-!    write(*,*) 'Flux 1: ', soln%F(i,1), 'd 1 : ', soln%d(i,1)
-!  end do
-!  write(*,*)
-!  do i = i_low,i_high
-!    write(*,*) 'Flux 2: ', soln%F(i,2), 'd 2 : ', soln%d(i,2)
-!  end do
-!  write(*,*)
-!  do i = i_low,i_high
-!    write(*,*) 'Flux 3: ', soln%F(i,3), 'd 3 : ', soln%d(i,3)
-!  end do
+  !write(*,*)
+  !do i = i_low,i_high
+  !  write(*,*) 'Flux 1: ', soln%F(i,1), 'd 1 : ', soln%d(i,1)
+  !end do
+  !write(*,*)
+  !do i = i_low,i_high
+  !  write(*,*) 'Flux 2: ', soln%F(i,2), 'd 2 : ', soln%d(i,2)
+  !end do
+  !write(*,*)
+  !do i = i_low,i_high
+  !  write(*,*) 'Flux 3: ', soln%F(i,3), 'd 3 : ', soln%d(i,3)
+  !end do
   
   call deallocate_exact_q1d( ex_soln )
   call teardown_geometry(grid,soln)
