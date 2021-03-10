@@ -15,7 +15,7 @@ module soln_type
     real(prec), allocatable, dimension(:)   :: T
     real(prec), allocatable, dimension(:,:) :: R
     real(prec), allocatable, dimension(:)   :: dt
-    !real(prec), allocatable, dimension(:,:) :: eps
+    real(prec), allocatable, dimension(:) :: S
     real(prec), allocatable, dimension(:)   :: lambda
 
   end type soln_t
@@ -41,6 +41,7 @@ contains
     allocate(soln%U(     i_low1 : i_high1,neq),      &
              soln%V(     i_low1 : i_high1,neq),      &
              soln%M(     i_low1 : i_high1),      &
+             soln%S(     i_low1 : i_high1),      &
              soln%T(     i_low1 : i_high1),      &
              soln%dt(    i_low1 : i_high1),     &
              soln%lambda(i_low1 : i_high1),     &
