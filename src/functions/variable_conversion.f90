@@ -30,6 +30,16 @@ subroutine prim2cons(U,V)
 
 end subroutine prim2cons
 
+subroutine update_mach(V,M)
+  
+  real(prec), dimension(:,:), intent(in) :: V 
+  real(prec), dimension(size(V,1)) :: a
+  real(prec), dimension(:), intent(inout) :: M
+
+  call speed_of_sound(V(:,3),V(:,1),a(:))
+  M = abs(V(:,2))/a(:)
+
+end subroutine update_mach
 
 subroutine cons2prim(U,V)
   
