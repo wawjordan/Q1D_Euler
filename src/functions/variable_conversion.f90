@@ -50,7 +50,7 @@ subroutine cons2prim(U,V)
   V(:,2) = U(:,2)/U(:,1)
   V(:,3) = (gamma - one)*U(:,3) - half*(gamma - one)*U(:,2)**2/U(:,1)
   
-  call limit_primitives(U,V)
+  !call limit_primitives(U,V)
   
 end subroutine cons2prim
 
