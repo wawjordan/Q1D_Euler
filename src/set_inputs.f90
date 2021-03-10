@@ -16,13 +16,13 @@ module set_inputs
   public :: p0, T0, a0, rho0, pb
   public :: set_derived_inputs
   
-  integer :: imax    = 10
+  integer :: imax    = 128
   integer :: i_low   = 10
   integer :: i_high  = 10
   integer :: ig_low  = 10
   integer :: ig_high = 10
   integer :: neq  = 3
-  integer :: iSS  = 1
+  integer :: iSS  = 0
   integer :: n_ghost_cells   = 2
   integer :: max_newton_iter = 1000
 
