@@ -75,7 +75,7 @@ module time_integration
            - F(i_low-1:i_high-1,1)*grid%Ai(i_low-1:i_high-1)
     R(:,2) = F(i_low:i_high,2)*grid%Ai(i_low:i_high) & 
            - F(i_low-1:i_high-1,2)*grid%Ai(i_low-1:i_high-1) &
-           - S(i_low:i_high)*grid%xc(i_low:i_high)
+           - S(i_low:i_high)*grid%dx
     R(:,3) = F(i_low:i_high,3)*grid%Ai(i_low:i_high) &
            - F(i_low-1:i_high-1,3)*grid%Ai(i_low-1:i_high-1)
     
