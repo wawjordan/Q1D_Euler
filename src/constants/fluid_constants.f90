@@ -17,6 +17,12 @@ module fluid_constants
 
   contains
 
+  !=========================== set_fluid_constants ===========================80
+  !>
+  !! Description: Sets derived quantities.
+  !!
+  !<
+  !===========================================================================80
   subroutine set_fluid_constants
 
     R_gas = R_u/M_air
