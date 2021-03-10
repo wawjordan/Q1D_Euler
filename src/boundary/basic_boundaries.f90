@@ -3,7 +3,7 @@ module basic_boundaries
 use set_precision, only : prec
 use set_constants, only : one, two
 use set_inputs,    only : imax, neq, eps
-use variable_conversion, only : prim2cons, isentropic_relations
+use variable_conversion, only : prim2cons, isentropic_relations, update_mach
 
 implicit none
 
@@ -20,7 +20,7 @@ contains
     real(prec), dimension(:,:), intent(inout) :: U, V
     !ireal(prec), dimension(:)  :: T
     integer :: i, i_low
-    
+    call update_mach(V,M)
     i_low  = lbound(M,1)
     
     if ( i_low < 1 ) then
