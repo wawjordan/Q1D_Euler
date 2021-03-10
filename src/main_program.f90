@@ -3,7 +3,8 @@ program main_program
  ! use set_precision, only : prec
   use set_constants, only : set_derived_constants
   use fluid_constants, only : set_fluid_constants
-  use set_inputs, only : set_derived_inputs, imax, i_low, i_high
+  use set_inputs, only : set_derived_inputs, imax
+  use set_inputs, only : i_high, i_low, ig_high, ig_low
   use variable_conversion
   use time_integration
   use basic_boundaries
@@ -17,7 +18,7 @@ program main_program
   implicit none
   
   character(len=100) :: header_str
-  integer :: i
+  integer :: i, j
   type( grid_t )      :: grid
   type( soln_t )      :: soln
   type( exact_q1d_t ) :: ex_soln  
@@ -30,53 +31,66 @@ program main_program
   call initialize(grid,soln)
   call allocate_exact_q1d( ex_soln, grid )
   
-  write(*,*) 'grid%xc:  ','low = ',lbound(grid%xc,1),'  high= ',ubound(grid%xc,1)
-  write(*,*) 'grid%xi:  ','low = ',lbound(grid%xi,1),'  high= ',ubound(grid%xi,1)
-  write(*,*) 'soln%U:  ','low = ',lbound(soln%U,1),'  high= ',ubound(soln%U,1)
-  write(*,*) 'soln%F:  ','low = ',lbound(soln%F,1),'  high= ',ubound(soln%F,1)
   call solve_exact_q1d( ex_soln, grid)
   
-  !call calc_time_step(grid%dx,soln%V,soln%lambda,soln%dt)
   
-  !call sub_in_bndry( soln%M, soln%U, soln%V )
-  !call sup_out_bndry( soln%U, soln%V )
-    
+  call sub_in_bndry( soln%M, soln%U, soln%V )
+  call sup_out_bndry( soln%U, soln%V )
+  call cons2prim( soln%U, soln%V )
+  
+  do j = 1,10
+  call calc_time_step(grid%dx,soln%V,soln%lambda,soln%dt)
+  
+  call cons2prim( soln%U, soln%V )
+  
   call central_flux(soln%U, soln%F)
-  call cons2prim(soln%U,soln%V)
-  call prim2cons(soln%U,soln%V)
-  write(*,*) 'soln%U:  ','low = ',lbound(soln%U,1),'  high= ',ubound(soln%U,1)
+  
   call jst_damping(soln%lambda,soln%U,soln%V,soln%d)
-   
-  write(*,*) 'Exact solution at cell interfaces:'
-  write(header_str,*) '|    x   |    A    |         M         |'// &
-  &  '        rho        |         u        |         p        |'
+  
+  soln%F = soln%F + soln%d
+  
+  call calculate_sources(soln%V,grid%dAc,soln%S)
+  call explicit_euler(grid,soln%S,soln%dt,soln%F,soln%U,soln%R)
+  
+  call sub_in_bndry( soln%M, soln%U, soln%V )
+  call sup_out_bndry( soln%U, soln%V )
+  call cons2prim(soln%U,soln%V)
+  
   100 format(2(F9.4),4(F20.14))
-  write(*,*) trim(adjustl(header_str))
-  do i = 0,imax
-    write(*,100) grid%xi(i), grid%Ai(i), ex_soln%Mi(i), &
-                 ex_soln%Vi(i,1), ex_soln%Vi(i,2), ex_soln%Vi(i,3)/1000.0_prec
-  end do
-  
-  write(*,*)
-  
-  write(*,*) 'Exact solution at cell centers:'
+  write(*,*) 'Initial solution values at cell centers:'
   write(header_str,*) '|    x   |    A    |         M         |'// &
   &  '        rho        |         u        |         p        |'
   write(*,*) trim(adjustl(header_str))
-  do i = 1,imax
-    write(*,100) grid%xc(i), grid%Ac(i), ex_soln%Mc(i), &
-                 ex_soln%Vc(i,1), ex_soln%Vc(i,2), ex_soln%Vc(i,3)/1000.0_prec
+  do i = ig_low,ig_high
+    write(*,100) grid%xc(i), grid%Ac(i), soln%M(i), soln%V(i,1), soln%V(i,2), soln%V(i,3)/1000.0_prec
   end do
-  
-  write(*,*)
-  
-!  write(*,*) 'Initial solution values at cell centers:'
+
+  end do
+  !call prim2cons(soln%U,soln%V)
+  !write(*,*) 'soln%U:  ','low = ',lbound(soln%U,1),'  high= ',ubound(soln%U,1)
+   
+!  write(*,*) 'Exact solution at cell interfaces:'
 !  write(header_str,*) '|    x   |    A    |         M         |'// &
 !  &  '        rho        |         u        |         p        |'
 !  write(*,*) trim(adjustl(header_str))
-!  do i = i_low,i_high
-!    write(*,100) grid%xc(i), grid%Ac(i), soln%M(i), soln%V(i,1), soln%V(i,2), soln%V(i,3)/1000.0_prec
+!  do i = 0,imax
+!    write(*,100) grid%xi(i), grid%Ai(i), ex_soln%Mi(i), &
+!                 ex_soln%Vi(i,1), ex_soln%Vi(i,2), ex_soln%Vi(i,3)/1000.0_prec
 !  end do
+!  
+!  write(*,*)
+!  
+!  write(*,*) 'Exact solution at cell centers:'
+!  write(header_str,*) '|    x   |    A    |         M         |'// &
+!  &  '        rho        |         u        |         p        |'
+!  write(*,*) trim(adjustl(header_str))
+!  do i = 1,imax
+!    write(*,100) grid%xc(i), grid%Ac(i), ex_soln%Mc(i), &
+!                 ex_soln%Vc(i,1), ex_soln%Vc(i,2), ex_soln%Vc(i,3)/1000.0_prec
+!  end do
+  
+!  write(*,*)
+  
   
 !  write(*,*)
   
@@ -90,7 +104,15 @@ program main_program
 
 !  write(*,*)
 !  do i = i_low,i_high
-!    write(*,*) 'x  ', grid%xc(i), 'dt  ', soln%dt(i)
+!    write(*,*) 'Flux 1: ', soln%F(i,1), 'd 1 : ', soln%d(i,1)
+!  end do
+!  write(*,*)
+!  do i = i_low,i_high
+!    write(*,*) 'Flux 2: ', soln%F(i,2), 'd 2 : ', soln%d(i,2)
+!  end do
+!  write(*,*)
+!  do i = i_low,i_high
+!    write(*,*) 'Flux 3: ', soln%F(i,3), 'd 3 : ', soln%d(i,3)
 !  end do
   
   call deallocate_exact_q1d( ex_soln )
