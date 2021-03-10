@@ -51,11 +51,10 @@ program main_program
   
   call calculate_sources(soln%V,grid%dAc,soln%S)
   call explicit_euler(grid,soln%S,soln%dt,soln%F,soln%U,soln%R)
-  
+  call update_mach(soln%V,soln%M)
   call sub_in_bndry( soln%M, soln%U, soln%V )
   call sup_out_bndry( soln%U, soln%V )
-  call cons2prim(soln%U,soln%V)
-  
+  call cons2prim(soln%U,soln%V) 
   100 format(2(F9.4),4(F20.14))
   write(*,*) 'Initial solution values at cell centers:'
   write(header_str,*) '|    x   |    A    |         M         |'// &
