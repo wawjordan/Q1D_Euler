@@ -47,9 +47,9 @@ subroutine explicit_euler(grid,S,dt,F,U,R)
                                                    - S(i_low:i_high)*grid%xc(i_low:i_high)
   R(:,3) = F(i_low:i_high,3)*grid%Ai(i_low:i_high) - F(i_low-1:i_high-1,3)*grid%Ai(i_low-1:i_high-1)
   
-  U(i_low:i_high,1) = U(i_low:i_high,1) + dt(i_low:i_high)/(grid%Ac(i_low:i_high)*grid%dx)*R(:,1)
-  U(i_low:i_high,2) = U(i_low:i_high,2) + dt(i_low:i_high)/(grid%Ac(i_low:i_high)*grid%dx)*R(:,2)
-  U(i_low:i_high,3) = U(i_low:i_high,3) + dt(i_low:i_high)/(grid%Ac(i_low:i_high)*grid%dx)*R(:,3)
+  U(i_low:i_high,1) = U(i_low:i_high,1) + minval(dt(i_low:i_high))/(grid%Ac(i_low:i_high)*grid%dx)*R(:,1)
+  U(i_low:i_high,2) = U(i_low:i_high,2) + minval(dt(i_low:i_high))/(grid%Ac(i_low:i_high)*grid%dx)*R(:,2)
+  U(i_low:i_high,3) = U(i_low:i_high,3) + minval(dt(i_low:i_high))/(grid%Ac(i_low:i_high)*grid%dx)*R(:,3)
   
 end subroutine explicit_euler
 
