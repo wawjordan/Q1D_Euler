@@ -48,9 +48,9 @@ program main_program
   
     call central_flux(soln%U, soln%F)
   
-    !call jst_damping(soln%lambda,soln%U,soln%V,soln%d)
+    call jst_damping(soln%lambda,soln%U,soln%V,soln%d)
   
-    soln%F = soln%F! + soln%d
+    soln%F = soln%F + soln%d
     
     call explicit_euler(grid,soln%S,soln%dt,soln%F,soln%U,soln%R)
     
