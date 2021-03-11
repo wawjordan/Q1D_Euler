@@ -34,14 +34,15 @@ module basic_boundaries
     
     integer :: i
     
-    call update_mach(V,M)
+    call update_mach(V,M,ig_low,ig_high)
     
     do i = i_low-1,-1,ig_low
       M(i) = 2*M(i+1) - M(i+2)
     end do
     
-    call isentropic_relations(M(ig_low:i_low-1),V(ig_low:i_low-1,:))
-    call prim2cons(U(ig_low:0,:),V(ig_low:i_low-1,:))
+    call isentropic_relations(M(ig_low:i_low-1),&
+                              V(ig_low:i_low-1,:),ig_low,i_low-1)
+    call prim2cons(U(ig_low:0,:),V(ig_low:i_low-1,:),ig_low,i_low-1)
     
   end subroutine sub_in_bndry
   
@@ -66,26 +67,22 @@ module basic_boundaries
     
     i_high = ubound(V,1)
     
-    if ( i_high > imax ) then
+    do i = i_high+1,ig_high
       
-      do i = imax+1,i_high
-        
-        if (i == imax+1) then
-          V(i,1) = two*V(i-1,1) - V(i-2,1)
-          V(i,2) = two*V(i-1,2) - V(i-2,2)
-          V(i,3) = two*pb - V(i-1,3)
-        else
-          V(i,1) = V(i-1,1)
-          V(i,2) = V(i-1,2)
-          V(i,3) = V(i-1,3)
-        end if
-        
-      end do
+      if (i == i_high+1) then
+        V(i,1) = two*V(i-1,1) - V(i-2,1)
+        V(i,2) = two*V(i-1,2) - V(i-2,2)
+        V(i,3) = two*pb - V(i-1,3)
+      else
+        V(i,1) = V(i-1,1)
+        V(i,2) = V(i-1,2)
+        V(i,3) = V(i-1,3)
+      end if
       
-      call prim2cons(U(imax+1:i_high,:),V(imax+1:i_high,:))
-      
-    end if
+    end do
     
+    call prim2cons(U(i_high+1:ig_high,:),V(i_high+1:ig_high,:),i_high+1,ig_high)
+      
   end subroutine sub_out_bndry
   
   !============================= sup_out_bndry ===============================80
@@ -122,7 +119,7 @@ module basic_boundaries
       
     end do
     
-    call prim2cons(U(i_high+1:ig_high,:),V(i_high+1:ig_high,:))
+    call prim2cons(U(i_high+1:ig_high,:),V(i_high+1:ig_high,:),i_high+1,ig_high)
     
   end subroutine sup_out_bndry
   
