@@ -20,11 +20,11 @@ module fluxes
   !!              F :
   !<
   !===========================================================================80
-  subroutine central_flux(Ui,F)
+  subroutine central_flux(U,F)
      
     real(prec), dimension(i_low-1:i_high,neq), intent(out)  :: F
-    real(prec), dimension(i_low-1:i_high,neq),  :: Ui 
-    real(prec), dimension(ig_low,ig_high,neq), intent(in)  :: U
+    real(prec), dimension(i_low-1:i_high,neq)   :: Ui 
+    real(prec), dimension(ig_low:ig_high,neq), intent(in)  :: U
     
     Ui(i_low-1:i_high,:) = half*(U(i_low:i_high+1,:) + U(i_low-1:i_high,:))
     
