@@ -41,8 +41,8 @@ module variable_conversion
   subroutine prim2cons( U, V, i_start, i_stop )
     
     integer, intent(in) :: i_start, i_stop
-    real(prec), dimension(ig_low:ig_high,neq), intent(inout)  :: U
-    real(prec), dimension(ig_low:ig_high,neq), intent(in)     :: V
+    real(prec), dimension(i_start:i_stop,neq), intent(inout)  :: U
+    real(prec), dimension(i_start:i_stop,neq), intent(in)     :: V
     
     U(:,1) = V(:,1)
     U(:,2) = V(:,1)*V(:,2)
