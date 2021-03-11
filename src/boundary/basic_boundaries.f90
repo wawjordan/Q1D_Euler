@@ -2,7 +2,7 @@ module basic_boundaries
 
   use set_precision, only : prec
   use set_constants, only : one, two
-  use set_inputs,    only : imax, neq, eps, ig_low, ig_high
+  use set_inputs,    only : imax, neq, eps, i_low, i_high, ig_low, ig_high
   use variable_conversion, only : prim2cons, isentropic_relations, update_mach
   
   implicit none
@@ -36,12 +36,12 @@ module basic_boundaries
     
     call update_mach(V,M)
     
-    do i = 0,-1,ig_low
+    do i = i_low-1,-1,ig_low
       M(i) = 2*M(i+1) - M(i+2)
     end do
     
-    call isentropic_relations(M(ig_low:0),V(ig_low:0,:))
-    call prim2cons(U(ig_low:0,:),V(ig_low:0,:))
+    call isentropic_relations(M(ig_low:i_low-1),V(ig_low:i_low-1,:))
+    call prim2cons(U(ig_low:0,:),V(ig_low:i_low-1,:))
     
   end subroutine sub_in_bndry
   
@@ -108,7 +108,7 @@ module basic_boundaries
     integer :: i
     
       
-    do i = imax+1,ig_high
+    do i = i_high+1,ig_high
       
       V(i,:) = two*V(i-1,:) - V(i-2,:)
       
@@ -122,7 +122,7 @@ module basic_boundaries
       
     end do
     
-    call prim2cons(U(imax+1:ig_high,:),V(imax+1:ig_high,:))
+    call prim2cons(U(i_high+1:ig_high,:),V(i_high+1:ig_high,:))
     
   end subroutine sup_out_bndry
   
