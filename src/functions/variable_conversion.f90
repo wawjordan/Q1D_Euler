@@ -92,7 +92,7 @@ module variable_conversion
     V(:,2) = U(:,2)/U(:,1)
     V(:,3) = (gamma - one)*U(:,3) - half*(gamma - one)*U(:,2)**2/U(:,1)
     
-    !call limit_primitives(U,V)
+    call limit_primitives(U,V)
     
   end subroutine cons2prim
   
@@ -112,13 +112,13 @@ module variable_conversion
     real(prec), dimension(:,:), intent(inout) :: U
     real(prec), dimension(:,:), intent(inout) :: V
     integer :: i
-    logical, dimension(lbound(U,1):ubound(U,1)) :: mask
+    !logical, dimension(lbound(U,1):ubound(U,1)) :: mask
     
-    mask = .false.
+    !mask = .false.
     
-    where ( (V(:,1)<0.001_prec).or.(V(:,2)<10.0_prec).or.(V(:,3)<500.0_prec) )
-      mask = .true.
-    end where
+    !where ( (V(:,1)<0.001_prec).or.(V(:,2)<10.0_prec).or.(V(:,3)<500.0_prec) )
+    !  mask = .true.
+    !end where
     
     do i = lbound(U,1),ubound(U,1)
       if (V(i,1)<0.001_prec) then
@@ -130,10 +130,11 @@ module variable_conversion
       if (V(i,3)<500.0_prec) then
         V(i,3) = 500.0_prec
       end if
-      if (mask(i)) then
-        call prim2cons(U,V)
-      end if
+      !if (mask(i)) then
+      !  call prim2cons(U,V)
+      !end if
     end do
+    call prim2cons(U,V)
     
   end subroutine limit_primitives
   
