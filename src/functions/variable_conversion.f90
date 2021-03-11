@@ -124,7 +124,7 @@ module variable_conversion
     !  mask = .true.
     !end where
     
-    do i = ig_low,ig_high
+    do i = i_start,i_stop
       if (V(i,1)<0.001_prec) then
         V(i,1) = 0.001_prec
       end if
