@@ -1,7 +1,8 @@
 module soln_type
 
   use set_precision, only : prec
-  use set_constants, only : one
+  use set_constants, only : zero, one
+  use set_inputs,    only : neq, max_iter, i_low, i_high, ig_low, ig_high
   
   implicit none
 
@@ -9,14 +10,17 @@ module soln_type
     
     real(prec), allocatable, dimension(:,:) :: V
     real(prec), allocatable, dimension(:,:) :: U
-    real(prec), allocatable, dimension(:,:) :: F
-    real(prec), allocatable, dimension(:,:) :: d
-    real(prec), allocatable, dimension(:)   :: M
-    real(prec), allocatable, dimension(:)   :: T
     real(prec), allocatable, dimension(:,:) :: R
+    real(prec), allocatable, dimension(:,:) :: F
+    real(prec), allocatable, dimension(:,:) :: D
+    real(prec), allocatable, dimension(:)   :: asnd
+    real(prec), allocatable, dimension(:)   :: mach
+    real(prec), allocatable, dimension(:)   :: temp
     real(prec), allocatable, dimension(:)   :: dt
-    real(prec), allocatable, dimension(:) :: S
+    real(prec), allocatable, dimension(:)   :: src
     real(prec), allocatable, dimension(:)   :: lambda
+    real(prec), allocatable, dimension(:,:) :: rnorm 
+    real(prec), allocatable, dimension(:,:) :: rinit
 
   end type soln_t
 
@@ -34,52 +38,35 @@ module soln_type
   !===========================================================================80
   subroutine allocate_soln( soln )
 
-    use set_constants, only : zero
-    use set_inputs,    only : imax, neq, n_ghost_cells
-    
-    implicit none
-    
     type(soln_t), intent(inout) :: soln
-    integer :: i_low1, i_high1
-    integer :: i_low2, i_high2
     
-    i_low1  = 1 - n_ghost_cells
-    i_high1 = imax + n_ghost_cells
-    i_low2  = 1
-    i_high2 = imax
+    allocate( soln%V( ig_low:ig_high, neq ), &
+              soln%U( ig_low:ig_high, neq ), &
+              soln%R( i_low:i_high,   neq ), &
+              soln%F( i_low-1:i_high, neq ), &
+              soln%D( i_low-1:i_high, neq ), &
+              soln%asnd( ig_low:ig_high ),      &
+              soln%mach( ig_low:ig_high ),      &
+              soln%temp( ig_low:ig_high ),      &
+              soln%Src( ig_low:ig_high ),      &
+              soln%dt( ig_low:ig_high ),     &
+              soln%lambda( ig_low:ig_high ), &
+               soln%rinit( 1, neq ), &
+              soln%rnorm( 1:max_iter, neq ) )
 
-    allocate(soln%U(     i_low1 : i_high1,neq),      &
-             soln%V(     i_low1 : i_high1,neq),      &
-             soln%M(     i_low1 : i_high1),      &
-             soln%S(     i_low1 : i_high1),      &
-             soln%T(     i_low1 : i_high1),      &
-             soln%dt(    i_low1 : i_high1),     &
-             soln%lambda(i_low1 : i_high1),     &
-             soln%R(     i_low2 : i_high2,neq),      &
-             soln%F(     i_low2-1 : i_high2,neq),      &
-             soln%D(     i_low2-1 : i_high2,neq),      )
-
-
-!    allocate(soln%U(i_low:i_high,neq),      &
-!             soln%V(i_low:i_high,neq),      &
-!             soln%F(i_low:i_high,neq),      &
-!             soln%D(i_low:i_high,neq),      &
-!             soln%M(i_low:i_high),      &
-!             soln%T(i_low:i_high),      &
-!             soln%R(i_low:i_high,neq),      &
-!             soln%dt(i_low:i_high),     &
-!             soln%eps(i_low:i_high,neq),    &
-!             soln%lambda(i_low:i_high)  )
-
-    soln%U   = zero
     soln%V   = zero
+    soln%U   = zero
+    soln%R   = zero
     soln%F   = zero
     soln%D   = zero
-    soln%M   = zero
-    soln%T   = zero
-    soln%R   = zero
+    soln%asnd   = zero
+    soln%mach   = zero
+    soln%temp   = zero
+    soln%src   = zero
     soln%dt  = zero
     soln%lambda = zero
+    soln%rinit = zero
+    soln%rnorm = zero
 
   end subroutine allocate_soln
   
@@ -99,15 +86,19 @@ module soln_type
     
     type(soln_t), intent(inout) :: soln
     
-    deallocate(soln%U,      &
-               soln%V,      &
+    deallocate(soln%V,      &
+               soln%U,      &
+               soln%R,      &
                soln%F,      &
                soln%D,      &
-               soln%M,      &
-               soln%T,      &
-               soln%R,      &
+               soln%asnd,      &
+               soln%mach,      &
+               soln%temp,      &
+               soln%src,      &
                soln%dt,     &
-               soln%lambda  )
+               soln%lambda, &
+               soln%rinit,  &
+               soln%rnorm   )
     
   end subroutine deallocate_soln
 
