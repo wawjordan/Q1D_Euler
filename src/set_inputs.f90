@@ -37,7 +37,7 @@ module set_inputs
   real(prec) :: xmax       = one
   real(prec) :: CFL        = 0.25_prec
   real(prec) :: pb         = 1000_prec
-  real(prec) :: k2         = 1.0_prec/2.0_prec
+  real(prec) :: k2         = 1.0_prec/4.0_prec
   real(prec) :: k4         = 1.0_prec/32.0_prec
 
   contains
