@@ -8,16 +8,7 @@ module fluxes
   implicit none
   
   contains
-  
-  subroutine central_quad(U,Ui)
-    
-    real(prec), dimension(ig_low,ig_high,neq), intent(in)  :: U
-    real(prec), dimension(i_low-1:i_high,neq), intent(out) :: Ui
-    
-    Ui(i_low-1:i_high,:) = half*(U(i_low:i_high+1,:) + U(i_low-1:i_high,:))
-    
-  end subroutine central_quad
-  
+   
   !================================= central_flux ============================80
   !>
   !! Description: 
@@ -32,7 +23,10 @@ module fluxes
   subroutine central_flux(Ui,F)
      
     real(prec), dimension(i_low-1:i_high,neq), intent(out)  :: F
-    real(prec), dimension(i_low-1:i_high,neq), intent(in)  :: Ui
+    real(prec), dimension(i_low-1:i_high,neq),  :: Ui 
+    real(prec), dimension(ig_low,ig_high,neq), intent(in)  :: U
+    
+    Ui(i_low-1:i_high,:) = half*(U(i_low:i_high+1,:) + U(i_low-1:i_high,:))
     
     F(:,1) = Ui(:,2)
     F(:,2) = half*(three-gamma)*( Ui(:,2)**2 )/Ui(:,1) &
