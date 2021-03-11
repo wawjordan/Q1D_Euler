@@ -39,9 +39,6 @@ module grid_type
     type( grid_t ), intent( inout ) :: grid
     integer :: i
     
-    !i_low  = 1 - n_ghost_cells
-    !i_high = imax + n_ghost_cells
-    
     grid%dx = (xmax - xmin)/real(imax,prec)
 
     allocate( grid%xi(ig_low-1:ig_high), &
@@ -70,8 +67,6 @@ module grid_type
   !<
   !===========================================================================80
   subroutine deallocate_grid( grid )
-    
-    implicit none
     
     type( grid_t ), intent( inout ) :: grid
     
