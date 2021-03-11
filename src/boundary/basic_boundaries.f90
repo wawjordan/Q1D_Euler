@@ -2,7 +2,7 @@ module basic_boundaries
 
   use set_precision, only : prec
   use set_constants, only : one, two
-  use set_inputs,    only : imax, neq, eps
+  use set_inputs,    only : imax, neq, eps, ig_low, ig_high
   use variable_conversion, only : prim2cons, isentropic_relations, update_mach
   
   implicit none
@@ -29,27 +29,22 @@ module basic_boundaries
   !===========================================================================80
   subroutine sub_in_bndry( M, U, V )
     
-    real(prec), dimension(:),   intent(inout) :: M
-    real(prec), dimension(:,:), intent(inout) :: U, V
+    real(prec), dimension(ig_low:ig_high), intent(inout) :: M
+    real(prec), dimension(ig_low:ig_high,neq), intent(inout) :: U, V
     
-    integer :: i, i_low
+    integer :: i
     
     call update_mach(V,M)
     
-    i_low  = lbound(M,1)
+    do i = 0,-1,ig_low
+      M(i) = 2*M(i+1) - M(i+2)
+    end do
     
-    if ( i_low < 1 ) then
-      do i = 0,-1,i_low
-        M(i) = 2*M(i+1) - M(i+2)
-      end do
-      
-      call isentropic_relations(M(i_low:0),V(i_low:0,:))
-      call prim2cons(U(i_low:0,:),V(i_low:0,:))
-      
-    end if
+    call isentropic_relations(M(ig_low:0),V(ig_low:0,:))
+    call prim2cons(U(ig_low:0,:),V(ig_low:0,:))
     
   end subroutine sub_in_bndry
-
+  
   !============================ sub_out_bndry ================================80
   !>
   !! Description: 
@@ -108,31 +103,26 @@ module basic_boundaries
     
     use set_inputs, only : p0
     
-    real(prec), dimension(:,:), intent(inout) :: U, V
+    real(prec), dimension(ig_low:ig_high,neq), intent(inout) :: U, V
     
-    integer :: i, j, i_high
+    integer :: i
     
-    i_high = ubound(V,1)
+      
+    do i = imax+1,ig_high
+      
+      V(i,:) = two*V(i-1,:) - V(i-2,:)
+      
+      !if ( V(i,1) < eps) then
+      !    V(i,1) = eps
+      !elseif ( V(i,2) < eps ) then
+      !    V(i,2) = eps
+      !elseif ( V(i,3)/(1000.0_prec*p0) < 1.0e-5_prec ) then
+      !    V(i,3) = 0.01_prec*1000.0_prec*p0
+      !end if
+      
+    end do
     
-    if ( i_high > imax ) then
-      
-      do i = imax+1,i_high
-        
-        V(i,:) = two*V(i-1,:) - V(i-2,:)
-        
-        if ( V(i,1) < eps) then
-            V(i,1) = eps
-        elseif ( V(i,2) < eps ) then
-            V(i,2) = eps
-        elseif ( V(i,3)/(1000.0_prec*p0) < 1.0e-5_prec ) then
-            V(i,3) = 0.01_prec*1000.0_prec*p0
-        end if
-        
-      end do
-      
-      call prim2cons(U(imax+1:i_high,:),V(imax+1:i_high,:))
-      
-    end if
+    call prim2cons(U(imax+1:ig_high,:),V(imax+1:ig_high,:))
     
   end subroutine sup_out_bndry
   
