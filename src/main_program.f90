@@ -48,7 +48,7 @@ program main_program
   
     call central_flux(soln%U, soln%F)
   
-    call jst_damping(soln%lambda,soln%U,soln%V,soln%D)
+    !call jst_damping(soln%lambda,soln%U,soln%V,soln%D)
   
     soln%F = soln%F! + soln%D
     
