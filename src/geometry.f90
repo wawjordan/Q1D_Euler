@@ -62,6 +62,11 @@ module geometry
       grid%dAc(i) = darea( grid%xc(i) )
     end do
     grid%dAc(imax:i_high) = darea( grid%xc(imax) )
+    !grid%dAc(i_low:1) = darea( grid%xc(1) )
+    !do i = 1,imax-1
+    !  grid%dAc(i) = ( grid%Ac(i+1) - grid%Ac(i) )/grid%dx
+    !end do
+    !grid%dAc(imax:i_high) = darea( grid%xc(imax) )
     
   end subroutine setup_geometry
   
