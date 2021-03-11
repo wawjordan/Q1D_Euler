@@ -87,8 +87,8 @@ module other_subroutines
     
     d(:,:) = D3(:,:) - D1(:,:)
     
-    d(i_low-1,:) = 2*d(i_low,:) - d(i_low+1,:)
-    d(i_high,:) = 2*d(i_high-1,:) - d(i_high-2,:)
+    !d(i_low-1,:) = 2*d(i_low,:) - d(i_low+1,:)
+    !d(i_high,:) = 2*d(i_high-1,:) - d(i_high-2,:)
 
   end subroutine jst_damping
   
