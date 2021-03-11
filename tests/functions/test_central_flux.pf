@@ -2,6 +2,7 @@ module test_central_flux
 
   use set_precision,   only : prec
   use fluid_constants, only : gamma
+  use set_inputs, only : i_low, i_high, ig_low, ig_high
   use fluxes, only : central_flux
   use pfunit_mod
 
