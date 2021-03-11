@@ -64,7 +64,7 @@ module time_integration
     real(prec), dimension(ig_low:ig_high,neq), intent(inout) :: U
     real(prec), dimension(i_low:i_high,neq),   intent(out)   :: R
     real(prec), dimension(i_low-1:i_high,neq), intent(in)    :: F
-    real(prec), dimension(ig_low:ig_high)  ,   intent(in)    :: src, dt
+    real(prec), dimension(i_low:i_high)  ,   intent(in)    :: src, dt
     
     integer :: i
     
@@ -78,13 +78,13 @@ module time_integration
     
     
     U(i_low:i_high,1) = U(i_low:i_high,1) & 
-                      + dt(i_low:i_high)/ &
+                      + minval(dt(i_low:i_high))/ &
                         (grid%Ac(i_low:i_high)*grid%dx)*R(:,1)
     U(i_low:i_high,2) = U(i_low:i_high,2) &
-                      + dt(i_low:i_high)/ &
+                      + minval(dt(i_low:i_high))/ &
                         (grid%Ac(i_low:i_high)*grid%dx)*R(:,2)
     U(i_low:i_high,3) = U(i_low:i_high,3) &
-                      + dt(i_low:i_high)/ &
+                      + minval(dt(i_low:i_high))/ &
                         (grid%Ac(i_low:i_high)*grid%dx)*R(:,3)
     
   end subroutine explicit_euler
