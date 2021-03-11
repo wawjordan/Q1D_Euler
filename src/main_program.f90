@@ -34,29 +34,29 @@ program main_program
   call solve_exact_q1d( ex_soln, grid)
   
   
-  call sub_in_bndry( soln%M, soln%U, soln%V )
+  call sub_in_bndry( soln%mach, soln%U, soln%V )
   call sup_out_bndry( soln%U, soln%V )
   call cons2prim( soln%U, soln%V )
   
   do j = 1,200
-   
-    call calculate_sources(soln%V,grid%dAc,soln%S)
     
-    call calc_time_step(grid%dx,soln%V,soln%lambda,soln%dt)
+    call calculate_sources(soln%V,grid%dAc,soln%src)
+    
+    call calc_time_step(grid%dx,soln%V,soln%asnd,soln%lambda,soln%dt)
   
     call cons2prim( soln%U, soln%V )
   
     call central_flux(soln%U, soln%F)
   
-    call jst_damping(soln%lambda,soln%U,soln%V,soln%d)
+    call jst_damping(soln%lambda,soln%U,soln%V,soln%D)
   
-    soln%F = soln%F + soln%d
+    soln%F = soln%F + soln%D
     
-    call explicit_euler(grid,soln%S,soln%dt,soln%F,soln%U,soln%R)
+    call explicit_euler(grid,soln%src,soln%dt,soln%F,soln%U,soln%R)
     
-    call update_mach(soln%V,soln%M)
+    call update_mach(soln%V,soln%mach)
     
-    call sub_in_bndry( soln%M, soln%U, soln%V )
+    call sub_in_bndry( soln%mach, soln%U, soln%V )
     
     call sup_out_bndry( soln%U, soln%V )
     
