@@ -3,7 +3,7 @@ module variable_conversion
   use set_precision,   only : prec
   use set_constants,   only : one, half
   use fluid_constants, only : gamma, R_gas
-  use set_inputs,      only : p0,T0
+  use set_inputs,      only : p0,T0, neq, ig_low, ig_high
 
   implicit none
 
@@ -40,8 +40,8 @@ module variable_conversion
   !===========================================================================80
   subroutine prim2cons( U, V )
     
-    real(prec), dimension(:,:), intent(inout)  :: U
-    real(prec), dimension(:,:), intent(in)     :: V
+    real(prec), dimension(ig_low:ig_high,neq), intent(inout)  :: U
+    real(prec), dimension(ig_low:ig_high,neq), intent(in)     :: V
     
     U(:,1) = V(:,1)
     U(:,2) = V(:,1)*V(:,2)
@@ -61,8 +61,8 @@ module variable_conversion
   !===========================================================================80
   subroutine update_mach( V, M )
     
-    real(prec), dimension(:,:),  intent(in) :: V 
-    real(prec), dimension(:), intent(inout) :: M
+    real(prec), dimension(ig_low:ig_high,neq),  intent(in) :: V 
+    real(prec), dimension(ig_low:ig_high), intent(inout) :: M
     
     real(prec), dimension(size(V,1)) :: a
     
@@ -85,8 +85,8 @@ module variable_conversion
   !===========================================================================80
   subroutine cons2prim( U, V )
     
-    real(prec), dimension(:,:), intent(inout) :: U
-    real(prec), dimension(:,:), intent(inout) :: V
+    real(prec), dimension(ig_low:ig_high,neq), intent(inout) :: U
+    real(prec), dimension(ig_low:ig_high,neq), intent(inout) :: V
     
     V(:,1) = U(:,1)
     V(:,2) = U(:,2)/U(:,1)
@@ -109,8 +109,8 @@ module variable_conversion
   !===========================================================================80
   subroutine limit_primitives(U,V)
     
-    real(prec), dimension(:,:), intent(inout) :: U
-    real(prec), dimension(:,:), intent(inout) :: V
+    real(prec), dimension(ig_low:ig_high,neq), intent(inout) :: U
+    real(prec), dimension(ig_low:ig_high,neq), intent(inout) :: V
     integer :: i
     !logical, dimension(lbound(U,1):ubound(U,1)) :: mask
     
@@ -120,7 +120,7 @@ module variable_conversion
     !  mask = .true.
     !end where
     
-    do i = lbound(U,1),ubound(U,1)
+    do i = ig_low,ig_high
       if (V(i,1)<0.001_prec) then
         V(i,1) = 0.001_prec
       end if
@@ -150,10 +150,10 @@ module variable_conversion
   !===========================================================================80
   subroutine isentropic_relations(M,V)
     
-    real(prec), dimension(:,:), intent(inout) :: V
-    real(prec), dimension(:),   intent(in) :: M
-    !real(prec), dimension(:),   intent(out) :: T
-    real(prec), dimension(size(V,1))  :: T
+    real(prec), dimension(ig_low:ig_high,neq), intent(inout) :: V
+    real(prec), dimension(ig_low:ig_high),   intent(in) :: M
+    
+    real(prec), dimension(ig_low:ig_high)  :: T
     
     T(:) = T0/(one + half*(gamma - one)*M(:)**2)
     V(:,3) = 1000.0_prec*p0/(one + half*(gamma - one)*M(:)**2)**(gamma/(gamma-1))
