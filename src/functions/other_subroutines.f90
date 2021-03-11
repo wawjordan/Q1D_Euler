@@ -2,7 +2,7 @@ module other_subroutines
   
   use set_precision, only : prec
   use set_constants, only : zero, one, two, three, half
-  use set_inputs, only : imax
+  use set_inputs, only : imax, neq, i_low, i_high, ig_low, ig_high
   use variable_conversion
   use fluxes
   use soln_type
@@ -28,7 +28,7 @@ module other_subroutines
     real(prec), dimension(:),   intent(in) :: dA
     real(prec), dimension(lbound(V,1):ubound(V,1)), intent(out) :: S
     
-    S(:) = zero !V(:,3)*dA(:)
+    S(:) = V(:,3)*dA(:)
     
   end subroutine calculate_sources
   
@@ -48,41 +48,48 @@ module other_subroutines
     
     use set_inputs, only : neq, k2, k4
     
-    real(prec), dimension(:),   intent(in) :: lambda
-    real(prec), dimension(:,:), intent(in) :: U,V
-    real(prec), dimension(:,:), intent(out) :: d
-    real(prec), dimension(lbound(U,1)+1:ubound(U,1)-2,neq) :: D1
-    real(prec), dimension(lbound(U,1)+1:ubound(U,1)-2,neq) :: D3
-    real(prec), dimension(lbound(U,1)+1:ubound(U,1)-2) :: e2
-    real(prec), dimension(lbound(U,1)+1:ubound(U,1)-2) :: e4
-    real(prec), dimension(lbound(U,1):ubound(U,1)) :: nu
-    real(prec), dimension(lbound(U,1):ubound(U,1)) :: P
+    real(prec), dimension(ig_low:ig_high),   intent(in) :: lambda
+    real(prec), dimension(ig_low:ig_high,neq), intent(in) :: U,V
+    real(prec), dimension(i_low-1:i_high,neq), intent(out) :: d
+    real(prec), dimension(i_low-1:i_high) :: lambda_half
+    real(prec), dimension(i_low-1:i_high,neq) :: D1
+    real(prec), dimension(i_low-1:i_high,neq) :: D3
+    real(prec), dimension(i_low-1:i_high) :: e2
+    real(prec), dimension(i_low-1:i_high) :: e4
+    real(prec), dimension(ig_low:ig_high) :: nu
+    real(prec), dimension(ig_low:ig_high) :: P
     
-    integer :: i, i_low, i_high
-    
-    i_low  = lbound(U,1)
-    i_high = ubound(U,1)
+    integer :: i
     
     P(:) = V(:,3)
-    
-    do i = i_low+1,i_high-1
+    lambda_half = half*(lambda(i_low:i_high+1) + lambda(i_low-1:i_high))
+    do i = i_low-1,i_high
       nu(i) = abs(P(i+1)-two*P(i)+P(i-1))/abs(P(i+1)+two*P(i)+P(i-1))
     end do
-    nu(i_low)  = nu(i_low+1)
-    nu(i_high) = nu(i_high-1)
+    nu(i_low-2)  = nu(i_low-1)
+    nu(i_high+1) = nu(i_high)
     
-    do i = i_low+1,i_high-2
-      e2(i) = k2*max(nu(i-1),nu(i),nu(i+1),nu(i+2))
+    do i = i_low-1,i_high
+      if (i == i_low-1) then
+        e2(i) = k2*max(nu(i),nu(i+1),nu(i+2))
+      elseif(i == i_high) then
+        e2(i) = k2*max(nu(i-1),nu(i),nu(i+1))
+      else
+        e2(i) = k2*max(nu(i-1),nu(i),nu(i+1),nu(i+2))
+      end if
       e4(i) = max(zero,k4-e2(i))
     end do
     
-    do i = i_low+1,i_high-2
-      D1(i,:) = lambda(i)*e2(i)*(U(i+1,:)-U(i,:))
-      D3(i,:) = lambda(i)*e4(i)*(U(i+2,:)-three*U(i+1,:)+three*U(i,:)-U(i-1,:))
+    do i = i_low-1,i_high
+      D1(i,:) = lambda_half(i)*e2(i)*(U(i+1,:)-U(i,:))
+      D3(i,:) = lambda_half(i)*e4(i)*(U(i+2,:)-three*U(i+1,:)+three*U(i,:)-U(i-1,:))
     end do
     
     d(:,:) = D3(:,:) - D1(:,:)
     
+    d(i_low-1,:) = 2*d(i_low,:) - d(i_low+1,:)
+    d(i_high,:) = 2*d(i_high-1,:) - d(i_high-2,:)
+
   end subroutine jst_damping
   
   !============================= output_soln =================================80
