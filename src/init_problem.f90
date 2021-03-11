@@ -43,8 +43,8 @@ module init_problem
       end if
     end do
     
-    call isentropic_relations(soln%mach,soln%V)
-    call prim2cons(soln%U,soln%V)
+    call isentropic_relations(soln%mach,soln%V,ig_low,ig_high)
+    call prim2cons(soln%U,soln%V,ig_low,ig_high)
     
     !write(*,*) 'grid%xc:  ','low = ',lbound(grid%xc,1),'  high= ',ubound(grid%xc,1)
     !write(*,*) 'grid%xi:  ','low = ',lbound(grid%xi,1),'  high= ',ubound(grid%xi,1)
