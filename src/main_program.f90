@@ -38,13 +38,13 @@ program main_program
   call sup_out_bndry( soln%U, soln%V )
   call cons2prim( soln%U, soln%V )
   
-  do j = 1,100
+  do j = 1,200
    
     call calculate_sources(soln%V,grid%dAc,soln%S)
     
     call calc_time_step(grid%dx,soln%V,soln%lambda,soln%dt)
   
-    !call cons2prim( soln%U, soln%V )
+    call cons2prim( soln%U, soln%V )
   
     call central_flux(soln%U, soln%F)
   
@@ -60,7 +60,7 @@ program main_program
     
     call sup_out_bndry( soln%U, soln%V )
     
-    call cons2prim(soln%U,soln%V)
+    !call cons2prim(soln%U,soln%V)
  ! 100 format(2(F9.4),4(F20.14))
  ! write(*,*) 'Initial solution values at cell centers:'
  ! write(header_str,*) '|    x   |    A    |         M         |'// &
@@ -119,7 +119,7 @@ program main_program
   !end do
   !write(*,*)
   !do i = i_low,i_high
-  !  write(*,*) 'Flux 3: ', soln%F(i,3), 'd 3 : ', soln%d(i,3)
+  !  write(*,*) 'da: ', grid%dAc(i)
   !end do
   
   call deallocate_exact_q1d( ex_soln )
