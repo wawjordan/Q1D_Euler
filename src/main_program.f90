@@ -50,7 +50,7 @@ program main_program
   
     call jst_damping(soln%lambda,soln%U,soln%V,soln%D)
   
-    soln%F = soln%F + soln%D
+    soln%F = soln%F! + soln%D
     
     call explicit_euler(grid,soln%src,soln%dt,soln%F,soln%U,soln%R)
     
