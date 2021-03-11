@@ -30,13 +30,13 @@ module time_integration
     
     real(prec), dimension(ig_low:ig_high,neq), intent(in)  :: V
     real(prec), intent(in) :: dx
-    real(prec), dimension(i_low:i_high),   intent(out) :: lambda
+    real(prec), dimension(ig_low:ig_high),   intent(out) :: lambda
     real(prec), dimension(i_low:i_high),   intent(out) :: dt
     
-    real(prec), dimension(i_low:i_high), intent(in)    :: asnd
+    real(prec), dimension(ig_low:ig_high), intent(in)    :: asnd
     
-    lambda(:) = abs(V(i_low:i_high,2)) + asnd
-    dt(:) = CFL*dx/lambda(:)
+    lambda(:) = abs(V(:,2)) + asnd
+    dt(:) = CFL*dx/lambda(i_low:i_high)
     
   end subroutine calc_time_step
   
