@@ -24,11 +24,11 @@ module other_subroutines
   !===========================================================================80
   subroutine calculate_sources(V,dA,S)
     
-    real(prec), dimension(:,:), intent(in) :: V
-    real(prec), dimension(:),   intent(in) :: dA
-    real(prec), dimension(lbound(V,1):ubound(V,1)), intent(out) :: S
+    real(prec), dimension(ig_low:ig_high,neq), intent(in) :: V
+    real(prec), dimension(i_low:i_high),   intent(in) :: dA
+    real(prec), dimension(i_low:i_high),   intent(out) :: S
     
-    S(:) = V(:,3)*dA(:)
+    S = V(i_low:i_high,3)*dA
     
   end subroutine calculate_sources
   
@@ -46,9 +46,9 @@ module other_subroutines
   !===========================================================================80
   subroutine jst_damping(lambda,U,V,d)
     
-    use set_inputs, only : neq, k2, k4
+    use set_inputs, only : k2, k4
     
-    real(prec), dimension(ig_low:ig_high),   intent(in) :: lambda
+    real(prec), dimension(ig_low:ig_high),     intent(in) :: lambda
     real(prec), dimension(ig_low:ig_high,neq), intent(in) :: U,V
     real(prec), dimension(i_low-1:i_high,neq), intent(out) :: d
     real(prec), dimension(i_low-1:i_high) :: lambda_half
@@ -121,7 +121,7 @@ module other_subroutines
              & DOUBLE DOUBLE )'
     do i = 1, imax
     write(40,*)grid%xc(i),grid%Ac(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
-             & soln%M(i),soln%U(i,1),soln%U(i,2),soln%U(i,3)
+             & soln%mach(i),soln%U(i,1),soln%U(i,2),soln%U(i,3)
     enddo
     
   end subroutine output_soln
