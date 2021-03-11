@@ -12,7 +12,7 @@ module set_inputs
   public :: i_high, i_low, ig_high, ig_low
   public :: Astar, area, darea
   public :: CFL, k2, k4, eps
-  public :: iSS, max_newton_iter, newton_tol
+  public :: iSS, max_iter, max_newton_iter, newton_tol
   public :: p0, T0, a0, rho0, pb
   public :: set_derived_inputs
   
@@ -23,6 +23,7 @@ module set_inputs
   integer :: ig_high = 10
   integer :: neq  = 3
   integer :: iSS  = 0
+  integer :: max_iter = 100
   integer :: n_ghost_cells   = 2
   integer :: max_newton_iter = 1000
 
