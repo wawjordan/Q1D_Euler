@@ -36,7 +36,7 @@ program main_program
   
   call sub_in_bndry( soln%mach, soln%U, soln%V )
   call sup_out_bndry( soln%U, soln%V )
-  call cons2prim( soln%U, soln%V )
+  call cons2prim( soln%U, soln%V, ig_low, ig_high )
   
   do j = 1,200
     
@@ -44,7 +44,7 @@ program main_program
     
     call calc_time_step(grid%dx,soln%V,soln%asnd,soln%lambda,soln%dt)
   
-    call cons2prim( soln%U, soln%V )
+    call cons2prim( soln%U, soln%V, ig_low, ig_high )
   
     call central_flux(soln%U, soln%F)
   
@@ -54,7 +54,7 @@ program main_program
     
     call explicit_euler(grid,soln%src,soln%dt,soln%F,soln%U,soln%R)
     
-    call update_mach(soln%V,soln%mach)
+    call update_mach(soln%V,soln%mach, ig_low, ig_high)
     
     call sub_in_bndry( soln%mach, soln%U, soln%V )
     
