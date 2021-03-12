@@ -3,6 +3,7 @@ module other_subroutines
   use set_precision, only : prec
   use set_constants, only : zero, one, two, three, half
   use set_inputs, only : imax, neq, i_low, i_high, ig_low, ig_high
+  use fluid_constants, only : gamma
   use variable_conversion
   use fluxes
   use soln_type
@@ -25,11 +26,13 @@ module other_subroutines
   subroutine calculate_sources(V,dA,S)
     
     real(prec), dimension(ig_low:ig_high,neq), intent(in) :: V
-    real(prec), dimension(i_low:i_high),   intent(in) :: dA
+    real(prec), dimension(ig_low:ig_high),   intent(in) :: dA
     real(prec), dimension(i_low:i_high),   intent(out) :: S
-    
-    S = V(i_low:i_high,3)*dA
-    
+    integer :: i
+    S(i_low:i_high) = V(i_low:i_high,3)*dA(i_low:i_high)
+    !do i = i_low,i_high
+    !write(*,*) i, "dA : ",dA(i), "V: ",V(i,:)," S: ",S(i)
+    !end do
   end subroutine calculate_sources
   
   
@@ -70,13 +73,13 @@ module other_subroutines
     nu(i_high+1) = nu(i_high)
     
     do i = i_low-1,i_high
-      if (i == i_low-1) then
-        e2(i) = k2*max(nu(i),nu(i+1),nu(i+2))
-      elseif(i == i_high) then
-        e2(i) = k2*max(nu(i-1),nu(i),nu(i+1))
-      else
+      !if (i == i_low-1) then
+      !  e2(i) = k2*max(nu(i),nu(i+1),nu(i+2))
+      !elseif(i == i_high) then
+      !  e2(i) = k2*max(nu(i-1),nu(i),nu(i+1))
+      !else
         e2(i) = k2*max(nu(i-1),nu(i),nu(i+1),nu(i+2))
-      end if
+      !end if
       e4(i) = max(zero,k4-e2(i))
     end do
     
@@ -87,8 +90,8 @@ module other_subroutines
     
     d(:,:) = D3(:,:) - D1(:,:)
     
-    !d(i_low-1,:) = 2*d(i_low,:) - d(i_low+1,:)
-    !d(i_high,:) = 2*d(i_high-1,:) - d(i_high-2,:)
+    d(i_low-1,:) = 2*d(i_low,:) - d(i_low+1,:)
+    d(i_high,:) = 2*d(i_high-1,:) - d(i_high-2,:)
 
   end subroutine jst_damping
   
@@ -112,16 +115,17 @@ module other_subroutines
     open(40,file='q1Dnozzle.dat',status='unknown')
     write(40,*) 'TITLE = "Quasi-1D Nozzle Solution"'
     write(40,*)' variables="x(m)""Area(m^2)""rho(kg/m^3)""u(m/s)"&
-             & "Press(N/m^2)""Mach""U1""U2""U3"'
+             & "Press(N/m^2)""Mach""U1""U2""U3""F1""F2""F3"'
     ! Repeat the following each time you want to write out the solution
     write(40,*) 'zone T="',num_iter,'" '
     write(40,*) 'I=',imax
     write(40,*) 'DATAPACKING=POINT'
     write(40,*) 'DT=(DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
-             & DOUBLE DOUBLE )'
+             & DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE)'
     do i = 1, imax
     write(40,*)grid%xc(i),grid%Ac(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
-             & soln%mach(i),soln%U(i,1),soln%U(i,2),soln%U(i,3)
+             & soln%mach(i),soln%U(i,1),soln%U(i,2),soln%U(i,3),&
+             & soln%F(i,1),soln%F(i,2),soln%F(i,3)
     enddo
     
   end subroutine output_soln

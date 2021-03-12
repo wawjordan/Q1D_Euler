@@ -17,7 +17,10 @@ program main_program
   use exact_q1d_type
   implicit none
   
-  character(len=100) :: header_str
+  character(len=100) :: header_str1
+  character(len=100) :: header_str2
+  character(len=100) :: header_str3
+  character(len=100) :: header_str4
   integer :: i, j
   type( grid_t )      :: grid
   type( soln_t )      :: soln
@@ -29,31 +32,101 @@ program main_program
   call setup_geometry(grid,soln)
   
   call initialize(grid,soln)
-  call allocate_exact_q1d( ex_soln, grid )
   
-  call solve_exact_q1d( ex_soln, grid)
+  !call allocate_exact_q1d( ex_soln, grid )
   
+  !call solve_exact_q1d( ex_soln, grid)
+  
+  100 format(2(F9.4),4(G20.7))
+  200 format(1(F9.4),3(G20.7))
+  300 format(2(F9.4),3(G20.7))
+  write(header_str1,*) '|    x   |    A    |         M         |'// &
+  &  '        rho        |         u        |         p        |'
+  write(header_str2,*) '|    x   |        U(1)       |'// &
+  & '       U(2)       |       U(3)       |'
+  write(header_str3,*) '|    x   |        F(1)       |'// &
+  & '       F(2)       |       F(3)       |'
+  write(header_str4,*) '|    x   |    dA   |         S         |'// &
+  & '         dt       |       lambda     |'
+ 
+
+  write(*,*) 'Initial Conditions: Primitives'
+  write(*,*) trim(adjustl(header_str1))
+  do i = ig_low,ig_high
+    write(*,100) grid%xc(i), grid%Ac(i), soln%mach(i), soln%V(i,1), soln%V(i,2), soln%V(i,3)/1000.0_prec
+  end do
+  write(*,*)
+  write(*,*) 'Initial Conditions: Conserved'
+  write(*,*) trim(adjustl(header_str2))
+  do i = i_low-1,i_high
+    write(*,200) grid%xi(i), soln%U(i,1), soln%U(i,2), soln%U(i,3)
+  end do
+  write(*,*)
+
   
   call sub_in_bndry( soln%mach, soln%U, soln%V )
+  
+  write(*,*) 'Inflow BC Applied: Primitives'
+  write(*,*) trim(adjustl(header_str1))
+  do i = ig_low,ig_high
+    write(*,100) grid%xc(i), grid%Ac(i), soln%mach(i), soln%V(i,1), soln%V(i,2), soln%V(i,3)/1000.0_prec
+  end do
+  write(*,*)
+
   call sup_out_bndry( soln%U, soln%V )
-  !do i = ig_low,ig_high
-  !write(*,*) "(V)",i,soln%V(i,:)
-  !end do
+  
+  write(*,*) 'Outflow BC Applied: Primitives'
+  write(*,*) trim(adjustl(header_str1))
+  do i = ig_low,ig_high
+    write(*,100) grid%xc(i), grid%Ac(i), soln%mach(i), soln%V(i,1), soln%V(i,2), soln%V(i,3)/1000.0_prec
+  end do
+  write(*,*)
+  
+  
   call cons2prim( soln%U, soln%V )
   
+  write(*,*) 'cons2prim Applied: Primitives'
+  write(*,*) trim(adjustl(header_str1))
+  do i = ig_low,ig_high
+    write(*,100) grid%xc(i), grid%Ac(i), soln%mach(i), soln%V(i,1), soln%V(i,2), soln%V(i,3)/1000.0_prec
+  end do
+  write(*,*)
+  write(*,*) 'cons2prim Applied: Conserved'
+  write(*,*) trim(adjustl(header_str2))
+  do i = i_low-1,i_high
+    write(*,200) grid%xi(i), soln%U(i,1), soln%U(i,2), soln%U(i,3)
+  end do 
+  write(*,*)
+ 
+  call calculate_sources(soln%V,grid%dAc,soln%src)
+
+  call calc_time_step(grid%dx,soln%V,soln%asnd,soln%lambda,soln%dt)
+  write(*,*) 'Calculate Sources and Time step:'
+  write(*,*) trim(adjustl(header_str4))
+  do i = ig_low,ig_high
+    if( (i>=i_low).and.(i<=i_high) ) then
+      write(*,300) grid%xc(i),grid%dAc(i), soln%src(i), soln%dt(i), soln%lambda(i)
+    else 
+      write(*,300) grid%xc(i), zero, zero, zero, soln%lambda(i)
+    end if
+  end do
+  write(*,*)
+
+
+
   do j = 1,200
     
     call calculate_sources(soln%V,grid%dAc,soln%src)
     
     call calc_time_step(grid%dx,soln%V,soln%asnd,soln%lambda,soln%dt)
   
-    call cons2prim( soln%U, soln%V )
+   ! call cons2prim( soln%U, soln%V )
   
     call central_flux(soln%U, soln%F)
   
     call jst_damping(soln%lambda,soln%U,soln%V,soln%D)
   
-    soln%F = soln%F! + soln%D
+    soln%F = soln%F + soln%D
     
     call explicit_euler(grid,soln%src,soln%dt,soln%F,soln%U,soln%R)
     
@@ -63,7 +136,7 @@ program main_program
     
     call sup_out_bndry( soln%U, soln%V )
    
-   !call cons2prim(soln%U,soln%V)
+   call cons2prim(soln%U,soln%V)
 ! 100 format(2(F9.4),4(F20.14))
 ! write(*,*) 'Initial solution values at cell centers:'
 ! write(header_str,*) '|    x   |    A    |         M         |'// &
@@ -125,7 +198,7 @@ program main_program
   !  write(*,*) 'da: ', grid%dAc(i)
   !end do
   
-  call deallocate_exact_q1d( ex_soln )
+  !call deallocate_exact_q1d( ex_soln )
   call teardown_geometry(grid,soln)
 
 end program main_program
