@@ -36,7 +36,10 @@ program main_program
   
   call sub_in_bndry( soln%mach, soln%U, soln%V )
   call sup_out_bndry( soln%U, soln%V )
-  call cons2prim( soln%U, soln%V, ig_low, ig_high )
+  !do i = ig_low,ig_high
+  !write(*,*) "(V)",i,soln%V(i,:)
+  !end do
+  call cons2prim( soln%U, soln%V )
   
   do j = 1,200
     
@@ -44,34 +47,34 @@ program main_program
     
     call calc_time_step(grid%dx,soln%V,soln%asnd,soln%lambda,soln%dt)
   
-    call cons2prim( soln%U, soln%V, ig_low, ig_high )
+    call cons2prim( soln%U, soln%V )
   
     call central_flux(soln%U, soln%F)
   
-    !call jst_damping(soln%lambda,soln%U,soln%V,soln%D)
+    call jst_damping(soln%lambda,soln%U,soln%V,soln%D)
   
     soln%F = soln%F! + soln%D
     
     call explicit_euler(grid,soln%src,soln%dt,soln%F,soln%U,soln%R)
     
-    call update_mach(soln%V,soln%mach, ig_low, ig_high)
+    call update_mach(soln%V,soln%mach )
     
     call sub_in_bndry( soln%mach, soln%U, soln%V )
     
     call sup_out_bndry( soln%U, soln%V )
-    
-    !call cons2prim(soln%U,soln%V)
- ! 100 format(2(F9.4),4(F20.14))
- ! write(*,*) 'Initial solution values at cell centers:'
- ! write(header_str,*) '|    x   |    A    |         M         |'// &
- ! &  '        rho        |         u        |         p        |'
- ! write(*,*) trim(adjustl(header_str))
- ! do i = ig_low,ig_high
- !   write(*,100) grid%xc(i), grid%Ac(i), soln%M(i), soln%V(i,1), soln%V(i,2), soln%V(i,3)/1000.0_prec
-  !end do
-  
+   
+   !call cons2prim(soln%U,soln%V)
+! 100 format(2(F9.4),4(F20.14))
+! write(*,*) 'Initial solution values at cell centers:'
+! write(header_str,*) '|    x   |    A    |         M         |'// &
+! &  '        rho        |         u        |         p        |'
+! write(*,*) trim(adjustl(header_str))
+! do i = ig_low,ig_high
+!   write(*,100) grid%xc(i), grid%Ac(i), soln%M(i), soln%V(i,1), soln%V(i,2), soln%V(i,3)/1000.0_prec
+ !end do
+ 
   call output_soln(grid,soln,j)
-  
+ 
   end do
   !call prim2cons(soln%U,soln%V)
   !write(*,*) 'soln%U:  ','low = ',lbound(soln%U,1),'  high= ',ubound(soln%U,1)

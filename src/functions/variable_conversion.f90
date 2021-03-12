@@ -19,8 +19,8 @@ module variable_conversion
   !! Outputs:     sound_speed :
   !<
   !===========================================================================80
-  subroutine speed_of_sound( pressure, rho, sound_speed, i_start, i_stop )
-    integer, intent(in) :: i_start, i_stop
+  subroutine speed_of_sound( pressure, rho, sound_speed )
+    
     real(prec), dimension(:), intent(in)  :: pressure, rho
     real(prec), dimension(:), intent(out) :: sound_speed
     
@@ -38,13 +38,15 @@ module variable_conversion
   !!              V :
   !<
   !===========================================================================80
-  subroutine prim2cons( U, V, i_start, i_stop )
+  subroutine prim2cons( U, V )
     
-    integer, intent(in) :: i_start, i_stop
-    real(prec), dimension(i_start:i_stop,neq), intent(inout)  :: U
-    real(prec), dimension(i_start:i_stop,neq), intent(in)     :: V
-    
+    real(prec), dimension(:,:), intent(out)  :: U
+    real(prec), dimension(:,:), intent(in)   :: V
+    integer :: i
     U(:,1) = V(:,1)
+    !do i = lbound(U,1),ubound(U,1)
+    !write(*,*) "i = ", i, "  V(:,1) = ", V(i,1), "V(:,2) = ", V(i,2)
+    !end do
     U(:,2) = V(:,1)*V(:,2)
     U(:,3) = ( V(:,3)/(gamma - one) ) + half*V(:,1)*V(:,2)**2
     
@@ -60,15 +62,14 @@ module variable_conversion
   !! Outputs:     M :
   !<
   !===========================================================================80
-  subroutine update_mach( V, M, i_start, i_stop )
+  subroutine update_mach( V, M )
     
-    integer, intent(in) :: i_start, i_stop
-    real(prec), dimension(i_start:i_stop,neq),  intent(in) :: V 
-    real(prec), dimension(i_start:i_stop), intent(inout) :: M
+    real(prec), dimension(:,:),  intent(in) :: V 
+    real(prec), dimension(:), intent(inout) :: M
     
-    real(prec), dimension(i_start:i_stop) :: a
+    real(prec), dimension(lbound(V,1):ubound(V,1)) :: a
     
-    call speed_of_sound(V(:,3),V(:,1),a(:),i_start,i_stop)
+    call speed_of_sound(V(:,3),V(:,1),a)
     
     M = abs(V(:,2))/a(:)
     
@@ -85,17 +86,16 @@ module variable_conversion
   !!              V : 
   !<
   !===========================================================================80
-  subroutine cons2prim( U, V, i_start, i_stop )
+  subroutine cons2prim( U, V )
     
-    integer, intent(in) :: i_start, i_stop
-    real(prec), dimension(i_start:i_stop,neq), intent(inout) :: U
-    real(prec), dimension(i_start:i_stop,neq), intent(inout) :: V
+    real(prec), dimension(:,:), intent(inout) :: U
+    real(prec), dimension(:,:), intent(inout) :: V
     
     V(:,1) = U(:,1)
     V(:,2) = U(:,2)/U(:,1)
     V(:,3) = (gamma - one)*U(:,3) - half*(gamma - one)*U(:,2)**2/U(:,1)
     
-    call limit_primitives(U,V,i_start,i_stop)
+    call limit_primitives(U,V)
     
   end subroutine cons2prim
   
@@ -110,11 +110,10 @@ module variable_conversion
   !!              V : 
   !<
   !===========================================================================80
-  subroutine limit_primitives(U,V, i_start, i_stop)
+  subroutine limit_primitives(U,V)
     
-    integer, intent(in) :: i_start, i_stop
-    real(prec), dimension(i_start:i_stop,neq), intent(inout) :: U
-    real(prec), dimension(i_start:i_stop,neq), intent(inout) :: V
+    real(prec), dimension(:,:), intent(inout) :: U
+    real(prec), dimension(:,:), intent(inout) :: V
     integer :: i
     !logical, dimension(lbound(U,1):ubound(U,1)) :: mask
     
@@ -124,7 +123,7 @@ module variable_conversion
     !  mask = .true.
     !end where
     
-    do i = i_start,i_stop
+    do i = lbound(V,1),ubound(V,1)
       if (V(i,1)<0.001_prec) then
         V(i,1) = 0.001_prec
       end if
@@ -138,7 +137,7 @@ module variable_conversion
       !  call prim2cons(U,V)
       !end if
     end do
-    call prim2cons(U,V,i_start,i_stop)
+    call prim2cons(U,V)
     
   end subroutine limit_primitives
   
@@ -152,20 +151,27 @@ module variable_conversion
   !! Outputs:     V : 
   !<
   !===========================================================================80
-  subroutine isentropic_relations(M,V,i_start,i_stop)
+  subroutine isentropic_relations(M,V)
     
-    integer, intent(in) :: i_start, i_stop
-    real(prec), dimension(i_start:i_stop,neq), intent(inout) :: V
-    real(prec), dimension(i_start:i_stop),   intent(in) :: M
+    real(prec), dimension(:,:), intent(inout) :: V
+    real(prec), dimension(:),   intent(in) :: M
     
-    real(prec), dimension(i_start:i_stop)  :: T
+    real(prec), dimension(lbound(V,1):ubound(V,1))  :: T
+    real(prec), dimension(lbound(V,1):ubound(V,1)) :: a
+    integer :: i
     
-    T(:) = T0/(one + half*(gamma - one)*M(:)**2)
-    V(:,3) = 1000.0_prec*p0/(one + half*(gamma - one)*M(:)**2)**(gamma/(gamma-1))
-    V(:,1) = V(:,3)/(R_gas*T(:))
-    call speed_of_sound(V(:,3),V(:,1),V(:,2),i_start,i_stop)
-    V(:,2) = M(:)*V(:,2)
+    T = T0/(one + half*(gamma - one)*M(:)**2)
+    !do i = i_start,i_stop
+    ! write(*,*)"(M)", i , M(i)
+    !end do
+    V(:,3) = 1000.0_prec*p0/(one + half*(gamma - one)*M**2)**(gamma/(gamma-1))
+    V(:,1) = V(:,3)/(R_gas*T)
+    call speed_of_sound(V(:,3),V(:,1),a)
+    V(:,2) = M*a
     
+    !do i = i_start,i_stop
+    ! write(*,*)"(V) ", i , V(i,:)
+    !end do
   end subroutine isentropic_relations
   
 end module variable_conversion

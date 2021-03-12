@@ -122,7 +122,7 @@ contains
       
     end do
     
-    call isentropic_relations( soln%Mc, soln%Vc, i_low, i_high )
+    call isentropic_relations( soln%Mc, soln%Vc )
     
 !====================== Solution at cell interfaces =========================80
     
@@ -146,7 +146,7 @@ contains
       
     end do
     
-    call isentropic_relations( soln%Mi, soln%Vi, i_low-1, i_high )
+    call isentropic_relations( soln%Mi, soln%Vi )
     
   end subroutine solve_exact_q1d
 
