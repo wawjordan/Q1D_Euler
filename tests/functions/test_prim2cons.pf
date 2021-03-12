@@ -26,7 +26,7 @@ module test_prim2cons
       U_expected(1,2) = 4.168601384157521e+02_prec
       U_expected(1,3) = 3.242400000000001e+05_prec
 
-      call prim2cons(U,V,1,3)
+      call prim2cons(U,V)
 
       write(*,*)
       write(*,*) 'U(1)     = ', U(1,1)
