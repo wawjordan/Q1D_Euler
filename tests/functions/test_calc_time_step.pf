@@ -2,7 +2,8 @@ module test_calc_time_step
   
   use set_precision,    only : prec
   use fluid_constants,  only : gamma
-  use time_integration, only :calc_time_step
+  use time_integration, only : calc_time_step
+  use set_inputs,       only : CFL, i_low,i_high,ig_low,ig_high
   use pfunit_mod
   
   implicit none
@@ -20,6 +21,11 @@ module test_calc_time_step
       real(prec) :: dx
       real(prec), dimension(2) :: dt, lambda, asnd
       
+      i_low = 1
+      ig_low = 1
+      i_high = 2
+      ig_high = 2
+      CFL = 1.0_prec
       dx     = 0.066666666666667_prec
       V(1,1) = 1.225_prec
       V(1,2) = 340.29399054347107_prec
