@@ -98,26 +98,32 @@ module time_integration
   !! Outputs:     Rnorm : 
   !<
   !===========================================================================80
-  subroutine residual_norms( R, Rnorm, pnorm )
+  subroutine residual_norms( R, Rnorm, pnorm, rinit )
     
-    real(prec), dimension(i_low:i_high,neq), intent(in) :: R
-    real(prec), dimension(1,size(R,2)), intent(out) :: Rnorm
+    real(prec), dimension(i_low:i_high,1:neq), intent(in) :: R
+    real(prec), dimension(1,1:neq), intent(in)  :: rinit
+    real(prec),  intent(inout) :: Rnorm(1,1:neq)
     integer :: pnorm
     
     if (pnorm == 0) then
-      
-      Rnorm(1,:) = abs(maxval(R,1))
-      
-      elseif (pnorm == 1) then
-        Rnorm(1,:) = (one/real(size(R,1)))*sum(abs(R),1)
-      elseif (pnorm == 2) then 
-        Rnorm(1,:) = sqrt((one/real(size(R,1)))*sum(R**2,1))
-      else
-      
-      Rnorm(1,:) = abs(maxval(R,1))
-      
+      Rnorm(1,1:neq) = maxval(abs(R),1)
+    elseif (pnorm == 1) then
+      Rnorm(1,1) = (one/real(size(R,1)))*sum(abs(R(:,1)),1)
+      Rnorm(1,2) = (one/real(size(R,1)))*sum(abs(R(:,2)),1)
+      Rnorm(1,3) = (one/real(size(R,1)))*sum(abs(R(:,3)),1)
+    elseif (pnorm == 2) then 
+      Rnorm(1,1) = sqrt((one/real(size(R,1)))*sum(R(:,1)**2,1))
+      Rnorm(1,2) = sqrt((one/real(size(R,1)))*sum(R(:,2)**2,1))
+      Rnorm(1,3) = sqrt((one/real(size(R,1)))*sum(R(:,3)**2,1))
+    else
+      Rnorm(1,1) = maxval(abs(R(:,1)))
+      Rnorm(1,2) = maxval(abs(R(:,2)))
+      Rnorm(1,3) = maxval(abs(R(:,3)))
     end if
-    
+     Rnorm(1,1) = Rnorm(1,1)/rinit(1,1)
+     Rnorm(1,2) = Rnorm(1,2)/rinit(1,2)
+     Rnorm(1,3) = Rnorm(1,3)/rinit(1,3)
+     
   end subroutine residual_norms
 
 !subroutine advance_solution(grid,soln)
