@@ -16,7 +16,7 @@ module set_inputs
   public :: p0, T0, a0, rho0, pb
   public :: set_derived_inputs
   
-  integer :: imax    = 128
+  integer :: imax    = 32
   integer :: i_low   = 10
   integer :: i_high  = 10
   integer :: ig_low  = 10
