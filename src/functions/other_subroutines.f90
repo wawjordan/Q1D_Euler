@@ -100,6 +100,79 @@ module other_subroutines
 
   end subroutine jst_damping
   
+  
+
+  !========================== output_file_headers ============================80
+  !>
+  !! Description: 
+  !!
+  !! Inputs:      grid     : 
+  !!              soln     : 
+  !!              num_iter : 
+  !<
+  !===========================================================================80
+subroutine output_file_headers
+
+    use set_inputs, only : imax, CFL, k2, k4, shock, ramp
+
+    character(len=1024) :: dirname
+    character(len=1024) :: filename
+    character(len=64) ::   shock_str
+    character(len=64) ::   ncells_str
+    character(len=64) ::   CFL_str
+    character(len=64) ::   kappa2_str
+    character(len=64) ::   kappa4_str
+
+    ! Set up output directories
+    write (ncells_str  , "(A1,I0.3,A1)") "N"  , imax   , "/"
+    if (shock.eq.1) then
+      write (shock_str, "(A12)") "normal-shock"
+    else
+      write (shock_str, "(A10)") "isentropic"
+    end if
+    if (ramp.eq.1) then
+      write (CFL_str  , "(A4,I0.3,A5)") "CFL-", int(1000*cfl),"-ramp"
+    else
+      write (CFL_str  , "(A4,I0.3,A8)") "CFL-", int(1000*cfl),"-no-ramp"
+    end if
+    write (kappa2_str, "(A4,I0.4)") "_K2-"  , int(1000*k2)
+    write (kappa4_str, "(A4,I0.4)") "_K4-"  , int(1000*k4)
+    write (dirname, *) adjustl(trim(shock_str)),"/"//  &
+    &                   adjustl(trim(ncells_str))
+    write (filename,*) trim(CFL_str)//     &
+    &                   trim(kappa2_str)// &
+    &                   trim(kappa4_str)
+    write(*,*) trim(adjustl(filename))
+    write(*,*) trim(adjustl(dirname))
+    !call execute_command_line ('mkdir -p results/' // adjustl(trim(dirname)))
+
+  ! Set up output files (history and solution)
+  ! open(30,file='history.dat',status='unknown')
+    !open(30,file= 'results/'//trim(adjustl(dirname))//  &
+    !&               trim(adjustl(filename))//'_history.dat',status='unknown')
+    !open(30,file='q1Dnozzle_hist.dat',status='unknown')
+    !write(30,*) 'TITLE = "Quasi-1D Nozzle Iterative Residual History"'
+    !write(30,*) 'variables="Iteration""Time(s)""Res1""Res2""Res3"'
+
+    !open(40,file= 'results/'//trim(adjustl(dirname))//  &
+    !&               trim(adjustl(filename))//'_field.dat',status='unknown')
+    !open(40,file='q1Dnozzle.dat',status='unknown')
+    !write(40,*) 'TITLE = "Quasi-1D Nozzle Solution"'
+    !if(shock.eq.0) then
+    !  write(40,*) 'variables="x(m)""A(m^2)""rho(kg/m^3)""u(m/s)""p(N/m^2)"  &
+    !  & "M""U1""U2""U3""rho-exact""u-exact""p-exact""DE-rho""DE-u""DE-p"'
+    !elseif(shock.eq.1) then
+    !  write(40,*) 'variables="x(m)""A(m^2)""rho(kg/m^3)""u(m/s)""p(N/m^2)"&
+    !  &           "M""U1""U2""U3"'
+    !else
+    !  write(*,*) 'ERROR! shock must equal 0 or 1!!!'
+    !  stop
+    !endif
+  
+  end subroutine output_file_headers
+
+
+
   !============================= output_soln =================================80
   !>
   !! Description: 
@@ -117,22 +190,39 @@ module other_subroutines
     
     integer :: i
     
-    open(40,file='q1Dnozzle.dat',status='unknown')
-    write(40,*) 'TITLE = "Quasi-1D Nozzle Solution"'
-    write(40,*)' variables="x(m)""Area(m^2)""rho(kg/m^3)""u(m/s)"&
-             & "Press(N/m^2)""Mach""U1""U2""U3""F1""F2""F3"'
     ! Repeat the following each time you want to write out the solution
-    write(40,*) 'zone T="',num_iter,'" '
-    write(40,*) 'I=',imax
-    write(40,*) 'DATAPACKING=POINT'
-    write(40,*) 'DT=(DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
-             & DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE)'
+    write(30,*) 'zone T="',num_iter,'" '
+    write(30,*) 'I=',imax
+    write(30,*) 'DATAPACKING=POINT'
+    write(30,*) 'DT=(DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
+             & DOUBLE DOUBLE)'
     do i = 1, imax
-    write(40,*)grid%xc(i),grid%Ac(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
-             & soln%mach(i),soln%U(i,1),soln%U(i,2),soln%U(i,3),&
-             & soln%F(i,1),soln%F(i,2),soln%F(i,3)
+    write(30,*) grid%xc(i),grid%Ac(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
+             & soln%mach(i),soln%U(i,1),soln%U(i,2),soln%U(i,3)
     enddo
     
   end subroutine output_soln
+
+
+
+
+  !============================= output_res ==================================80
+  !>
+  !! Description: 
+  !!
+  !! Inputs:      grid     : 
+  !!              soln     : 
+  !!              num_iter : 
+  !<
+  !===========================================================================80
+  subroutine output_res(rnorm,num_iter)
+    
+    real(prec), dimension(neq), intent(in) :: rnorm
+    integer, intent(in) :: num_iter
+    integer :: i
+    ! Repeat the following each time you want to write out the solution
+    write(40,*) num_iter,(rnorm(i),i=1,neq)
+    
+  end subroutine output_res
   
 end module other_subroutines
