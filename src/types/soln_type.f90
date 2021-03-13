@@ -19,8 +19,6 @@ module soln_type
     real(prec), allocatable, dimension(:)   :: dt
     real(prec), allocatable, dimension(:)   :: src
     real(prec), allocatable, dimension(:)   :: lambda
-    real(prec), allocatable, dimension(:,:) :: rnorm 
-    real(prec), allocatable, dimension(:,:) :: rinit
 
   end type soln_t
 
@@ -50,9 +48,7 @@ module soln_type
               soln%temp( ig_low:ig_high ),      &
               soln%Src( i_low:i_high ),      &
               soln%dt( i_low:i_high ),     &
-              soln%lambda( ig_low:ig_high ), &
-               soln%rinit( 1, neq ), &
-              soln%rnorm( 1:max_iter, neq ) )
+              soln%lambda( ig_low:ig_high )  )
 
     soln%V   = zero
     soln%U   = zero
@@ -65,8 +61,6 @@ module soln_type
     soln%src   = zero
     soln%dt  = zero
     soln%lambda = zero
-    soln%rinit = zero
-    soln%rnorm = zero
 
   end subroutine allocate_soln
   
@@ -96,9 +90,7 @@ module soln_type
                soln%temp,      &
                soln%src,      &
                soln%dt,     &
-               soln%lambda, &
-               soln%rinit,  &
-               soln%rnorm   )
+               soln%lambda,   )
     
   end subroutine deallocate_soln
 
