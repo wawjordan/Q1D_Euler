@@ -71,7 +71,7 @@ module variable_conversion
     
     call speed_of_sound(V(:,3),V(:,1),a)
     
-    M = abs(V(:,2))/a(:)
+    M = abs(V(:,2))/a
     
   end subroutine update_mach
   
