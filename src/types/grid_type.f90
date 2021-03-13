@@ -34,7 +34,7 @@ module grid_type
   subroutine allocate_grid( grid )
     
     use set_constants, only : zero, one, half
-    use set_inputs   , only : imax, xmin, xmax, ig_low, ig_high
+    use set_inputs   , only : imax, xmin, xmax, ig_low, ig_high, i_low, i_high
     
     type( grid_t ), intent( inout ) :: grid
     integer :: i
@@ -45,7 +45,7 @@ module grid_type
               grid%xc(ig_low:ig_high)  , &
               grid%Ai(ig_low-1:ig_high), &
               grid%Ac(ig_low:ig_high)  , &
-              grid%dAc(ig_low:ig_high)   )
+              grid%dAc(i_low:i_high)   )
     
     grid%xi = [ (xmin + real(i,prec)/real(imax,prec)*(xmax-xmin), &
                i=ig_low-1,ig_high) ]
