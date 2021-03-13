@@ -36,10 +36,10 @@ module set_inputs
   real(prec) :: rho0       = zero
   real(prec) :: xmin       = -one
   real(prec) :: xmax       = one
-  real(prec) :: CFL        = 0.25_prec
+  real(prec) :: CFL        = 0.1_prec
   real(prec) :: pb         = 1000_prec
   real(prec) :: k2         = 1.0_prec/4.0_prec
-  real(prec) :: k4         = 1.0_prec/32.0_prec
+  real(prec) :: k4         = 1.0_prec/64.0_prec
 
   contains
 
