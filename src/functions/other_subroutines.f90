@@ -23,13 +23,15 @@ module other_subroutines
   !! Outputs:     S  : 
   !<
   !===========================================================================80
-  subroutine calculate_sources(V,dA,S)
+  subroutine calculate_sources(P,dA,S)
     
-    real(prec), dimension(ig_low:ig_high,neq), intent(in) :: V
-    real(prec), dimension(ig_low:ig_high),   intent(in) :: dA
+    !real(prec), dimension(ig_low:ig_high,neq), intent(in) :: V
+    real(prec), dimension(i_low:i_high),   intent(in) :: dA
+    real(prec), dimension(ig_low:ig_high),   intent(in) :: P
     real(prec), dimension(i_low:i_high),   intent(out) :: S
     integer :: i
-    S(i_low:i_high) = V(i_low:i_high,3)*dA(i_low:i_high)
+    !S(i_low:i_high) = V(i_low:i_high,3)*dA(i_low:i_high)/1000.0_prec
+    S(i_low:i_high) = P(i_low:i_high)*dA(i_low:i_high)
     !do i = i_low,i_high
     !write(*,*) i, "dA : ",dA(i), "V: ",V(i,:)," S: ",S(i)
     !end do
@@ -70,17 +72,17 @@ module other_subroutines
       !write(*,*) "lambda_half ", lambda_half(i)
       nu(i) = abs(P(i+1)-two*P(i)+P(i-1))/abs(P(i+1)+two*P(i)+P(i-1))
     end do
-    nu(i_low-2)  = nu(i_low-1)
-    nu(i_high+1) = nu(i_high)
+    nu(i_low-2)  = abs(2*nu(i_low-1) - nu(i_low))
+    nu(i_high+1) = abs(2*nu(i_high) - nu(i_high-1))
     
     do i = i_low-1,i_high
-      if (i == i_low-1) then
-        e2(i) = k2*max(nu(i),nu(i+1),nu(i+2))
-      elseif(i == i_high) then
-        e2(i) = k2*max(nu(i-1),nu(i),nu(i+1))
-      else
+      !if (i == i_low-1) then
+      !  e2(i) = k2*max(nu(i),nu(i+1),nu(i+2))
+      !elseif(i == i_high) then
+      !  e2(i) = k2*max(nu(i-1),nu(i),nu(i+1))
+      !else
         e2(i) = k2*max(nu(i-1),nu(i),nu(i+1),nu(i+2))
-      end if
+      !end if
       e4(i) = max(zero,k4-e2(i))
       !write(*,*) "e2 ",e2(i),"e4 ",e4(i)
     end do
