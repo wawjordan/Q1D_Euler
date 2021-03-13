@@ -48,13 +48,14 @@ module geometry
     
     !do i = i_low,i_high
     !  grid%dAc(i) = darea( grid%xc(i) )
+    !  write(*,*) grid%dAc(i)
     !end do
-    grid%dAc(ig_low:i_low-1) = zero
+    !grid%dAc(ig_low:i_low-1) = zero
     do i = i_low,i_high
       grid%dAc(i) = ( grid%Ai(i) - grid%Ai(i-1) )/grid%dx
-      write(*,*) grid%dAc(i)
+      !write(*,*) grid%dAc(i)
     end do
-    grid%dAc(i_high+1:ig_high) = zero
+    !grid%dAc(i_high+1:ig_high) = zero
     
   end subroutine setup_geometry
   
