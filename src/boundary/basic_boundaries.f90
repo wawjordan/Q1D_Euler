@@ -108,21 +108,18 @@ module basic_boundaries
     integer :: i
     
       
+    !do i = i_high+1,ig_high
+    !  V(i,:) = two*V(i-1,:) - V(i-2,:)
+    !end do
     do i = i_high+1,ig_high
-      V(i,:) = two*V(i-1,:) - V(i-2,:)
-      
-      !if ( V(i,1) < eps) then
-      !    V(i,1) = eps
-      !elseif ( V(i,2) < eps ) then
-      !    V(i,2) = eps
-      !elseif ( V(i,3)/(1000.0_prec*p0) < 1.0e-5_prec ) then
-      !    V(i,3) = 0.01_prec*1000.0_prec*p0
-      !end if
-      
+      U(i,:) = two*U(i-1,:) - U(i-2,:)
+      !U(i,:) = U(i-1,:)
     end do
+    !U(i_high+1,:) = two*U(i_high,:)-U(i_high-1,:)
+    !U(i_high+2,:) = U(i_high+1,:)
     !call prim2cons(U,V)
-    call prim2cons( U(i_high+1:ig_high,1:neq), V(i_high+1:ig_high,1:neq) )
-    !call cons2prim( U(i_high+1:ig_high,1:neq), V(i_high+1:ig_high,1:neq) )
+    !call prim2cons( U(i_high+1:ig_high,1:neq), V(i_high+1:ig_high,1:neq) )
+    call cons2prim( U(i_high+1:ig_high,1:neq), V(i_high+1:ig_high,1:neq) )
   end subroutine sup_out_bndry
   
  ! subroutine enforce_bndry()   
