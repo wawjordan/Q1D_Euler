@@ -11,7 +11,7 @@ module set_inputs
   public :: imax, neq, xmin, xmax, n_ghost_cells
   public :: i_high, i_low, ig_high, ig_low
   public :: Astar, area, darea
-  public :: CFL, k2, k4, eps
+  public :: CFL, k2, k4, eps, tol
   public :: iSS, max_iter, max_newton_iter, newton_tol
   public :: p0, T0, a0, rho0, pb
   public :: set_derived_inputs
@@ -23,11 +23,12 @@ module set_inputs
   integer :: ig_high = 10
   integer :: neq  = 3
   integer :: iSS  = 0
-  integer :: max_iter = 100
+  integer :: max_iter = 500000
   integer :: n_ghost_cells   = 2
   integer :: max_newton_iter = 1000
 
   real(prec) :: newton_tol = 1.0e-15_prec
+  real(prec) :: tol = 1.0e-10_prec
   real(prec) :: eps        = 1.0e-3_prec
   real(prec) :: p0         = 300.0_prec
   real(prec) :: T0         = 600.0_prec
