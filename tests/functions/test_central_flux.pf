@@ -15,15 +15,26 @@ module test_central_flux
   @test
     subroutine central_flux_wall_test
 
-      real(prec), dimension(3,3) :: U
-      real(prec), dimension(3,3) :: F_expected
-      real(prec), dimension(3,3) :: F
+      real(prec), dimension(0:2,3) :: U
+      real(prec), dimension(1,3) :: F_expected
+      real(prec), dimension(0:1,3) :: F
       
+      i_low = 1
+      ig_low = 0
+      i_high = 1
+      ig_high = 2
+      
+      U(0,1) = 1.225_prec
+      U(0,2) = 0.0_prec
+      U(0,3) = 253312.5_prec
+
       U(1,1) = 1.225_prec
       U(1,2) = 0.0_prec
       U(1,3) = 253312.5_prec
-
       
+      U(2,1) = 1.225_prec
+      U(2,2) = 0.0_prec
+      U(2,3) = 253312.5_prec
 
       F_expected(1,1) = 0.0_prec
       F_expected(1,2) = 101325.0_prec
@@ -33,15 +44,15 @@ module test_central_flux
 
       write(*,*)
       write(*,*) 'zero velocity test case:'
-      write(*,*) 'F(1)     = ', F(1,1)
+      write(*,*) 'F(1)     = ', F(0,1)
       write(*,*) 'F_exp(1) = ', F_expected(1,1)
-      @assertequal(F_expected(1,1), F(1,1), toler)
-      write(*,*) 'F(2)     = ', F(1,2)
+      @assertequal(F_expected(1,1), F(0,1), toler)
+      write(*,*) 'F(2)     = ', F(0,2)
       write(*,*) 'F_exp(2) = ', F_expected(1,2)
-      @assertequal(1.0_prec, F(1,2)/F_expected(1,2), toler)
-      write(*,*) 'F(3)     = ', F(1,3)
+      @assertequal(1.0_prec, F(0,2)/F_expected(1,2), toler)
+      write(*,*) 'F(3)     = ', F(0,3)
       write(*,*) 'F_exp(3) = ', F_expected(1,3)
-      @assertequal(F_expected(1,3), F(1,3), toler)
+      @assertequal(F_expected(1,3), F(0,3), toler)
       write(*,*) 'toler    = ', toler
       
     end subroutine central_flux_wall_test
@@ -49,14 +60,26 @@ module test_central_flux
   @test
     subroutine central_flux_supersonic_test
 
-      real(prec), dimension(3,3) :: U
-      real(prec), dimension(3,3) :: F_expected
-      real(prec), dimension(3,3) :: F
+      real(prec), dimension(0:2,3) :: U
+      real(prec), dimension(1,3) :: F_expected
+      real(prec), dimension(0:1,3) :: F
       
+      i_low = 1
+      ig_low = 0
+      i_high = 1
+      ig_high = 2
+      
+      U(0,1) = 1.225_prec
+      U(0,2) = 510.6536695593_prec
+      U(0,3) = 917035.5796875_prec
+
       U(1,1) = 1.225_prec
       U(1,2) = 510.6536695593_prec
       U(1,3) = 917035.5796875_prec
-
+      
+      U(2,1) = 1.225_prec
+      U(2,2) = 510.6536695593_prec
+      U(2,3) = 917035.5796875_prec
       
       F_expected(1,1) = 510.6536695593_prec
       F_expected(1,2) = 537111.1593750_prec
@@ -67,15 +90,15 @@ module test_central_flux
 
       write(*,*)
       write(*,*) 'supersonic test case:'
-      write(*,*) 'F(1)     = ', F(1,1)
+      write(*,*) 'F(1)     = ', F(0,1)
       write(*,*) 'F_exp(1) = ', F_expected(1,1)
-      @assertequal(1.0_prec, F(1,1)/F_expected(1,1), toler)
-      write(*,*) 'F(2)     = ', F(1,2)
+      @assertequal(1.0_prec, F(0,1)/F_expected(1,1), toler)
+      write(*,*) 'F(2)     = ', F(0,2)
       write(*,*) 'F_exp(2) = ', F_expected(1,2)
-      @assertequal(1.0_prec, F(1,2)/F_expected(1,2), toler)
-      write(*,*) 'F(3)     = ', F(1,3)
+      @assertequal(1.0_prec, F(0,2)/F_expected(1,2), toler)
+      write(*,*) 'F(3)     = ', F(0,3)
       write(*,*) 'F_exp(3) = ', F_expected(1,3)
-      @assertequal(1.0_prec, F(1,3)/F_expected(1,3), toler)
+      @assertequal(1.0_prec, F(0,3)/F_expected(1,3), toler)
       write(*,*) 'toler    = ', toler
       
     end subroutine central_flux_supersonic_test
