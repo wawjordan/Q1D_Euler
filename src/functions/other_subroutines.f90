@@ -67,31 +67,47 @@ module other_subroutines
     P(:) = V(:,3)
     lambda_half = half*(lambda(i_low:i_high+1) + lambda(i_low-1:i_high))
     do i = i_low-1,i_high
+      !write(*,*) "lambda_half ", lambda_half(i)
       nu(i) = abs(P(i+1)-two*P(i)+P(i-1))/abs(P(i+1)+two*P(i)+P(i-1))
     end do
     nu(i_low-2)  = nu(i_low-1)
     nu(i_high+1) = nu(i_high)
     
     do i = i_low-1,i_high
-      !if (i == i_low-1) then
-      !  e2(i) = k2*max(nu(i),nu(i+1),nu(i+2))
-      !elseif(i == i_high) then
-      !  e2(i) = k2*max(nu(i-1),nu(i),nu(i+1))
-      !else
+      if (i == i_low-1) then
+        e2(i) = k2*max(nu(i),nu(i+1),nu(i+2))
+      elseif(i == i_high) then
+        e2(i) = k2*max(nu(i-1),nu(i),nu(i+1))
+      else
         e2(i) = k2*max(nu(i-1),nu(i),nu(i+1),nu(i+2))
-      !end if
+      end if
       e4(i) = max(zero,k4-e2(i))
+      !write(*,*) "e2 ",e2(i),"e4 ",e4(i)
     end do
     
-    do i = i_low-1,i_high
+    do i = i_low-1,i_high-1
       D1(i,:) = lambda_half(i)*e2(i)*(U(i+1,:)-U(i,:))
-      D3(i,:) = lambda_half(i)*e4(i)*(U(i+2,:)-three*U(i+1,:)+three*U(i,:)-U(i-1,:))
+      D3(i,:) = lambda_half(i)*e4(i)* &
+              & ( U(i+2,:) - three*U(i+1,:) + three*U(i,:) - U(i-1,:) )
+      !write(*,*) "U(i+2,3) ",U(i+2,3), "U(i+1,3): ",U(i+1,3), &
+      !         & "U(i,3): ",U(i,3),"U(i-1,3): ",U(i-1,3)
     end do
-    
+    !do i = i_low-1,i_high
+    !  write(*,*) "D1(1): ",D1(i,1), "D1(2): ",D1(i,2), "D1(3): ", D1(i,3)
+    !end do
+    !write(*,*)
+    !do i = i_low-1,i_high
+    !  write(*,*) "D3(1): ",D3(i,1), "D3(2): ",D3(i,2), "D3(3): ", D3(i,3)
+    !end do
     d(:,:) = D3(:,:) - D1(:,:)
     
-    d(i_low-1,:) = 2*d(i_low,:) - d(i_low+1,:)
+    !do i = i_low-1,i_high
+    !  write(*,*) "d(1): ",d(i,1), "d(2): ",d(i,2), "d(3): ", d(i,3)
+    !end do
+    !d(i_low-1,:) = 2*d(i_low,:) - d(i_low+1,:)
+    !d(i_high-1,:) = 2*d(i_high-2,:) - d(i_high-3,:)
     d(i_high,:) = 2*d(i_high-1,:) - d(i_high-2,:)
+    
 
   end subroutine jst_damping
   
