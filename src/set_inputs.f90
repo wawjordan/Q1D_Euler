@@ -12,18 +12,21 @@ module set_inputs
   public :: i_high, i_low, ig_high, ig_low
   public :: Astar, area, darea
   public :: CFL, k2, k4, eps, tol
-  public :: iSS, max_iter, max_newton_iter, newton_tol
+  public :: max_iter, max_newton_iter, newton_tol
+  public :: iSS, shock, ramp
   public :: p0, T0, a0, rho0, pb
   public :: set_derived_inputs
   
-  integer :: imax    = 32
+  integer :: imax    = 128
   integer :: i_low   = 10
   integer :: i_high  = 10
   integer :: ig_low  = 10
   integer :: ig_high = 10
   integer :: neq  = 3
-  integer :: iSS  = 0
-  integer :: max_iter = 500000
+  integer :: iSS  = 1
+  integer :: shock = 0
+  integer :: ramp = 0
+  integer :: max_iter = 5000
   integer :: n_ghost_cells   = 2
   integer :: max_newton_iter = 1000
 
@@ -38,8 +41,8 @@ module set_inputs
   real(prec) :: xmin       = -one
   real(prec) :: xmax       = one
   real(prec) :: CFL        = 0.1_prec
-  real(prec) :: pb         = 1000_prec
-  real(prec) :: k2         = 1.0_prec/4.0_prec
+  real(prec) :: pb         = 100000_prec
+  real(prec) :: k2         = 1.0_prec/2.0_prec
   real(prec) :: k4         = 1.0_prec/64.0_prec
 
   contains
