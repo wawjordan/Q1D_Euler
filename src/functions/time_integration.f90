@@ -78,13 +78,13 @@ module time_integration
     
     
     U(i_low:i_high,1) = U(i_low:i_high,1) & 
-                      + minval(dt(i_low:i_high))/ &
+                      - minval(dt(i_low:i_high))/ &
                         (grid%Ac(i_low:i_high)*grid%dx)*R(:,1)
     U(i_low:i_high,2) = U(i_low:i_high,2) &
-                      + minval(dt(i_low:i_high))/ &
+                      - minval(dt(i_low:i_high))/ &
                         (grid%Ac(i_low:i_high)*grid%dx)*R(:,2)
     U(i_low:i_high,3) = U(i_low:i_high,3) &
-                      + minval(dt(i_low:i_high))/ &
+                      - minval(dt(i_low:i_high))/ &
                         (grid%Ac(i_low:i_high)*grid%dx)*R(:,3)
     
   end subroutine explicit_euler
