@@ -36,14 +36,10 @@ module basic_boundaries
     
     integer :: i
     
-    call update_mach(V,M)
-    
     do i = i_low-1,-1,ig_low
       M(i) = 2*M(i+1) - M(i+2)
     end do
     
-    !call isentropic_relations(M,V)
-    !call prim2cons(U,V)
     call isentropic_relations(M(ig_low:i_low-1),V(ig_low:i_low-1,:))
     call prim2cons(U(ig_low:i_low-1,:),V(ig_low:i_low-1,:))
     
@@ -64,11 +60,9 @@ module basic_boundaries
     
     use set_inputs, only : pb
     
-    real(prec), dimension(:,:), intent(inout) :: U, V
+    real(prec), dimension(ig_low:ig_high,neq), intent(inout) :: U, V
     
-    integer :: i, i_high
-    
-    i_high = ubound(V,1)
+    integer :: i
     
     do i = i_high+1,ig_high
       
@@ -77,15 +71,15 @@ module basic_boundaries
         V(i,2) = two*V(i-1,2) - V(i-2,2)
         V(i,3) = two*pb - V(i-1,3)
       else
-        V(i,1) = V(i-1,1)
-        V(i,2) = V(i-1,2)
-        V(i,3) = V(i-1,3)
+        V(i,1) = two*V(i-1,1) - V(i-2,1)
+        V(i,2) = two*V(i-1,2) - V(i-2,2)
+        V(i,3) = two*V(i-1,3) - V(i-2,3)
       end if
       
     end do
     
     call prim2cons(U(i_high+1:ig_high,:),V(i_high+1:ig_high,:))
-      
+    call cons2prim(U(i_high+1:ig_high,:),V(i_high+1:ig_high,:))
   end subroutine sub_out_bndry
   
   !============================= sup_out_bndry ===============================80
@@ -100,8 +94,6 @@ module basic_boundaries
   !<
   !===========================================================================80
   subroutine sup_out_bndry( U, V )
-    
-    use set_inputs, only : p0
     
     real(prec), dimension(ig_low:ig_high,neq), intent(inout) :: U, V
     
@@ -120,6 +112,7 @@ module basic_boundaries
     !call prim2cons(U,V)
     !call prim2cons( U(i_high+1:ig_high,1:neq), V(i_high+1:ig_high,1:neq) )
     call cons2prim( U(i_high+1:ig_high,1:neq), V(i_high+1:ig_high,1:neq) )
+    !call isentropic_relations(
   end subroutine sup_out_bndry
   
  ! subroutine enforce_bndry()   
