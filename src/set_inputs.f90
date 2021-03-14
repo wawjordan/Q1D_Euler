@@ -26,7 +26,7 @@ module set_inputs
   integer :: iSS  = 1
   integer :: shock = 0
   integer :: ramp = 0
-  integer :: max_iter = 500000
+  integer :: max_iter = 150000
   integer :: n_ghost_cells   = 2
   integer :: max_newton_iter = 1000
 
