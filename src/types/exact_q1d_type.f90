@@ -109,7 +109,7 @@ contains
     call newton_safe( grid%Ac(i_low), fun, dfun, M0, M1, soln%Mc(i_low), Mk, err )
     
     do i = i_low+1,i_high
-      if ( (iSS==1).and.(grid%Ac(i) > grid%Ac(i-1)) ) then
+      if ( (iSS==1).and.(grid%Ai(i) > grid%Ai(i-1)) ) then
         M0 = one - eps
         M1 = 10.0_prec
       else
