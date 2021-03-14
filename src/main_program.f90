@@ -18,10 +18,6 @@ program main_program
   implicit none
   
   character(len=100) :: header_str1
-  !character(len=100) :: header_str2
-  !character(len=100) :: header_str3
-  !character(len=100) :: header_str4
-  !character(len=100) :: header_str5
   integer :: j
   real(prec), dimension(3) :: rnorm
   real(prec), dimension(3) :: rinit
@@ -29,8 +25,6 @@ program main_program
   type( soln_t )      :: soln
   type( exact_q1d_t ) :: ex_soln  
   
-  call read_in
-  call output_file_headers
   
   100 format(1(I0.8),3(G20.7))
   
@@ -38,6 +32,8 @@ program main_program
   & "   ||velocity||    |   ||pressure||    |"
   call set_derived_constants
   call set_fluid_constants
+  call read_in
+  call output_file_headers
   call set_derived_inputs
   call setup_geometry(grid,soln)
   
@@ -72,6 +68,7 @@ program main_program
   write(*,*) 'Residual Norms: Iteration 0'
   write(*,*) header_str1
   write(*,100) j, rinit(1), rinit(2), rinit(3)
+  write(*,*)
   write(*,*) 'Relative Residual Norms:'
   
   do j = 1,max_iter
@@ -104,7 +101,7 @@ program main_program
       call output_soln(grid,soln,j)
     end if
     
-    call residual_norms(soln%R,rnorm,0,rinit)
+    call residual_norms(soln%R,rnorm,2,rinit)
     !soln%rnorm(j,1:neq) = rnorm(1,1:neq)
     if (all(rnorm<tol) ) then
       exit
@@ -127,34 +124,3 @@ program main_program
   call teardown_geometry(grid,soln)
 
 end program main_program
-
-!  100 format(2(F9.4),4(G20.7))
-!  200 format(1(F9.4),3(G20.7))
-!  300 format(2(F9.4),3(G20.7))
-!  write(header_str1,*) '|    x   |    A    |         M         |'// &
-!  &  '        rho        |         u        |         p        |'
-!  write(header_str2,*) '|    x   |        U(1)       |'// &
-!  & '       U(2)       |       U(3)       |'
-!  write(header_str3,*) '|    x   |        F(1)       |'// &
-!  & '       F(2)       |       F(3)       |'
-!  write(header_str4,*) '|    x   |    dA   |         S         |'// &
-!  & '         dt       |       lambda     |' 
-!  write(header_str5,*) '|    x   |        D(1)       |'// &
-!  & '       D(2)       |       D(3)       |'
-
-!  write(*,*) 'Initial Conditions: Primitives'
-!  write(*,*) trim(adjustl(header_str1))
-!  do i = ig_low,ig_high
-!    write(*,100) grid%xc(i), grid%Ac(i), soln%mach(i), soln%V(i,1), soln%V(i,2), soln%V(i,3)/1000.0_prec
-!  end do
-!  write(*,*)
-!  write(*,*) 'Calculate Sources and Time step:'
-!  write(*,*) trim(adjustl(header_str4))
-!  do i = ig_low,ig_high
-!    if( (i>=i_low).and.(i<=i_high) ) then
-!      write(*,300) grid%xc(i),grid%dAc(i), soln%src(i), soln%dt(i), soln%lambda(i)
-!    else 
-!      write(*,300) grid%xc(i), zero, zero, zero, soln%lambda(i)
-!    end if
-!  end do
-!  write(*,*)
