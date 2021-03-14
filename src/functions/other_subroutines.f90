@@ -7,6 +7,7 @@ module other_subroutines
   use variable_conversion
   use fluxes
   use soln_type
+  use exact_q1d_type
   use grid_type
   
   implicit none
@@ -100,7 +101,34 @@ module other_subroutines
 
   end subroutine jst_damping
   
-  
+  subroutine calc_de( soln, exact_soln, DE, DEnorm, pnorm )
+    
+    type(soln_t), intent(inout) :: soln
+    type(exact_q1d_t), intent(in) :: exact_soln
+    real(prec), dimension(i_low:i_high,1:neq), intent(out) :: DE
+    real(prec), dimension(1,1:neq), intent(out) :: DEnorm
+    integer, intent(in) :: pnorm
+    real(prec) :: Linv
+    Linv = one/real(i_high-i_low)
+    DE = soln%V(i_low:i_high,1:neq) - exact_soln%Vc(i_low:i_high,1:neq)
+    
+    if (pnorm == 0) then
+      DEnorm(1,1:neq) = maxval(abs(DE),1)
+    elseif (pnorm == 1) then
+      DEnorm(1,1) = Linv*sum(abs(DE(:,1)),1)
+      DEnorm(1,2) = Linv*sum(abs(DE(:,2)),1)
+      DEnorm(1,3) = Linv*sum(abs(DE(:,3)),1)
+    elseif (pnorm == 2) then
+      DEnorm(1,1) = sqrt(Linv*sum(DE(:,1)**2,1))
+      DEnorm(1,2) = sqrt(Linv*sum(DE(:,2)**2,1))
+      DEnorm(1,3) = sqrt(Linv*sum(DE(:,3)**2,1))
+    else
+      DEnorm(1,1) = maxval(abs(DE(:,1)))
+      DEnorm(1,2) = maxval(abs(DE(:,2)))
+      DEnorm(1,3) = maxval(abs(DE(:,3)))
+    end if
+    
+  end subroutine calc_de
 
   !========================== output_file_headers ============================80
   !>
