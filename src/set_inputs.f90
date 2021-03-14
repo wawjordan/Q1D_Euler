@@ -15,7 +15,7 @@ module set_inputs
   public :: max_iter, max_newton_iter, newton_tol
   public :: iSS, shock, ramp
   public :: p0, T0, a0, rho0, pb
-  public :: set_derived_inputs
+  public :: set_derived_inputs, read_in
   
   integer :: imax    = 128
   integer :: i_low   = 10
@@ -41,11 +41,31 @@ module set_inputs
   real(prec) :: xmin       = -one
   real(prec) :: xmax       = one
   real(prec) :: CFL        = 0.1_prec
-  real(prec) :: pb         = 100000_prec
+  real(prec) :: p_ratio    = 0.5_prec
+  real(prec) :: pb         = 150000_prec
   real(prec) :: k2         = 1.0_prec/2.0_prec
   real(prec) :: k4         = 1.0_prec/64.0_prec
 
   contains
+
+
+  subroutine read_in
+      implicit none
+      character(len=10) :: discard              ! ignore character string
+      open(25,file='input.dat',status='old')
+      read(25,*) discard
+      read(25,*) discard
+      read(25,*) discard, imax
+      read(25,*) discard, shock
+      read(25,*) discard, ramp
+      read(25,*) discard, p_ratio
+      read(25,*) discard, CFL
+      read(25,*) discard, k2
+      read(25,*) discard, k4
+      close(25)
+      pb = p_ratio*p0*1000_prec
+  end subroutine read_in
+
 
   !=================================== area ==================================80
   !>
