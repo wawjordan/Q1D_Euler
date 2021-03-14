@@ -11,7 +11,8 @@ module basic_boundaries
   
   public :: sub_in_bndry
   public :: sub_out_bndry, sup_out_bndry
-
+  public :: enforce_bndry
+  
   contains
   
   !============================= sub_in_bndry  ===============================80
@@ -115,7 +116,24 @@ module basic_boundaries
     !call isentropic_relations(
   end subroutine sup_out_bndry
   
- ! subroutine enforce_bndry()   
- ! end subroutine sub_in_bndry
+ subroutine enforce_bndry( soln )
+  
+  use set_inputs, only : shock
+  use soln_type,  only : soln_t
+
+  type( soln_t ), intent(inout) :: soln
+  
+  if (shock.eq.1) then
+    call sub_in_bndry( soln%mach, soln%U, soln%V )
+    call sub_out_bndry( soln%U, soln%V )
+  elseif (shock.eq.0) then
+    call sub_in_bndry( soln%mach, soln%U, soln%V )
+    call sup_out_bndry( soln%U, soln%V )
+  else
+    write(*,*) 'ERROR! shock must equal 0 or 1!!!'
+    stop
+  end if
+
+ end subroutine enforce_bndry
   
 end module basic_boundaries
