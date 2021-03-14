@@ -158,20 +158,14 @@ module variable_conversion
     
     real(prec), dimension(lbound(V,1):ubound(V,1))  :: T
     real(prec), dimension(lbound(V,1):ubound(V,1)) :: a
-    integer :: i
     
     T = T0/(one + half*(gamma - one)*M(:)**2)
-    !do i = i_start,i_stop
-    ! write(*,*)"(M)", i , M(i)
-    !end do
+    
     V(:,3) = 1000.0_prec*p0/(one + half*(gamma - one)*M**2)**(gamma/(gamma-1))
     V(:,1) = V(:,3)/(R_gas*T)
     call speed_of_sound(V(:,3),V(:,1),a)
     V(:,2) = M*a
     
-    !do i = i_start,i_stop
-    ! write(*,*)"(V) ", i , V(i,:)
-    !end do
   end subroutine isentropic_relations
   
 end module variable_conversion
