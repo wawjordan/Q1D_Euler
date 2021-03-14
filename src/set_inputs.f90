@@ -14,7 +14,7 @@ module set_inputs
   public :: CFL, k2, k4, eps, tol
   public :: max_iter, max_newton_iter, newton_tol
   public :: iSS, shock, ramp
-  public :: p0, T0, a0, rho0, pb
+  public :: p0, T0, a0, rho0, pb, p_ratio
   public :: set_derived_inputs, read_in
   
   integer :: imax    = 128
@@ -26,12 +26,12 @@ module set_inputs
   integer :: iSS  = 1
   integer :: shock = 0
   integer :: ramp = 0
-  integer :: max_iter = 5000
+  integer :: max_iter = 500000
   integer :: n_ghost_cells   = 2
   integer :: max_newton_iter = 1000
 
   real(prec) :: newton_tol = 1.0e-15_prec
-  real(prec) :: tol = 1.0e-10_prec
+  real(prec) :: tol = 1.0e-11_prec
   real(prec) :: eps        = 1.0e-3_prec
   real(prec) :: p0         = 300.0_prec
   real(prec) :: T0         = 600.0_prec
