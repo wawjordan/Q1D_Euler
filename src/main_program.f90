@@ -3,11 +3,11 @@ program main_program
   use set_precision, only : prec
   use set_constants, only : set_derived_constants
   use fluid_constants, only : set_fluid_constants
-  use set_inputs, only : set_derived_inputs, max_iter, neq, tol
-  !use set_inputs, only : i_high, i_low, ig_high, ig_low
+  use set_inputs, only : set_derived_inputs, read_in
+  use set_inputs, only : max_iter, neq, tol, shock
   use variable_conversion
   use time_integration
-  use basic_boundaries
+  use basic_boundaries, only : enforce_bndry
   use fluxes
   use other_subroutines
   use geometry, only : setup_geometry, teardown_geometry
@@ -23,10 +23,14 @@ program main_program
   !character(len=100) :: header_str4
   !character(len=100) :: header_str5
   integer :: j
-  real(prec), dimension(1,3) :: rnorm
+  real(prec), dimension(3) :: rnorm
+  real(prec), dimension(3) :: rinit
   type( grid_t )      :: grid
   type( soln_t )      :: soln
   type( exact_q1d_t ) :: ex_soln  
+  
+  call read_in
+  call output_file_headers
   
   100 format(1(I0.8),3(G20.7))
   
@@ -43,9 +47,7 @@ program main_program
   
   call solve_exact_q1d( ex_soln, grid)
   
-  call sub_in_bndry( soln%mach, soln%U, soln%V )
-
-  call sub_out_bndry( soln%U, soln%V )
+  call enforce_bndry( soln )
   
   call cons2prim( soln%U, soln%V )
  
@@ -65,11 +67,11 @@ program main_program
   
   call explicit_euler(grid,soln%src,soln%dt,soln%F,soln%U,soln%R)
   
-  call residual_norms(soln%R,soln%rinit,2,(/one,one,one/))
+  call residual_norms(soln%R,rinit,2,(/one,one,one/))
   
   write(*,*) 'Residual Norms: Iteration 0'
   write(*,*) header_str1
-  write(*,100) j, soln%rinit(1,1), soln%rinit(1,2), soln%rinit(1,3)
+  write(*,100) j, rinit(1), rinit(2), rinit(3)
   write(*,*) 'Relative Residual Norms:'
   
   do j = 1,max_iter
@@ -80,9 +82,7 @@ program main_program
     
     call calc_time_step(grid%dx,soln%V,soln%asnd,soln%lambda,soln%dt)
     
-    call sub_in_bndry( soln%mach, soln%U, soln%V )
-    
-    call sub_out_bndry( soln%U, soln%V )
+    call enforce_bndry( soln )
     
     call cons2prim( soln%U, soln%V )
     
@@ -100,23 +100,28 @@ program main_program
     
     call cons2prim(soln%U,soln%V)
     
-    if (mod(j,1000)==0) then
+    if (mod(j,10000)==0) then
       call output_soln(grid,soln,j)
     end if
     
-    call residual_norms(soln%R(:,:),rnorm(:,:),0,soln%rinit(:,:))
+    call residual_norms(soln%R,rnorm,0,rinit)
     !soln%rnorm(j,1:neq) = rnorm(1,1:neq)
     if (all(rnorm<tol) ) then
       exit
     end if
-    if (mod(j,1000)==0) then
+    if (mod(j,10000)==0) then
       write(*,*) header_str1
     end if
-    if (mod(j,100)==0) then
-      write(*,100) j, rnorm(1,1), rnorm(1,2), rnorm(1,3)
+    if (mod(j,1000)==0) then
+      write(*,100) j, rnorm(1), rnorm(2), rnorm(3)  
+    end if
+    if (mod(j,10)==0) then
+      call output_res(rnorm,j)
     end if
   end do
+  
   call output_soln(grid,soln,j+1)
+  call output_res(rnorm,j)
   
   call deallocate_exact_q1d( ex_soln )
   call teardown_geometry(grid,soln)
