@@ -1,11 +1,17 @@
 #!./bin/bash
-filename="input.dat"
+input="input.dat"
+summary="../results/summary.dat"
+temp="temp.txt"
 start=`date +%s`
 shock_str=""
 cfl_str=""
-for imax in 32 #16 32 64 128 256 512
+touch $summary
+if [ -f $summary ]; then
+  rm -f "$summary"
+fi
+for shock in 0 #0 1
 do
-  for shock in 0 #0 1
+  for imax in 16 32 64 128 256 512
   do
     for ramp in 0 #0 1
     do
@@ -17,14 +23,12 @@ do
           do
             for cfl in 0.1 #0.1 0.5 0.9
             do
-              if [ $shock -eq 0 ]
-              then
+              if [ $shock -eq 0 ]; then
                 shock_str="Isentropic"
               else
                 shock_str="Normal Shock"
               fi
-              if [ $ramp -eq 1 ]
-              then
+              if [ $ramp -eq 1 ]; then
                 cfl_str="cfl-ramp"
               else
                cfl_str="cfl-const"
@@ -33,16 +37,18 @@ echo ""
 echo "################################################################################"
 echo " N=$imax | $shock_str | $cfl_str | P_rat=$prat | k2=$k2 | k4=$k4 | CFL=$cfl "
 echo "################################################################################"
-              echo "! Input Data" > $filename
-              echo "----|----|----|----|----|----|" >> $filename
-              echo "imax      $imax" >> $filename
-              echo "shock     $shock" >> $filename
-              echo "ramp      $ramp" >> $filename
-              echo "p_rat     $prat" >> $filename
-              echo "CFL       $cfl" >> $filename
-              echo "k2        $k2" >> $filename
-              echo "k4        $k4" >> $filename
+              echo "! Input Data" > $input
+              echo "----|----|----|----|----|----|" >> $input
+              echo "imax      $imax" >> $input
+              echo "shock     $shock" >> $input
+              echo "ramp      $ramp" >> $input
+              echo "p_rat     $prat" >> $input
+              echo "CFL       $cfl" >> $input
+              echo "k2        $k2" >> $input
+              echo "k4        $k4" >> $input
               ./../build/bin/test_program
+              #echo "N$imax" >> $summary
+              cat "$temp" >> $summary
             done
           done
         done      
@@ -50,6 +56,7 @@ echo "##########################################################################
     done        
   done
 done
+rm -f temp.txt
 end=`date +%s`
 runtime=$((end-start))
 hours=$((runtime / 3600))
