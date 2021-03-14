@@ -2,7 +2,8 @@ module soln_type
 
   use set_precision, only : prec
   use set_constants, only : zero, one
-  use set_inputs,    only : neq, max_iter, i_low, i_high, ig_low, ig_high
+  use set_inputs,    only : i_low, i_high, ig_low, ig_high
+  use set_inputs,    only : neq, max_iter, shock
   
   implicit none
 
@@ -19,7 +20,11 @@ module soln_type
     real(prec), allocatable, dimension(:)   :: dt
     real(prec), allocatable, dimension(:)   :: src
     real(prec), allocatable, dimension(:)   :: lambda
-
+    real(prec), allocatable, dimension(:,:) :: DE
+    real(prec), allocatable, dimension(:)   :: DEnorm
+    real(prec), allocatable, dimension(:)   :: rnorm
+    real(prec), allocatable, dimension(:)   :: rinit
+    
   end type soln_t
 
   contains
@@ -48,8 +53,17 @@ module soln_type
               soln%temp( ig_low:ig_high ),      &
               soln%Src( i_low:i_high ),      &
               soln%dt( i_low:i_high ),     &
-              soln%lambda( ig_low:ig_high )  )
-
+              soln%lambda( ig_low:ig_high ), &
+              soln%rnorm( 1:neq ),        &
+              soln%rinit( 1:neq ) )
+    
+    if (shock.eq.0) then
+      allocate( soln%DE( i_low:i_high, neq ), &
+                soln%DEnorm( 1:neq )  )
+      soln%DE = zero
+      soln%DE = zero
+    end if
+    
     soln%V   = zero
     soln%U   = zero
     soln%R   = zero
@@ -61,6 +75,8 @@ module soln_type
     soln%src   = zero
     soln%dt  = zero
     soln%lambda = zero
+    soln%rnorm = zero
+    soln%rinit = zero
 
   end subroutine allocate_soln
   
@@ -90,7 +106,13 @@ module soln_type
                soln%temp,      &
                soln%src,      &
                soln%dt,     &
-               soln%lambda,   )
+               soln%lambda, &
+               soln%rnorm,  &
+               soln%rinit  )
+    
+    if (shock.eq.0) then
+      deallocate( soln%DE, soln%DEnorm )
+    end if
     
   end subroutine deallocate_soln
 
