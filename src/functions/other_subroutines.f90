@@ -2,13 +2,13 @@ module other_subroutines
   
   use set_precision, only : prec
   use set_constants, only : zero, one, two, three, half
-  use set_inputs, only : imax, neq, i_low, i_high, ig_low, ig_high
+  use set_inputs, only : imax, neq, i_low, i_high, ig_low, ig_high, shock
   use fluid_constants, only : gamma
   use variable_conversion
   use fluxes
-  use soln_type
-  use exact_q1d_type
-  use grid_type
+  use soln_type, only : soln_t
+  use exact_q1d_type, only : exact_q1d_t
+  use grid_type, only : grid_t
   
   implicit none
   
@@ -178,24 +178,26 @@ subroutine output_file_headers
     open(30,file= '../results/'//trim(adjustl(dirname))//  &
     &               trim(adjustl(filename))//'_history.dat',status='unknown')
     write(30,*) 'TITLE = "Quasi-1D Nozzle Iterative Residual History"'
-    write(30,*) 'variables="Iteration""Res1""Res2""Res3"'
-    
+    if(shock.eq.0) then
+      write(30,*) 'variables="Iteration""Res1""Res2""Res3""DE1""DE2""DE3"'
+    else
+      write(30,*) 'variables="Iteration""Res1""Res2""Res3"'
+    end if
 
 
     open(40,file= '../results/'//trim(adjustl(dirname))//  &
     &               trim(adjustl(filename))//'_field.dat',status='unknown')
     write(40,*) 'TITLE = "Quasi-1D Nozzle Solution"'
-    !if(shock.eq.0) then
-    !  write(40,*) 'variables="x(m)""A(m^2)""rho(kg/m^3)""u(m/s)""p(N/m^2)"  &
-    !  & "M""U1""U2""U3""rho-exact""u-exact""p-exact""DE-rho""DE-u""DE-p"'
-    !elseif(shock.eq.1) then
+    if(shock.eq.0) then
+      write(40,*) 'variables="x(m)""A(m^2)""rho(kg/m^3)""u(m/s)""p(N/m^2)"  &
+      & "M""U1""U2""U3""M-exact""rho-exact""u-exact""p-exact""DE1""DE2""DE3"'
+    elseif(shock.eq.1) then
       write(40,*) 'variables="x(m)""A(m^2)""rho(kg/m^3)""u(m/s)""p(N/m^2)"&
       &"M""U1""U2""U3"'
-    
-    !else
-    !  write(*,*) 'ERROR! shock must equal 0 or 1!!!'
-    !  stop
-    !endif
+    else
+      write(*,*) 'ERROR! shock must equal 0 or 1!!!'
+      stop
+    endif
   
   end subroutine output_file_headers
 
@@ -210,54 +212,56 @@ subroutine output_file_headers
   !!              num_iter : 
   !<
   !===========================================================================80
-  subroutine output_soln(grid,soln,num_iter)
-    
-    !use set_inputs, only : shock
+  subroutine output_soln(grid,soln,ex_soln,num_iter)
     
     type( grid_t ), intent(in) :: grid
     type( soln_t ), intent(in) :: soln
+    type( exact_q1d_t ), intent(in) :: ex_soln
     integer,        intent(in) :: num_iter
     
     integer :: i
 
 
     open(40,status='unknown')
-    write(40,*) 'TITLE = "Quasi-1D Nozzle Solution"'
-    write(40,*)' variables="x(m)""Area(m^2)""rho(kg/m^3)""u(m/s)"&
-             & "Press(N/m^2)""Mach""U1""U2""U3""F1""F2""F3"'
+    !write(40,*) 'TITLE = "Quasi-1D Nozzle Solution"'
+    !write(40,*)' variables="x(m)""Area(m^2)""rho(kg/m^3)""u(m/s)"&
+    !         & "Press(N/m^2)""Mach""U1""U2""U3""F1""F2""F3"'
     ! Repeat the following each time you want to write out the solution
-    write(40,*) 'zone T="',num_iter,'" '
-    write(40,*) 'I=',imax
-    write(40,*) 'DATAPACKING=POINT'
-    write(40,*) 'DT=(DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
-             & DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE)'
-    do i = 1, imax
-    write(40,*)grid%xc(i),grid%Ac(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
-             & soln%mach(i),soln%U(i,1),soln%U(i,2),soln%U(i,3),&
-             & soln%F(i,1),soln%F(i,2),soln%F(i,3)
-    enddo
+    !write(40,*) 'zone T="',num_iter,'" '
+    !write(40,*) 'I=',imax
+    !write(40,*) 'DATAPACKING=POINT'
+    !write(40,*) 'DT=(DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
+    !         & DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE)'
+    !do i = 1, imax
+    !write(40,*)grid%xc(i),grid%Ac(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
+    !         & soln%mach(i),soln%U(i,1),soln%U(i,2),soln%U(i,3),&
+    !         & soln%F(i,1),soln%F(i,2),soln%F(i,3)
+    !enddo
 
     
     ! Repeat the following each time you want to write out the solution
-!    write(40,*) 'zone T="',num_iter,'" '
-!    write(40,*) 'I=',imax
-!    !if(shock.eq.0) then
-!      write(40,*) 'DATAPACKING=POINT'
-!      write(40,*) 'DT=(DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
-!             & DOUBLE DOUBLE)'
-!      do i = 1, imax
-!        write(40,*) grid%xc(i),grid%Ac(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
-!             & soln%mach(i),soln%U(i,1),soln%U(i,2),soln%U(i,3)
-!      end do
-    !elseif(shock.eq.1) then
-    !  write(40,*) 'DATAPACKING=POINT'
-    !  write(40,*) 'DT=(DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
-    !         & DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE )'
-    !  do i = 1, imax
-    !    write(40,*) grid%xc(i),grid%Ac(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
-    !         & soln%mach(i),soln%U(i,1),soln%U(i,2),soln%U(i,3)
-    !  end do
-    !endif
+    write(40,*) 'zone T="',num_iter,'" '
+    write(40,*) 'I=',imax
+    if(shock.eq.0) then
+      write(40,*) 'DATAPACKING=POINT'
+      write(40,*) 'DT=(DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
+             & DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
+             & DOUBLE)'
+      do i = 1, imax
+        write(40,*) grid%xc(i),grid%Ac(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
+             & soln%mach(i),soln%U(i,1),soln%U(i,2),soln%U(i,3), &
+             & ex_soln%Mc(i), ex_soln%Vc(i,1), ex_soln%Vc(i,2),  &
+             & ex_soln%Vc(i,3), soln%DE(i,1), soln%DE(i,2), soln%DE(i,3)
+      end do
+    elseif(shock.eq.1) then
+      write(40,*) 'DATAPACKING=POINT'
+      write(40,*) 'DT=(DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
+             & DOUBLE DOUBLE)'
+      do i = 1, imax
+        write(40,*) grid%xc(i),grid%Ac(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
+             & soln%mach(i),soln%U(i,1),soln%U(i,2),soln%U(i,3)
+      end do
+    endif
     
   end subroutine output_soln
 
@@ -273,13 +277,19 @@ subroutine output_file_headers
   !!              num_iter : 
   !<
   !===========================================================================80
-  subroutine output_res(rnorm,num_iter)
+  subroutine output_res(soln,num_iter)
     
-    real(prec), dimension(neq), intent(in) :: rnorm
+    !real(prec), dimension(neq), intent(in) :: rnorm
+    type( soln_t), intent(in) :: soln
     integer, intent(in) :: num_iter
     integer :: i
     ! Repeat the following each time you want to write out the solution
-    write(30,*) num_iter,(rnorm(i),i=1,neq)
+    if(shock.eq.0) then
+      write(30,*) num_iter,(soln%rnorm(i),i=1,neq),(soln%DEnorm(i),i=1,neq)
+    else
+      write(30,*) num_iter,(soln%rnorm(i),i=1,neq)
+    end if
+    
   end subroutine output_res
   
 end module other_subroutines
