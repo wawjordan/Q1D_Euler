@@ -30,7 +30,7 @@ module other_subroutines
     real(prec), dimension(i_low:i_high),   intent(in) :: dA
     real(prec), dimension(ig_low:ig_high),   intent(in) :: P
     real(prec), dimension(i_low:i_high),   intent(out) :: S
-    integer :: i
+    !integer :: i
     !S(i_low:i_high) = V(i_low:i_high,3)*dA(i_low:i_high)/1000.0_prec
     S(i_low:i_high) = P(i_low:i_high)*dA(i_low:i_high)
     !do i = i_low,i_high
