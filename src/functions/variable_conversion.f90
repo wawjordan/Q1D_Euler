@@ -42,11 +42,8 @@ module variable_conversion
     
     real(prec), dimension(:,:), intent(out)  :: U
     real(prec), dimension(:,:), intent(in)   :: V
-    integer :: i
+    
     U(:,1) = V(:,1)
-    !do i = lbound(U,1),ubound(U,1)
-    !write(*,*) "i = ", i, "  V(:,1) = ", V(i,1), "V(:,2) = ", V(i,2)
-    !end do
     U(:,2) = V(:,1)*V(:,2)
     U(:,3) = ( V(:,3)/(gamma - one) ) + half*V(:,1)*V(:,2)**2
     
