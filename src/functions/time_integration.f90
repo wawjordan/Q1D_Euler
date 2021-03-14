@@ -25,7 +25,6 @@ module time_integration
   !===========================================================================80
   subroutine calc_time_step( dx, V, asnd, lambda, dt )
     
-    use fluid_constants,     only : gamma
     use set_inputs,          only : CFL
     
     real(prec), dimension(ig_low:ig_high,neq), intent(in)  :: V
@@ -66,7 +65,7 @@ module time_integration
     real(prec), dimension(i_low-1:i_high,neq), intent(in)    :: F
     real(prec), dimension(i_low:i_high)  ,   intent(in)    :: src, dt
     
-    integer :: i
+    !integer :: i
     
     R(:,1) = F(i_low:i_high,1)*grid%Ai(i_low:i_high) &
            - F(i_low-1:i_high-1,1)*grid%Ai(i_low-1:i_high-1)
