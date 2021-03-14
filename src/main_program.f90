@@ -28,6 +28,8 @@ program main_program
   
   pnorm = 2
   
+  open(50,file='temp.txt',status='unknown')
+  
   100 format(1(I0.8),3(G20.7))
   
   write(header_str1,*) " Iter  |   ||density||    |"// &
@@ -131,14 +133,22 @@ program main_program
     end if
   end do
   
-  if (shock.eq.0) then
+  write(50,*) imax, j, soln%rnorm(1), soln%rnorm(2), soln%rnorm(3)
+  if (shock.eq.0) then 
+    call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, 1 )
+    write(50,*) imax, 1,soln%DEnorm
+    call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, 2 )
+    write(50,*) imax, 2,soln%DEnorm
+    call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, 0 )
+    write(50,*) imax, 0,soln%DEnorm
     call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm )
   end if
+  
 
   call output_soln(grid,soln,ex_soln,j+1)
   call output_res(soln,j)
   
   call deallocate_exact_q1d( ex_soln )
   call teardown_geometry(grid,soln)
-
+  close(50)
 end program main_program
