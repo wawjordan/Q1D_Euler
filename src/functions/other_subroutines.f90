@@ -247,7 +247,7 @@ subroutine output_file_headers
       write(40,*) 'DT=(DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
              & DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
              & DOUBLE)'
-      do i = 1, imax
+      do i = i_low,i_high
         write(40,*) grid%xc(i),grid%Ac(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
              & soln%mach(i),soln%U(i,1),soln%U(i,2),soln%U(i,3), &
              & ex_soln%Mc(i), ex_soln%Vc(i,1), ex_soln%Vc(i,2),  &
@@ -257,7 +257,7 @@ subroutine output_file_headers
       write(40,*) 'DATAPACKING=POINT'
       write(40,*) 'DT=(DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
              & DOUBLE DOUBLE)'
-      do i = 1, imax
+      do i = i_low,i_high
         write(40,*) grid%xc(i),grid%Ac(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
              & soln%mach(i),soln%U(i,1),soln%U(i,2),soln%U(i,3)
       end do
