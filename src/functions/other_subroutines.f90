@@ -113,7 +113,7 @@ module other_subroutines
   !===========================================================================80
 subroutine output_file_headers
 
-    use set_inputs, only : imax, CFL, k2, k4, shock, ramp
+    use set_inputs, only : imax, CFL, k2, k4, shock, ramp, p0, pb
 
     character(len=1024) :: dirname
     character(len=1024) :: filename
@@ -126,7 +126,7 @@ subroutine output_file_headers
     ! Set up output directories
     write (ncells_str  , "(A1,I0.3,A1)") "N"  , imax   , "/"
     if (shock.eq.1) then
-      write (shock_str, "(A12)") "normal-shock"
+      write (shock_str, "(A16,I0.3)") "normal-shock-pb-",int(1000*pb/p0)
     else
       write (shock_str, "(A10)") "isentropic"
     end if
