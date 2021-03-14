@@ -28,7 +28,7 @@ module geometry
   !===========================================================================80
   subroutine setup_geometry( grid, soln )
     
-    use set_inputs, only : imax, i_low, i_high
+    use set_inputs, only : i_low, i_high
     
     type( soln_t ), intent(inout) :: soln
     type( grid_t ), intent(inout) :: grid
