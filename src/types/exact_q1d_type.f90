@@ -41,10 +41,9 @@ contains
   !! Outputs:     soln:    exact_q1d_t type (allocated).
   !<
   !===========================================================================80
-  subroutine allocate_exact_q1d( soln, grid )
+  subroutine allocate_exact_q1d( soln )
     
     type(exact_q1d_t), intent(inout) :: soln
-    type(grid_t), intent(in) :: grid
     
     allocate( soln%Mc(i_low:i_high), &
               soln%Tc(i_low:i_high), &
