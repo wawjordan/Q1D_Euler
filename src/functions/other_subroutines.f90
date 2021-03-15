@@ -152,7 +152,7 @@ subroutine output_file_headers
     character(len=64) ::   kappa4_str
 
     ! Set up output directories
-    write (ncells_str  , "(A1,I0.3,A1)") "N"  , imax   , "/"
+    write (ncells_str  , "(A1,I0.3,A1)") "N"  , imax   , "_"
     if (shock.eq.1) then
       write (shock_str, "(A16,I0.2)") "normal-shock-pb-",int(100*p_ratio)
     else
@@ -165,10 +165,12 @@ subroutine output_file_headers
     end if
     write (kappa2_str, "(A4,I0.4)") "_K2-"  , int(1000*k2)
     write (kappa4_str, "(A4,I0.4)") "_K4-"  , int(1000*k4)
-    write (dirname, *) adjustl(trim(shock_str)),"/"//  &
-    &                   adjustl(trim(ncells_str))
-    write (filename,*) trim(CFL_str)//     &
-    &                   trim(kappa2_str)// &
+    !write (dirname, *) adjustl(trim(shock_str)),"/"//  &
+    !&                   adjustl(trim(ncells_str))
+    write (dirname, *) adjustl(trim(shock_str)),"/"
+    write (filename,*)  trim(ncells_str)//  &
+    &                   trim(CFL_str)//     &
+    &                   trim(kappa2_str)//  &
     &                   trim(kappa4_str)
     
     call execute_command_line ('mkdir -p ../results/' // adjustl(trim(dirname)))
