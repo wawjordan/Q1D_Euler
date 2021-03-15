@@ -128,7 +128,9 @@ program main_program
       write(*,100) j, soln%rnorm(1), soln%rnorm(2), soln%rnorm(3)
     end if
     if (mod(j,10)==0) then
-      call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm )
+      if (shock.eq.0) then
+        call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm )
+      end if
       call output_res(soln,j)
     end if
   end do
