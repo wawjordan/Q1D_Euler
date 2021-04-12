@@ -4,10 +4,33 @@ module variable_conversion
   use set_constants,   only : one, half
   use fluid_constants, only : gamma, R_gas
   use set_inputs,      only : p0,T0, neq, ig_low, ig_high
+  use soln_type
 
   implicit none
 
   contains
+  
+  
+  !============================== update_states  =============================80
+  !>
+  !! Description:
+  !!
+  !! Inputs:      soln :
+  !!
+  !! Outputs:     soln :
+  !<
+  !===========================================================================80
+  subroutine update_states( soln )
+    
+    type(soln_type) :: soln
+    
+    call cons2prim(soln%U,soln%V)
+    call speed_of_sound(soln%V(:,3),soln%V(:,1),soln%asnd)
+    
+    soln%mach = abs(soln%V(:,2))/soln%asnd
+    soln%temp = T0/(one + half*(gamma - one)*soln%mach**2)
+    
+  end subroutine update_states
   
   !============================== speed_of_sound  ============================80
   !>
