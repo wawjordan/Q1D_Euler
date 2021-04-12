@@ -51,7 +51,7 @@ module soln_type
               soln%asnd( ig_low:ig_high ),      &
               soln%mach( ig_low:ig_high ),      &
               soln%temp( ig_low:ig_high ),      &
-              soln%Src( i_low:i_high ),      &
+              soln%src( i_low:i_high ),      &
               soln%dt( i_low:i_high ),     &
               soln%lambda( ig_low:ig_high ), &
               soln%rnorm( 1:neq ),        &
