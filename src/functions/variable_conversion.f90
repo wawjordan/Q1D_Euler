@@ -4,7 +4,7 @@ module variable_conversion
   use set_constants,   only : one, half
   use fluid_constants, only : gamma, R_gas
   use set_inputs,      only : p0,T0, neq, ig_low, ig_high
-  use soln_type
+  use soln_type,       only : soln_t
 
   implicit none
 
@@ -22,7 +22,7 @@ module variable_conversion
   !===========================================================================80
   subroutine update_states( soln )
     
-    type(soln_type) :: soln
+    type(soln_t) :: soln
     
     call cons2prim(soln%U,soln%V)
     call speed_of_sound(soln%V(:,3),soln%V(:,1),soln%asnd)
