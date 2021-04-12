@@ -54,9 +54,10 @@ program main_program
   
   call enforce_bndry( soln )
   
-  call cons2prim( soln%U, soln%V )
+  !call cons2prim( soln%U, soln%V )
  
-  call speed_of_sound(soln%V(:,3),soln%V(:,1),soln%asnd)
+  !call speed_of_sound(soln%V(:,3),soln%V(:,1),soln%asnd)
+  call update_states( soln )
   
   call calculate_sources(soln%V,grid%dAc,soln%src)
   
@@ -71,7 +72,7 @@ program main_program
   soln%F = soln%F + soln%D
   
   call explicit_euler(grid,soln%src,soln%dt,soln%F,soln%U,soln%R)
-  
+  call update_states( soln )
   call residual_norms(soln%R,soln%rinit,pnorm,(/one,one,one/))
    
   write(*,*) 'Residual Norms: Iteration 0'
@@ -84,14 +85,14 @@ program main_program
     
     call calculate_sources(soln%V(:,3),grid%dAc,soln%src)
     
-    call speed_of_sound(soln%V(:,3),soln%V(:,1),soln%asnd)
+    !call speed_of_sound(soln%V(:,3),soln%V(:,1),soln%asnd)
     
     call calc_time_step(grid%dx,soln%V,soln%asnd,soln%lambda,soln%dt)
     
     call enforce_bndry( soln )
     
-    call cons2prim( soln%U, soln%V )
-    
+    !call cons2prim( soln%U, soln%V )
+    call update_states( soln )
     call central_flux(soln%U, soln%F)
     
     call prim2cons(soln%U,soln%V)
@@ -101,10 +102,10 @@ program main_program
     soln%F = soln%F + soln%D
     
     call explicit_euler(grid,soln%src,soln%dt,soln%F,soln%U,soln%R)
+    call update_states( soln )
+    !call update_mach(soln%V,soln%mach )
     
-    call update_mach(soln%V,soln%mach )
-    
-    call cons2prim(soln%U,soln%V)
+    !call cons2prim(soln%U,soln%V)
     
     if (mod(j,10000)==0) then
       if (shock.eq.0) then
