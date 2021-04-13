@@ -9,6 +9,7 @@ program main_program
   use time_integration
   use basic_boundaries, only : enforce_bndry
   use fluxes
+  use flux_calc, only : select_flux, flux_fun
   use other_subroutines
   use geometry, only : setup_geometry, teardown_geometry
   use init_problem, only : initialize
@@ -27,7 +28,8 @@ program main_program
   type( exact_q1d_t ) :: ex_soln  
   
   pnorm = 2
-  
+  j = 0
+
   open(50,file='temp.txt',status='unknown')
   
   100 format(1(I0.8),3(G20.7))
@@ -40,6 +42,8 @@ program main_program
   call output_file_headers
   call set_derived_inputs
   call setup_geometry(grid,soln)
+  
+  call select_flux()
   
   call initialize(grid,soln)
   
@@ -63,18 +67,19 @@ program main_program
   
   call calc_time_step(grid%dx,soln%V,soln%asnd,soln%lambda,soln%dt)
   
-  call central_flux( soln%U, soln%F )
-  
+  !call central_flux( soln%U, soln%F )
+  call flux_fun(soln%U(i_low-1:i_high,1:neq),soln%U(i_low:i_high+1,1:neq),soln%F)
   call prim2cons(soln%U,soln%V)
   
   call jst_damping(soln%lambda,soln%U,soln%V,soln%D) 
   
-  soln%F = soln%F + soln%D
+  !soln%F = soln%F + soln%D
   
   call explicit_euler(grid,soln%src,soln%dt,soln%F,soln%U,soln%R)
   call update_states( soln )
+  
   call residual_norms(soln%R,soln%rinit,pnorm,(/one,one,one/))
-   
+  
   write(*,*) 'Residual Norms: Iteration 0'
   write(*,*) header_str1
   write(*,100) j, soln%rinit(1), soln%rinit(2), soln%rinit(3)
@@ -93,13 +98,14 @@ program main_program
     
     !call cons2prim( soln%U, soln%V )
     call update_states( soln )
-    call central_flux(soln%U, soln%F)
-    
+    call flux_fun(soln%U(i_low-1:i_high,1:neq),soln%U(i_low:i_high+1,1:neq),soln%F)
+    !call central_flux(soln%U, soln%F)
+    !stop
     call prim2cons(soln%U,soln%V)
     
     call jst_damping(soln%lambda,soln%U,soln%V,soln%D)
     
-    soln%F = soln%F + soln%D
+    !soln%F = soln%F + soln%D
     
     call explicit_euler(grid,soln%src,soln%dt,soln%F,soln%U,soln%R)
     call update_states( soln )
@@ -107,7 +113,7 @@ program main_program
     
     !call cons2prim(soln%U,soln%V)
     
-    if (mod(j,10000)==0) then
+    if (mod(j,1)==0) then
       if (shock.eq.0) then
         call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm )
       end if
