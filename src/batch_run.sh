@@ -11,15 +11,15 @@ if [ -f $summary ]; then
 fi
 for shock in 1 #0 1
 do
-  for imax in 512 #16 32 64 128 256 512
+  for imax in 16 #16 32 64 128 256 512
   do
     for ramp in 0 #0 1
     do
       for prat in 0.4 #0.1 0.5 0.6
       do
-        for k2 in 0.5 0.25 #0.5 0.4 0.3 0.25
+        for k2 in 0.5 #0.5 0.4 0.3 0.25
         do
-          for k4 in 0.03125 0.015625 #0.03125 0.02 0.015625 
+          for k4 in 0.03125 #0.03125 0.02 0.015625 
           do
             for cfl in 0.1 #0.1 0.5 0.9
             do
