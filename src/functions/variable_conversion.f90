@@ -46,6 +46,7 @@ module variable_conversion
     
     real(prec), dimension(:), intent(in)  :: pressure, rho
     real(prec), dimension(:), intent(out) :: sound_speed
+    integer :: i
     
     sound_speed = sqrt(gamma*pressure/rho)
     
@@ -109,7 +110,7 @@ module variable_conversion
   subroutine cons2prim( U, V )
     
     real(prec), dimension(:,:), intent(inout) :: U
-    real(prec), dimension(:,:), intent(inout) :: V
+    real(prec), dimension(:,:), intent(out) :: V
     
     V(:,1) = U(:,1)
     V(:,2) = U(:,2)/U(:,1)
