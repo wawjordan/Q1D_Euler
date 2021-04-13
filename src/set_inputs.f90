@@ -15,7 +15,7 @@ module set_inputs
   public :: max_iter, max_newton_iter, newton_tol
   public :: iSS, shock, ramp
   public :: p0, T0, a0, rho0, pb, p_ratio
-  public :: set_derived_inputs, read_in
+  public :: set_derived_inputs, read_in, flux_scheme
   
   integer :: imax    = 128
   integer :: i_low   = 10
@@ -26,7 +26,7 @@ module set_inputs
   integer :: iSS  = 1
   integer :: shock = 0
   integer :: ramp = 0
-  integer :: max_iter = 150000
+  integer :: max_iter = 50 !100 !150000
   integer :: n_ghost_cells   = 2
   integer :: max_newton_iter = 1000
 
@@ -45,6 +45,7 @@ module set_inputs
   real(prec) :: pb         = 150000_prec
   real(prec) :: k2         = 1.0_prec/2.0_prec
   real(prec) :: k4         = 1.0_prec/64.0_prec
+  integer :: flux_scheme = 2
 
   contains
 
