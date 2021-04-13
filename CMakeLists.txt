@@ -32,7 +32,7 @@ set( CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/lib )
 set(
   USER_DEBUG_FLAGS
   "-O0 -fopenmp -Wall -Wextra -fimplicit-none -fcheck=all \
-   -ffpe-trap=zero,underflow,overflow,invalid --coverage -fbacktrace \
+   -ffpe-trap=zero,underflow,overflow,invalid --coverage -g -fbacktrace \
    -fstack-protector -fbounds-check"
 )
 set( USER_RELEASE_FLAGS "-O3 -march=native -fopenmp" )
