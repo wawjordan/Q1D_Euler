@@ -35,7 +35,8 @@ module time_integration
     real(prec), dimension(ig_low:ig_high), intent(in)    :: asnd
     
     lambda(:) = abs(V(:,2)) + asnd
-    dt(:) = minval(CFL*dx/lambda(i_low:i_high))
+    dt(:) = CFL*dx/lambda(i_low:i_high)
+    !dt(:) = minval(CFL*dx/lambda(i_low:i_high))
     
   end subroutine calc_time_step
   
