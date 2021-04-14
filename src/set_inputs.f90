@@ -26,7 +26,7 @@ module set_inputs
   integer :: iSS  = 1
   integer :: shock = 0
   integer :: ramp = 0
-  integer :: max_iter = 50 !100 !150000
+  integer :: max_iter = 150000
   integer :: n_ghost_cells   = 2
   integer :: max_newton_iter = 1000
 
@@ -45,7 +45,7 @@ module set_inputs
   real(prec) :: pb         = 150000_prec
   real(prec) :: k2         = 1.0_prec/2.0_prec
   real(prec) :: k4         = 1.0_prec/64.0_prec
-  integer :: flux_scheme = 2
+  integer :: flux_scheme   = 1
 
   contains
 
@@ -57,10 +57,14 @@ module set_inputs
       read(25,*) discard
       read(25,*) discard
       read(25,*) discard, imax
+      read(25,*) discard, p0
+      read(25,*) discard, T0
+      read(25,*) discard, flux_scheme
       read(25,*) discard, shock
       read(25,*) discard, ramp
       read(25,*) discard, p_ratio
       read(25,*) discard, CFL
+      read(25,*) discard, max_iter
       read(25,*) discard, k2
       read(25,*) discard, k4
       close(25)
