@@ -9,8 +9,8 @@ cfl_str=""
 #if [ -f $summary ]; then
 #  rm -f "$summary"
 #fi
-imax=128 #16 32 64 128 256 512
-p0=200.0
+imax=513 #16 32 64 128 256 512
+p0=300.0
 T0=600.0
 flux=2
 shock=0 #0 1
