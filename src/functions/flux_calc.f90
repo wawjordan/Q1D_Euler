@@ -69,7 +69,7 @@ contains
     
     real(prec), dimension(:,:), intent(in) :: left, right
     real(prec), dimension(i_low-1:i_high,neq), intent(out)   :: F
-    real(prec), dimension(i_low-1:i_high,neq)   :: VL, VR
+    real(prec), dimension(i_low-1:i_high,neq)   :: VL, VR, tempL, tempR
     real(prec), dimension(i_low-1:i_high)   :: aL, aR
     real(prec), dimension(i_low-1:i_high)   :: ML, MR
     real(prec), dimension(i_low-1:i_high)   :: M_plus, M_minus
@@ -80,11 +80,11 @@ contains
     real(prec), dimension(i_low-1:i_high)   :: p_plus, p_minus
     integer :: i
     
-    VL = left
-    VR = right
+    tempL = left
+    tempR = right
     
-    call cons2prim(VL,VL)
-    call cons2prim(VR,VR)
+    call cons2prim(tempL,VL)
+    call cons2prim(tempR,VR)
     
     !call cons2prim(left,VL)
     !call cons2prim(right,VR)
@@ -112,27 +112,19 @@ contains
     c_plus  = alpha_plus*(one+beta_L)*ML - beta_L*M_plus
     c_minus = alpha_minus*(one+beta_R)*MR - beta_R*M_minus
     
-    !p_plus  = M_plus*(- ML + two)
-    !p_minus = M_minus*(- MR - two)
-    p_plus  = (fourth*(ML+one)**2)*(- ML + two)
-    p_minus = (-fourth*(MR-one)**2)*(- MR - two)
+    p_plus  = M_plus*(-ML + two)
+    p_minus = M_minus*(-MR - two)
+    !p_plus  = (fourth*(ML+one)**2)*(- ML + two)
+    !p_minus = (-fourth*(MR-one)**2)*(- MR - two)
     d_plus  = alpha_plus*(one+beta_L) - beta_L*p_plus
     d_minus = alpha_minus*(one+beta_R) - beta_R*p_minus
     
-    !do i = i_low-1,i_high
-    !  write(*,*) i, d_plus(i), d_minus(i)
-    !end do
     
     F(:,1) = VL(:,1)*aL*c_plus + VR(:,1)*aR*c_minus
     F(:,2) = VL(:,1)*aL*c_plus*VL(:,2) + VR(:,1)*aR*c_minus*VR(:,2) + &
           & d_plus*VL(:,3) + d_minus*VR(:,3)
     F(:,3) = VL(:,1)*aL*c_plus*( aL**2/(gamma-1) + half*VL(:,2)**2) + &
           & VR(:,1)*aR*c_minus*( aR**2/(gamma-1) + half*VR(:,2)**2)
-    !write(*,*)
-    !write(*,*)
-    !do i = i_low-1,i_high
-    !  write(*,*) i, F(i,1), F(i,2), F(i,3)
-    !end do
     
   end subroutine van_leer_flux
   
