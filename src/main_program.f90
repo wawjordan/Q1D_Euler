@@ -71,7 +71,7 @@ program main_program
   call flux_fun(soln%U(i_low-1:i_high,1:neq),soln%U(i_low:i_high+1,1:neq),soln%F)
   call prim2cons(soln%U,soln%V)
   
-  call jst_damping(soln%lambda,soln%U,soln%V,soln%D) 
+  !call jst_damping(soln%lambda,soln%U,soln%V,soln%D) 
   
   !soln%F = soln%F + soln%D
   
@@ -103,7 +103,7 @@ program main_program
     !stop
     call prim2cons(soln%U,soln%V)
     
-    call jst_damping(soln%lambda,soln%U,soln%V,soln%D)
+    !call jst_damping(soln%lambda,soln%U,soln%V,soln%D)
     
     !soln%F = soln%F + soln%D
     
@@ -113,7 +113,7 @@ program main_program
     
     !call cons2prim(soln%U,soln%V)
     
-    if (mod(j,1)==0) then
+    if (mod(j,max_iter)==0) then
       if (shock.eq.0) then
         call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm )
       end if
