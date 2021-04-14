@@ -9,9 +9,9 @@ touch $summary
 if [ -f $summary ]; then
   rm -f "$summary"
 fi
-for shock in 1 #0 1
+for shock in 0 #0 1
 do
-  for imax in 16 #16 32 64 128 256 512
+  for imax in 128 #16 32 64 128 256 512
   do
     for ramp in 0 #0 1
     do
