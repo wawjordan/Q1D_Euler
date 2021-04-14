@@ -112,14 +112,16 @@ contains
     c_plus  = alpha_plus*(one+beta_L)*ML - beta_L*M_plus
     c_minus = alpha_minus*(one+beta_R)*MR - beta_R*M_minus
     
-    p_plus  = M_plus*(- ML + two)
-    p_minus = M_minus*(- MR - two)
+    !p_plus  = M_plus*(- ML + two)
+    !p_minus = M_minus*(- MR - two)
+    p_plus  = (fourth*(ML+one)**2)*(- ML + two)
+    p_minus = (-fourth*(MR-one)**2)*(- MR - two)
     d_plus  = alpha_plus*(one+beta_L) - beta_L*p_plus
     d_minus = alpha_minus*(one+beta_R) - beta_R*p_minus
     
-    do i = i_low-1,i_high
-      write(*,*) i, d_plus(i), d_minus(i)
-    end do
+    !do i = i_low-1,i_high
+    !  write(*,*) i, d_plus(i), d_minus(i)
+    !end do
     
     F(:,1) = VL(:,1)*aL*c_plus + VR(:,1)*aR*c_minus
     F(:,2) = VL(:,1)*aL*c_plus*VL(:,2) + VR(:,1)*aR*c_minus*VR(:,2) + &
