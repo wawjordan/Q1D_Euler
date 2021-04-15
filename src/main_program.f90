@@ -4,7 +4,7 @@ program main_program
   use set_constants, only : set_derived_constants
   use fluid_constants, only : set_fluid_constants
   use set_inputs, only : set_derived_inputs, read_in
-  use set_inputs, only : max_iter, neq, tol!, shock
+  use set_inputs, only : max_iter, neq, tol, soln_save, res_save
   use variable_conversion
   use time_integration
   use basic_boundaries, only : enforce_bndry
@@ -113,7 +113,7 @@ program main_program
     
     !call cons2prim(soln%U,soln%V)
     
-    if (mod(j,max_iter)==0) then
+    if (mod(j,soln_save)==0) then
       if (shock.eq.0) then
         call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm )
       end if
@@ -134,7 +134,7 @@ program main_program
       end if
       write(*,100) j, soln%rnorm(1), soln%rnorm(2), soln%rnorm(3)
     end if
-    if (mod(j,10)==0) then
+    if (mod(j,res_save)==0) then
       if (shock.eq.0) then
         call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm )
       end if
