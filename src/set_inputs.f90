@@ -13,7 +13,7 @@ module set_inputs
   public :: Astar, area, darea
   public :: CFL, k2, k4, eps, tol
   public :: max_iter, max_newton_iter, newton_tol
-  public :: iSS, shock, ramp
+  public :: iSS, shock, ramp, soln_save, res_save
   public :: p0, T0, a0, rho0, pb, p_ratio
   public :: set_derived_inputs, read_in, flux_scheme
   
@@ -46,6 +46,8 @@ module set_inputs
   real(prec) :: k2         = 1.0_prec/2.0_prec
   real(prec) :: k4         = 1.0_prec/64.0_prec
   integer :: flux_scheme   = 1
+  integer :: soln_save     = 150000
+  integer :: res_save      = 10
 
   contains
 
@@ -65,6 +67,8 @@ module set_inputs
       read(25,*) discard, p_ratio
       read(25,*) discard, CFL
       read(25,*) discard, max_iter
+      read(25,*) discard, soln_save
+      read(25,*) discard, res_save
       read(25,*) discard, k2
       read(25,*) discard, k4
       close(25)
