@@ -11,7 +11,7 @@ module set_inputs
   public :: imax, neq, xmin, xmax, n_ghost_cells
   public :: i_high, i_low, ig_high, ig_low
   public :: Astar, area, darea
-  public :: CFL, k2, k4, eps, tol
+  public :: CFL, k2, k4, eps, tol, eps_roe
   public :: max_iter, max_newton_iter, newton_tol
   public :: iSS, shock, ramp, soln_save, res_save
   public :: p0, T0, a0, rho0, pb, p_ratio
@@ -48,6 +48,7 @@ module set_inputs
   integer :: flux_scheme   = 1
   integer :: soln_save     = 150000
   integer :: res_save      = 10
+  real(prec) :: eps_roe        = 0.1_prec
 
   contains
 
@@ -69,6 +70,7 @@ module set_inputs
       read(25,*) discard, max_iter
       read(25,*) discard, soln_save
       read(25,*) discard, res_save
+      read(25,*) discard, eps_roe
       read(25,*) discard, k2
       read(25,*) discard, k4
       close(25)
