@@ -11,11 +11,11 @@ module set_inputs
   public :: imax, neq, xmin, xmax, n_ghost_cells
   public :: i_high, i_low, ig_high, ig_low
   public :: Astar, area, darea
-  public :: CFL, k2, k4, eps, tol, eps_roe
+  public :: CFL, k2, k4, eps, tol, eps_roe, beta_lim, epsM, kappaM
   public :: max_iter, max_newton_iter, newton_tol
   public :: iSS, shock, ramp, soln_save, res_save
   public :: p0, T0, a0, rho0, pb, p_ratio
-  public :: set_derived_inputs, read_in, flux_scheme
+  public :: set_derived_inputs, read_in, flux_scheme, limiter_scheme
   
   integer :: imax    = 128
   integer :: i_low   = 10
@@ -46,9 +46,13 @@ module set_inputs
   real(prec) :: k2         = 1.0_prec/2.0_prec
   real(prec) :: k4         = 1.0_prec/64.0_prec
   integer :: flux_scheme   = 1
+  integer :: limiter_scheme = 1
+  real(prec) :: beta_lim = 2
   integer :: soln_save     = 150000
   integer :: res_save      = 10
-  real(prec) :: eps_roe        = 0.1_prec
+  real(prec) :: eps_roe    = 0.1_prec
+  real(prec) :: epsM       = zero
+  real(prec) :: kappaM     = -one
 
   contains
 
