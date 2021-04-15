@@ -13,13 +13,14 @@ imax=128 #16 32 64 128 256 512
 p0=300.0
 T0=600.0
 flux=3
-shock=1 #0 1
+shock=0 #0 1
 ramp=0 #0 1
 prat=0.4 #0.1 0.5 0.6
 cfl=0.5 #0.1 0.5 0.9
 maxk=100000
 Sout=100000
-Rout=1
+Rout=10
+eps=0.05
 k2=0.5 #0.5 0.4 0.3 0.25
 k4=0.03125 #0.03125 0.02 0.015625 
 if [ $shock -eq 0 ]; then
@@ -49,6 +50,7 @@ echo "CFL       $cfl" >> $input
 echo "maxk      $maxk" >> $input
 echo "Sout      $Sout" >> $input
 echo "Rout      $Rout" >> $input
+echo "eps       $eps" >> $input
 echo "k2        $k2" >> $input
 echo "k4        $k4" >> $input
 ./../build/bin/test_program
