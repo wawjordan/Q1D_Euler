@@ -5,9 +5,11 @@ program main_program
   use fluid_constants, only : set_fluid_constants
   use set_inputs, only : set_derived_inputs, read_in
   use set_inputs, only : max_iter, neq, tol, soln_save, res_save
+  !use set_inputs, only : leftV, rightV, leftU, rightU
   use variable_conversion
   use time_integration
   use basic_boundaries, only : enforce_bndry
+  !use limiter_calc, only : select_limiter
   use fluxes
   use flux_calc, only : select_flux, flux_fun
   use other_subroutines
@@ -26,7 +28,6 @@ program main_program
   type( grid_t )      :: grid
   type( soln_t )      :: soln
   type( exact_q1d_t ) :: ex_soln  
-  
   pnorm = 2
   j = 0
 
@@ -44,6 +45,7 @@ program main_program
   call setup_geometry(grid,soln)
   
   call select_flux()
+  !call select_limiter()
   
   call initialize(grid,soln)
   
@@ -68,7 +70,13 @@ program main_program
   call calc_time_step(grid%dx,soln%V,soln%asnd,soln%lambda,soln%dt)
   
   !call central_flux( soln%U, soln%F )
+  !call MUSCL_extrap( soln%V, leftV, rightV )
+  
+  !call cons2prim(leftV,leftU)
+  !call cons2prim(rightV,rightU)
+  
   call flux_fun(soln%U(i_low-1:i_high,1:neq),soln%U(i_low:i_high+1,1:neq),soln%F)
+  !call flux_fun(leftU,rightU,soln%F)
   call prim2cons(soln%U,soln%V)
   
   !call jst_damping(soln%lambda,soln%U,soln%V,soln%D) 
