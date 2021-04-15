@@ -1,7 +1,7 @@
 module flux_calc
   
   use set_precision, only : prec
-  use set_constants, only : zero, one, two, three, half, fourth
+  use set_constants, only : zero, one, two, three, four, half, fourth
   use fluid_constants, only : gamma
   use set_inputs, only : neq, imax, i_low, i_high, ig_low, ig_high
   use variable_conversion, only : cons2prim, speed_of_sound
@@ -136,13 +136,14 @@ contains
     real(prec), dimension(i_low-1:i_high,neq) :: VL, VR
     real(prec), dimension(i_low-1:i_high)     ::  aL, aR
     real(prec), dimension(i_low-1:i_high)     ::  R
-    real(prec), dimension(3) :: FL, FR, rvec1, rvec2, rvec3
+    real(prec), dimension(3) :: FL, FR, rvec1, rvec2, rvec3, lambda
     real(prec) :: rhoL, rhoR, rho2
     real(prec) ::   uL,   uR,   u2
     real(prec) ::   pL,   pR,   a2
     real(prec) ::  htL,  htR,  ht2
-    real(prec) :: lambda1, lambda2, lambda3
+    !real(prec) :: lambda1, lambda2, lambda3
     real(prec) :: dw1, dw2, dw3
+    real(prec) :: eps = 0.1
     integer :: i
     
     call cons2prim(left,VL)
@@ -166,23 +167,26 @@ contains
       ht2  = (R(i)*htR + htL)/(R(i) + one)
       a2   = sqrt((gamma-one)*(ht2-half*u2**2))
       
-      lambda1 = u2
-      lambda2 = u2 + a2
-      lambda3 = u2 - a2
+      lambda = (/ u2, u2 + a2, u2 - a2 /)
       
-      rvec1 = (/ one, lambda1, half*u2**2 /)
-      rvec2 = half*(rho2/a2)*(/ one, lambda2, ht2 + u2*a2 /)
-      rvec3 = -half*(rho2/a2)*(/ one, lambda3, ht2 - u2*a2 /)
+      rvec1 = (/ one, lambda(1), half*u2**2 /)
+      rvec2 = half*(rho2/a2)*(/ one, lambda(2), ht2 + u2*a2 /)
+      rvec3 = -half*(rho2/a2)*(/ one, lambda(3), ht2 - u2*a2 /)
       
-      dw1 = (rhoR - rhoL) - (rhoR - rhoL)/a2**2
-      dw2 = (uR - uL) + (rhoR - rhoL)/(rho2*a2)
-      dw3 = (uR - uL) - (rhoR - rhoL)/(rho2*a2)
+      lambda = abs(lambda)
+      lambda = half*(one+sign(one,lambda-two*eps*a2))*lambda &
+           & + half*(one-sign(one,lambda-two*eps*a2))*&
+           & (lambda**2/(four*eps*a2) + eps*a2)
+      
+      dw1 = (rhoR - rhoL) - (pR - pL)/a2**2
+      dw2 = (uR - uL) + (pR - pL)/(rho2*a2)
+      dw3 = (uR - uL) - (pR - pL)/(rho2*a2)
       
       FL = (/ rhoL*uL, rhoL*uL**2 + pL, rhoL*uL*htL /)
       FR = (/ rhoR*uR, rhoR*uR**2 + pR, rhoR*uR*htR /)
       
-      F(i,:) = half*(FL+FR) - half*(abs(lambda1)*dw1*rvec1 + &
-             & abs(lambda2)*dw2*rvec2 + abs(lambda3)*dw3*rvec3)
+      F(i,:) = half*(FL+FR) - half*(lambda(1)*dw1*rvec1 + &
+             & lambda(2)*dw2*rvec2 + lambda(3)*dw3*rvec3)
     end do  
   end subroutine roe_flux
   
