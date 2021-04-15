@@ -101,7 +101,7 @@ program main_program
     call flux_fun(soln%U(i_low-1:i_high,1:neq),soln%U(i_low:i_high+1,1:neq),soln%F)
     !call central_flux(soln%U, soln%F)
     !stop
-    call prim2cons(soln%U,soln%V)
+    !call prim2cons(soln%U,soln%V)
     
     !call jst_damping(soln%lambda,soln%U,soln%V,soln%D)
     
