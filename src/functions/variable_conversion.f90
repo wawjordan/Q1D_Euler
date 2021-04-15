@@ -23,8 +23,8 @@ module variable_conversion
   subroutine update_states( soln )
     
     type(soln_t) :: soln
-    
     call cons2prim(soln%U,soln%V)
+    call limit_primitives(soln%U,soln%V)
     call speed_of_sound(soln%V(:,3),soln%V(:,1),soln%asnd)
     
     soln%mach = abs(soln%V(:,2))/soln%asnd
@@ -109,14 +109,14 @@ module variable_conversion
   !===========================================================================80
   subroutine cons2prim( U, V )
     
-    real(prec), dimension(:,:), intent(inout) :: U
+    real(prec), dimension(:,:), intent(in) :: U
     real(prec), dimension(:,:), intent(out) :: V
     
     V(:,1) = U(:,1)
     V(:,2) = U(:,2)/U(:,1)
     V(:,3) = (gamma - one)*U(:,3) - half*(gamma - one)*U(:,2)**2/U(:,1)
     
-    call limit_primitives(U,V)
+    !call limit_primitives(U,V)
     
   end subroutine cons2prim
   
