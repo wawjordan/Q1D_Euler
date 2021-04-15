@@ -35,8 +35,8 @@ module init_problem
     type( soln_t ), intent(inout) :: soln
     type( grid_t ), intent(inout) :: grid
     
-    !soln%mach = 0.9_prec*grid%xc + one
-    soln%mach = 0.5_prec*grid%xc + one
+    soln%mach = 0.9_prec*grid%xc + one
+    !soln%mach = 0.5_prec*grid%xc + one
     
     do i = ig_low,ig_high
       if ( soln%mach(i) < eps ) then
