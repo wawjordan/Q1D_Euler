@@ -11,5 +11,6 @@ add_lib_sources(
      time_integration.f90
      fluxes.f90
      flux_calc.f90
+     limiter_calc.f90
      other_subroutines.f90
 )
