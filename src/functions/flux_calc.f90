@@ -41,9 +41,7 @@ contains
     case(2)
       flux_fun => van_leer_flux
     case(3)
-      flux_fun => van_leer_flux2
-    !case(3)
-    !  flux_fun => roe_flux
+      flux_fun => roe_flux
     case default
     
     end select
@@ -73,11 +71,11 @@ contains
     real(prec), dimension(i_low-1:i_high,neq), intent(out) :: F
     real(prec), dimension(i_low-1:i_high,neq) :: VL, VR
     real(prec), dimension(i_low-1:i_high)     ::  aL, aR
-    real(prec) ::rhoL, rhoR
-    real(prec) ::  uL,   uR
-    real(prec) ::  pL,   pR
-    real(prec) ::  ML,   MR
-    real(prec) :: htL,  htR
+    real(prec) :: rhoL, rhoR
+    real(prec) ::   uL,   uR
+    real(prec) ::   pL,   pR
+    real(prec) ::   ML,   MR
+    real(prec) ::  htL,  htR
     real(prec) :: M_plus, M_minus
     real(prec) :: p_plus, p_minus
     real(prec) :: c_plus, c_minus
@@ -110,8 +108,8 @@ contains
       alpha_minus = half*(one-sign(one,MR))
       c_plus  = alpha_plus*(one+beta_L)*ML - beta_L*M_plus
       c_minus = alpha_minus*(one+beta_R)*MR - beta_R*M_minus
-      htL = aL(i)**2/(gamma-1) + half*uL**2
-      htR = aR(i)**2/(gamma-1) + half*uR**2
+      htL = aL(i)**2/(gamma-one) + half*uL**2
+      htR = aR(i)**2/(gamma-one) + half*uR**2
       
       Fc1 = rhoL*aL(i)*c_plus + rhoR*aR(i)*c_minus
       Fc2 =  rhoL*aL(i)*c_plus*uL + rhoR*aR(i)*c_minus*uR
@@ -130,6 +128,62 @@ contains
     end do
     
   end subroutine van_leer_flux
-
- 
+  
+  subroutine roe_flux( left, right, F )
+    
+    real(prec), dimension(:,:)               , intent(in)  :: left, right
+    real(prec), dimension(i_low-1:i_high,neq), intent(out) :: F
+    real(prec), dimension(i_low-1:i_high,neq) :: VL, VR
+    real(prec), dimension(i_low-1:i_high)     ::  aL, aR
+    real(prec), dimension(i_low-1:i_high)     ::  R
+    real(prec), dimension(3) :: FL, FR, rvec1, rvec2, rvec3
+    real(prec) :: rhoL, rhoR, rho2
+    real(prec) ::   uL,   uR,   u2
+    real(prec) ::   pL,   pR,   a2
+    real(prec) ::  htL,  htR,  ht2
+    real(prec) :: lambda1, lambda2, lambda3
+    real(prec) :: dw1, dw2, dw3
+    integer :: i
+    
+    call cons2prim(left,VL)
+    call cons2prim(right,VR)
+    call speed_of_sound(VL(:,3),VL(:,1),aL)
+    call speed_of_sound(VR(:,3),VR(:,1),aR)
+    
+    do i = i_low-1,i_high
+      rhoL = VL(i,1)
+      rhoR = VR(i,1)
+      uL   = VL(i,2)
+      uR   = VR(i,2)
+      pL   = VL(i,3)
+      pR   = VR(i,3)
+      htL  = aL(i)**2/(gamma-one) + half*uL**2
+      htR  = aR(i)**2/(gamma-one) + half*uR**2
+      
+      R(i) = sqrt(rhoR/rhoL)
+      rho2 = R(i)*rhoL
+      u2   = (R(i)*uR + uL)/(R(i) + one)
+      ht2  = (R(i)*htR + htL)/(R(i) + one)
+      a2   = sqrt((gamma-one)*(ht2-half*u2**2))
+      
+      lambda1 = u2
+      lambda2 = u2 + a2
+      lambda3 = u2 - a2
+      
+      rvec1 = (/ one, lambda1, half*u2**2 /)
+      rvec2 = half*(rho2/a2)*(/ one, lambda2, ht2 + u2*a2 /)
+      rvec3 = -half*(rho2/a2)*(/ one, lambda3, ht2 - u2*a2 /)
+      
+      dw1 = (rhoR - rhoL) - (rhoR - rhoL)/a2**2
+      dw2 = (uR - uL) + (rhoR - rhoL)/(rho2*a2)
+      dw3 = (uR - uL) - (rhoR - rhoL)/(rho2*a2)
+      
+      FL = (/ rhoL*uL, rhoL*uL**2 + pL, rhoL*uL*htL /)
+      FR = (/ rhoR*uR, rhoR*uR**2 + pR, rhoR*uR*htR /)
+      
+      F(i,:) = half*(FL+FR) - half*(abs(lambda1)*dw1*rvec1 + &
+             & abs(lambda2)*dw2*rvec2 + abs(lambda3)*dw3*rvec3)
+    end do  
+  end subroutine roe_flux
+  
 end module flux_calc
