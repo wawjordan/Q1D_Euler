@@ -38,6 +38,41 @@ module other_subroutines
     !end do
   end subroutine calculate_sources
   
+  subroutine MUSCL_extrap( V, left, right )
+    
+    real(prec), dimension(ig_low:ig_high,neq), intent(in)  :: V
+    real(prec), dimension(i_low-1:i_high,neq), intent(out) :: left, right
+    real(prec), dimension(i_low-1:i_high,neq) :: r_plus, r_minus
+    real(prec), dimension(i_low-1:i_high,neq) :: psi_plus, psi_minus
+    integer :: i
+    
+    do i = i_low-1,i_high
+      r_plus(i,:)   = ( V(i+2,:) - V(i+1,:) )/( V(i+1,:) - V(i,:) )
+      r_minus(i,:)  = ( V(i,:) - V(i-1,:) )/( V(i+1,:) - V(i,:) )
+    end do
+ 
+    !r_plus  = ( V(i_low+1:i_high+2,:) - V(i_low:i_high+1,:) )/&
+    !        & ( V(i_low:i_high+1,:) - V(i_low-1:i_high,:) )
+    !r_minus = ( V(i_low-1:i_high,:) - V(i_low-2:i_high-1,:) )/&
+    !        & ( V(i_low:i_high+1,:) - V(i_low-1:i_high,:) )
+    psi_plus = psi(r_plus)
+    psi_minus = psi(r_minus)
+    
+    do i = i_low,i_high-1
+      left(i,:) = V(i,:) + fourth*epsM*( &
+         & (one-kappaM)*psi_plus(i-1,:)*(V(i,:)-V(i-1,:)) + &
+         & (one+kappaM)*psi_minus(i,:)*(V(i+1,:)-V(i,:)) )
+      right(i,:) = V(i+1,:) - fourth*epsM*( &
+         & (one+kappaM)*psi_minus(i+1,:)*(V(i+1,:)-V(i,:)) + &
+         & (one-kappaM)*psi_plus(i,:)*(u(i+2)-u(i+1)) )
+    end do
+    left(i_low-1,:)  = two*left(i_low,:) - left(i_low+1,:)
+    left(i_high,:)   = two*left(i_high-1,:) - left(i_high-2,:)
+    right(i_low-1,:) = two*right(i_low,:) - right(i_low+1,:)
+    right(i_high,:)  = two*right(i_high-1,:) - right(i_high-2,:)
+
+  end subroutine MUSCL_extrap
+  
   
   !============================= jst_damping =================================80
   !>
