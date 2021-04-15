@@ -3,7 +3,7 @@ module flux_calc
   use set_precision, only : prec
   use set_constants, only : zero, one, two, three, four, half, fourth
   use fluid_constants, only : gamma
-  use set_inputs, only : neq, imax, i_low, i_high, ig_low, ig_high
+  use set_inputs, only : neq, imax, i_low, i_high, ig_low, ig_high, eps_roe
   use variable_conversion, only : cons2prim, speed_of_sound
   
   implicit none
@@ -141,9 +141,7 @@ contains
     real(prec) ::   uL,   uR,   u2
     real(prec) ::   pL,   pR,   a2
     real(prec) ::  htL,  htR,  ht2
-    !real(prec) :: lambda1, lambda2, lambda3
     real(prec) :: dw1, dw2, dw3
-    real(prec) :: eps = 0.1
     integer :: i
     
     call cons2prim(left,VL)
@@ -174,9 +172,9 @@ contains
       rvec3 = -half*(rho2/a2)*(/ one, lambda(3), ht2 - u2*a2 /)
       
       lambda = abs(lambda)
-      lambda = half*(one+sign(one,lambda-two*eps*a2))*lambda &
-           & + half*(one-sign(one,lambda-two*eps*a2))*&
-           & (lambda**2/(four*eps*a2) + eps*a2)
+      lambda = half*(one+sign(one,lambda-two*eps_roe*a2))*lambda &
+           & + half*(one-sign(one,lambda-two*eps_roe*a2))*&
+           & (lambda**2/(four*eps_roe*a2) + eps_roe*a2)
       
       dw1 = (rhoR - rhoL) - (pR - pL)/a2**2
       dw2 = (uR - uL) + (pR - pL)/(rho2*a2)
