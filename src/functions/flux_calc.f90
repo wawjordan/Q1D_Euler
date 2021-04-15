@@ -86,11 +86,6 @@ contains
     call cons2prim(tempL,VL)
     call cons2prim(tempR,VR)
     
-    !call cons2prim(left,VL)
-    !call cons2prim(right,VR)
-    !do i = i_low-1,i_high
-    !  write(*,*) i, VL(i,1), VL(i,2), VL(i,3)
-    !end do
     call speed_of_sound(VL(:,3),VL(:,1),aL)
     call speed_of_sound(VR(:,3),VR(:,1),aR)
     
@@ -98,12 +93,6 @@ contains
     MR = VR(:,2)/aR
     M_plus  = fourth*(ML+one)**2
     M_minus = -fourth*(MR-one)**2
-    
-    !write(*,*)
-    !write(*,*) 'i      ','ML      ','MR      ','Mplus      ','Mminus      '
-    !do i = i_low-1,i_high
-    !  write(*,*) i, ML(i), MR(i), M_plus(i), M_minus(i)
-    !end do
     
     beta_L = -max(zero,one-int(abs(ML)))
     beta_R = -max(zero,one-int(abs(MR)))
@@ -114,8 +103,6 @@ contains
     
     p_plus  = M_plus*(-ML + two)
     p_minus = M_minus*(-MR - two)
-    !p_plus  = (fourth*(ML+one)**2)*(- ML + two)
-    !p_minus = (-fourth*(MR-one)**2)*(- MR - two)
     d_plus  = alpha_plus*(one+beta_L) - beta_L*p_plus
     d_minus = alpha_minus*(one+beta_R) - beta_R*p_minus
     
