@@ -1,11 +1,12 @@
 module other_subroutines
   
   use set_precision, only : prec
-  use set_constants, only : zero, one, two, three, half
+  use set_constants, only : zero, one, two, three, half, fourth
   use set_inputs, only : imax, neq, i_low, i_high, ig_low, ig_high, shock
+  use set_inputs, only : epsM, kappaM
   use fluid_constants, only : gamma
   use variable_conversion
-  use fluxes
+  use limiter_calc, only : limiter_fun
   use soln_type, only : soln_t
   use exact_q1d_type, only : exact_q1d_t
   use grid_type, only : grid_t
@@ -55,8 +56,9 @@ module other_subroutines
     !        & ( V(i_low:i_high+1,:) - V(i_low-1:i_high,:) )
     !r_minus = ( V(i_low-1:i_high,:) - V(i_low-2:i_high-1,:) )/&
     !        & ( V(i_low:i_high+1,:) - V(i_low-1:i_high,:) )
-    psi_plus = psi(r_plus)
-    psi_minus = psi(r_minus)
+    
+    call limiter_fun(r_plus,psi_plus)
+    call limiter_fun(r_minus,psi_minus)
     
     do i = i_low,i_high-1
       left(i,:) = V(i,:) + fourth*epsM*( &
@@ -64,7 +66,7 @@ module other_subroutines
          & (one+kappaM)*psi_minus(i,:)*(V(i+1,:)-V(i,:)) )
       right(i,:) = V(i+1,:) - fourth*epsM*( &
          & (one+kappaM)*psi_minus(i+1,:)*(V(i+1,:)-V(i,:)) + &
-         & (one-kappaM)*psi_plus(i,:)*(u(i+2)-u(i+1)) )
+         & (one-kappaM)*psi_plus(i,:)*(V(i+2,:)-V(i+1,:)) )
     end do
     left(i_low-1,:)  = two*left(i_low,:) - left(i_low+1,:)
     left(i_high,:)   = two*left(i_high-1,:) - left(i_high-2,:)
