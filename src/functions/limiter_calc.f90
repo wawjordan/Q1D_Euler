@@ -3,6 +3,7 @@ module limiter_calc
   use set_precision, only : prec
   use set_constants, only : zero, one, two, three, four, half, fourth
   use set_inputs, only : neq, imax, i_low, i_high, ig_low, ig_high
+  use set_inputs, only : beta_lim
   
   implicit none
   
@@ -41,7 +42,7 @@ contains
     case(3)
       limiter_fun => minmod_limiter
     case(4)
-      limter_fun => beta_limiter
+      limiter_fun => beta_limiter
     case default
     
     end select
@@ -50,7 +51,7 @@ contains
   
   subroutine van_leer_limiter( r, psi )
     
-    real(prec), dimension(:,:), intent(in) :: left, right
+    real(prec), dimension(:,:), intent(in) :: r
     real(prec), dimension(i_low-1:i_high,neq), intent(out)   :: psi
     
     psi = (r + abs(r))/(one + r)
@@ -80,7 +81,7 @@ contains
     real(prec), dimension(:,:), intent(in) :: r
     real(prec), dimension(i_low-1:i_high,neq), intent(out)   :: psi
     
-    psi = maxval((/ zero, min(beta*r,one), min(r,beta) /))
+    psi = maxval((/ zero, min(beta_lim*r,one), min(r,beta_lim) /))
     
   end subroutine beta_limiter
   
