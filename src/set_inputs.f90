@@ -16,7 +16,8 @@ module set_inputs
   public :: iSS, shock, ramp, soln_save, res_save
   public :: p0, T0, a0, rho0, pb, p_ratio
   public :: set_derived_inputs, read_in, flux_scheme, limiter_scheme
-  
+  public :: leftV, rightV, leftU, rightU
+   
   integer :: imax    = 128
   integer :: i_low   = 10
   integer :: i_high  = 10
@@ -53,7 +54,9 @@ module set_inputs
   real(prec) :: eps_roe    = 0.1_prec
   real(prec) :: epsM       = zero
   real(prec) :: kappaM     = -one
-
+  
+  real(prec), dimension(:,:), allocatable :: leftV, rightV, leftU, rightU
+  
   contains
 
 
@@ -126,14 +129,13 @@ module set_inputs
   !<
   !===========================================================================80
   subroutine set_derived_inputs
-
+    
     a0   = sqrt(gamma*R_gas*T0)
     rho0 = 1000.0_prec*p0/(R_gas*T0)
     i_low = 1
     i_high = imax
     ig_low  = 1 - n_ghost_cells
     ig_high = imax + n_ghost_cells
-
     write(*,'(A8,F20.14,A13)') 'R     = ', R_gas, ' [J/(kmol*K)]'
     write(*,'(A8,F20.14)')     'gamma = ', gamma
     write(*,'(A8,F20.14,A6)')  'a_0   = ', a0, ' [m/s]'
@@ -142,6 +144,11 @@ module set_inputs
     write(*,'(A8,F20.14,A4)')  'T_0   = ', T0, ' [K]'
     write(*,'(A8,F20.14,A6)')  'A*    = ', Astar, ' [m^2]'
 
+    allocate(leftV(i_low-1:i_high,1:neq))
+    allocate(rightV(i_low-1:i_high,1:neq))
+    allocate(leftU(i_low-1:i_high,1:neq))
+    allocate(rightU(i_low-1:i_high,1:neq))
+    
   end subroutine set_derived_inputs
 
 end module set_inputs
