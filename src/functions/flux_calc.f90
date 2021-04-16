@@ -185,7 +185,7 @@ contains
       
       F(i,:) = half*(FL+FR) - half*(lambda(1)*dw1*rvec1 + &
              & lambda(2)*dw2*rvec2 + lambda(3)*dw3*rvec3)
-    end do  
+    end do
   end subroutine roe_flux
   
 end module flux_calc
