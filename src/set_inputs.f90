@@ -1,7 +1,7 @@
 module set_inputs
 
   use set_precision,   only : prec
-  use set_constants,   only : zero, one, pi
+  use set_constants,   only : zero, one, half, pi
   use fluid_constants, only : R_gas, gamma
 
   implicit none
