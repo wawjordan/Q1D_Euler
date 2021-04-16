@@ -45,13 +45,19 @@ module other_subroutines
     real(prec), dimension(i_low-1:i_high,neq), intent(out) :: left, right
     real(prec), dimension(i_low-1:i_high,neq) :: r_plus, r_minus
     real(prec), dimension(i_low-1:i_high,neq) :: psi_plus, psi_minus
+    real(prec), dimension(neq) :: den
     integer :: i
     
     do i = i_low-1,i_high
-      r_plus(i,:)   = ( V(i+2,:) - V(i+1,:) )/( V(i+1,:) - V(i,:) )
-      r_minus(i,:)  = ( V(i,:) - V(i-1,:) )/( V(i+1,:) - V(i,:) )
+      den = V(i+1,:) - V(i,:)
+      den = sign(one,den)*max(abs(den),1e-6_prec)
+      r_plus(i,:)   = ( V(i+2,:) - V(i+1,:) )/den
+      r_minus(i,:)  = ( V(i,:) - V(i-1,:) )/den
+      !write(*,*) i, r_plus(i,1), r_plus(i,2), r_plus(i,3), &
+      !         &    r_minus(i,1),r_minus(i,2), r_minus(i,3)
     end do
- 
+    !write(*,*)
+    !stop
     !r_plus  = ( V(i_low+1:i_high+2,:) - V(i_low:i_high+1,:) )/&
     !        & ( V(i_low:i_high+1,:) - V(i_low-1:i_high,:) )
     !r_minus = ( V(i_low-1:i_high,:) - V(i_low-2:i_high-1,:) )/&
@@ -68,10 +74,18 @@ module other_subroutines
          & (one+kappaM)*psi_minus(i+1,:)*(V(i+1,:)-V(i,:)) + &
          & (one-kappaM)*psi_plus(i,:)*(V(i+2,:)-V(i+1,:)) )
     end do
-    left(i_low-1,:)  = two*left(i_low,:) - left(i_low+1,:)
-    left(i_high,:)   = two*left(i_high-1,:) - left(i_high-2,:)
-    right(i_low-1,:) = two*right(i_low,:) - right(i_low+1,:)
-    right(i_high,:)  = two*right(i_high-1,:) - right(i_high-2,:)
+    !left(i_low-1,:)  = two*left(i_low,:) - left(i_low+1,:)
+    !left(i_high,:)   = two*left(i_high-1,:) - left(i_high-2,:)
+    !right(i_low-1,:) = two*right(i_low,:) - right(i_low+1,:)
+    !right(i_high,:)  = two*right(i_high-1,:) - right(i_high-2,:)
+    left(i_low-1,:)  = V(i_low-1,:)
+    left(i_high,:)   = V(i_high,:)
+    right(i_low-1,:) = V(i_low,:)
+    right(i_high,:)  = V(i_high+1,:)
+    !write(*,*)
+    !do i = i_low-1,i_high
+    !  write(*,*) i, left(i,1), left(i,2), left(i,3), right(i,1), right(i,2), right(i,3)
+    !end do
 
   end subroutine MUSCL_extrap
   
