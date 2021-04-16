@@ -5,11 +5,11 @@ program main_program
   use fluid_constants, only : set_fluid_constants
   use set_inputs, only : set_derived_inputs, read_in
   use set_inputs, only : max_iter, neq, tol, soln_save, res_save
-  !use set_inputs, only : leftV, rightV, leftU, rightU
+  use set_inputs, only : leftV, rightV, leftU, rightU
   use variable_conversion
   use time_integration
   use basic_boundaries, only : enforce_bndry
-  !use limiter_calc, only : select_limiter
+  use limiter_calc, only : select_limiter
   use fluxes
   use flux_calc, only : select_flux, flux_fun
   use other_subroutines
@@ -45,7 +45,7 @@ program main_program
   call setup_geometry(grid,soln)
   
   call select_flux()
-  !call select_limiter()
+  call select_limiter()
   
   call initialize(grid,soln)
   
@@ -59,30 +59,20 @@ program main_program
   call output_soln(grid,soln,ex_soln,0)
   
   call enforce_bndry( soln )
-  
-  !call cons2prim( soln%U, soln%V )
- 
-  !call speed_of_sound(soln%V(:,3),soln%V(:,1),soln%asnd)
   call update_states( soln )
+  call calculate_sources(soln%V(:,3),grid%dAc,soln%src)
+  call calc_time_step(grid%dx,soln%V,soln%asnd,soln%lambda,soln%dt) 
   
-  call calculate_sources(soln%V,grid%dAc,soln%src)
+  call MUSCL_extrap( soln%V, leftV, rightV )
+  call prim2cons(leftU,leftV)
+  call prim2cons(rightU,rightV)
+  call flux_fun(leftU,rightU,soln%F)
   
-  call calc_time_step(grid%dx,soln%V,soln%asnd,soln%lambda,soln%dt)
-  
-  !call central_flux( soln%U, soln%F )
-  !call MUSCL_extrap( soln%V, leftV, rightV )
-  
-  !call cons2prim(leftV,leftU)
-  !call cons2prim(rightV,rightU)
-  
-  call flux_fun(soln%U(i_low-1:i_high,1:neq),soln%U(i_low:i_high+1,1:neq),soln%F)
-  !call flux_fun(leftU,rightU,soln%F)
-  call prim2cons(soln%U,soln%V)
-  
+  !call flux_fun(soln%U(i_low-1:i_high,1:neq),soln%U(i_low:i_high+1,1:neq),soln%F)
+  !call flux_fun(leftU(i_low-1:i_high,1:neq),rightU(i_low-1:i_high,1:neq),soln%F)
   !call jst_damping(soln%lambda,soln%U,soln%V,soln%D) 
   
   !soln%F = soln%F + soln%D
-  
   call explicit_euler(grid,soln%src,soln%dt,soln%F,soln%U,soln%R)
   call update_states( soln )
   
@@ -96,19 +86,17 @@ program main_program
   
   do j = 1,max_iter
     
+    call enforce_bndry( soln )
+    call update_states( soln )
     call calculate_sources(soln%V(:,3),grid%dAc,soln%src)
-    
-    !call speed_of_sound(soln%V(:,3),soln%V(:,1),soln%asnd)
-    
     call calc_time_step(grid%dx,soln%V,soln%asnd,soln%lambda,soln%dt)
     
-    call enforce_bndry( soln )
+    call MUSCL_extrap( soln%V, leftV, rightV )
+    call prim2cons(leftU,leftV)
+    call prim2cons(rightU,rightV)
+    call flux_fun(leftU,rightU,soln%F)
     
-    !call cons2prim( soln%U, soln%V )
-    call update_states( soln )
-    call flux_fun(soln%U(i_low-1:i_high,1:neq),soln%U(i_low:i_high+1,1:neq),soln%F)
-    !call central_flux(soln%U, soln%F)
-    !stop
+    !call flux_fun(soln%U(i_low-1:i_high,1:neq),soln%U(i_low:i_high+1,1:neq),soln%F)
     !call prim2cons(soln%U,soln%V)
     
     !call jst_damping(soln%lambda,soln%U,soln%V,soln%D)
