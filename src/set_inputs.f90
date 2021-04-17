@@ -47,12 +47,12 @@ module set_inputs
   real(prec) :: k2         = 1.0_prec/2.0_prec
   real(prec) :: k4         = 1.0_prec/64.0_prec
   integer :: flux_scheme   = 1
-  integer :: limiter_scheme = 1
+  integer :: limiter_scheme = 2
   real(prec) :: beta_lim = 2
   integer :: soln_save     = 150000
   integer :: res_save      = 10
   real(prec) :: eps_roe    = 0.1_prec
-  real(prec) :: epsM       = zero
+  real(prec) :: epsM       = one
   real(prec) :: kappaM     = -one
   
   real(prec), dimension(:,:), allocatable :: leftV, rightV, leftU, rightU
@@ -61,26 +61,56 @@ module set_inputs
 
 
   subroutine read_in
-      implicit none
+      !integer :: istat
+      !logical :: lexist
+      !logical :: lopen = .false.
+      !character(len=20) :: name = 'input.dat'
+      
+      !openfile: do
+      !  inquire( file=name,exist=lexist )
+      !  exists: if ( .not. lexist ) then
+      !    open(25,file=name,status='new',action='read',iostat=istat)
+      !    lopen = .true.
+      !  else
+      !    write(*,*) 'ERROR: ',trim(name),' does not exist. Aborting'
+      !    stop
+      !  end do
+
       character(len=10) :: discard              ! ignore character string
       open(25,file='input.dat',status='old')
+      21 format(A10,F30.15)
+      20 format(A10,I30)
       read(25,*) discard
       read(25,*) discard
-      read(25,*) discard, imax
-      read(25,*) discard, p0
-      read(25,*) discard, T0
-      read(25,*) discard, flux_scheme
-      read(25,*) discard, shock
-      read(25,*) discard, ramp
-      read(25,*) discard, p_ratio
-      read(25,*) discard, CFL
-      read(25,*) discard, max_iter
-      read(25,*) discard, soln_save
-      read(25,*) discard, res_save
-      read(25,*) discard, eps_roe
-      read(25,*) discard, k2
-      read(25,*) discard, k4
+      read(25,20) discard, imax
+      read(25,21) discard, p0
+      read(25,21) discard, T0
+      read(25,21) discard, p_ratio
+      read(25,20) discard, flux_scheme
+      read(25,20) discard, limiter_scheme
+      read(25,21) discard, beta_lim
+      read(25,20) discard, shock
+      read(25,20) discard, ramp
+      read(25,21) discard, CFL
+      read(25,21) discard, eps_roe
+      read(25,21) discard, epsM
+      read(25,21) discard, kappaM
+      read(25,21) discard, k2
+      read(25,21) discard, k4
+      read(25,20) discard, max_iter
+      read(25,20) discard, soln_save
+      read(25,20) discard, res_save
       close(25)
+      p0 = real(p0,prec)
+      T0 = real(T0,prec)
+      p_ratio = real(p_ratio,prec)
+      beta_lim = real(beta_lim,prec)
+      CFL = real(beta_lim,prec)
+      eps_roe = real(eps_roe,prec)
+      epsM = real(epsM,prec)
+      kappaM = real(kappaM,prec)
+      k2 = real(k2,prec)
+      k4 = real(k4,prec)
       pb = p_ratio*p0*1000_prec
   end subroutine read_in
 
