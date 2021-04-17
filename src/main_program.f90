@@ -15,6 +15,7 @@ program main_program
   use other_subroutines
   use geometry, only : setup_geometry, teardown_geometry
   use init_problem, only : initialize
+  use namelist, only : read_namelist
   use grid_type
   use soln_type
   use exact_q1d_type
@@ -39,7 +40,8 @@ program main_program
   & "   ||velocity||    |   ||pressure||    |"
   call set_derived_constants
   call set_fluid_constants
-  call read_in
+  call read_namelist
+  !call read_in
   call output_file_headers
   call set_derived_inputs
   call setup_geometry(grid,soln)
@@ -90,12 +92,10 @@ program main_program
     call update_states( soln )
     call calculate_sources(soln%V(:,3),grid%dAc,soln%src)
     call calc_time_step(grid%dx,soln%V,soln%asnd,soln%lambda,soln%dt)
-    
     call MUSCL_extrap( soln%V, leftV, rightV )
     call prim2cons(leftU,leftV)
     call prim2cons(rightU,rightV)
     call flux_fun(leftU,rightU,soln%F)
-    
     !call flux_fun(soln%U(i_low-1:i_high,1:neq),soln%U(i_low:i_high+1,1:neq),soln%F)
     !call prim2cons(soln%U,soln%V)
     
