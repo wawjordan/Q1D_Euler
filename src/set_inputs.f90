@@ -52,7 +52,7 @@ module set_inputs
   integer :: soln_save     = 150000
   integer :: res_save      = 10
   real(prec) :: eps_roe    = 0.1_prec
-  real(prec) :: epsM       = one
+  real(prec) :: epsM       = zero
   real(prec) :: kappaM     = -one
   
   real(prec), dimension(:,:), allocatable :: leftV, rightV, leftU, rightU
@@ -101,16 +101,6 @@ module set_inputs
       read(25,20) discard, soln_save
       read(25,20) discard, res_save
       close(25)
-      p0 = real(p0,prec)
-      T0 = real(T0,prec)
-      p_ratio = real(p_ratio,prec)
-      beta_lim = real(beta_lim,prec)
-      CFL = real(beta_lim,prec)
-      eps_roe = real(eps_roe,prec)
-      epsM = real(epsM,prec)
-      kappaM = real(kappaM,prec)
-      k2 = real(k2,prec)
-      k4 = real(k4,prec)
       pb = p_ratio*p0*1000_prec
   end subroutine read_in
 
@@ -166,6 +156,7 @@ module set_inputs
     i_high = imax
     ig_low  = 1 - n_ghost_cells
     ig_high = imax + n_ghost_cells
+    !pb = p_ratio*p0*1000_prec
     write(*,'(A8,F20.14,A13)') 'R     = ', R_gas, ' [J/(kmol*K)]'
     write(*,'(A8,F20.14)')     'gamma = ', gamma
     write(*,'(A8,F20.14,A6)')  'a_0   = ', a0, ' [m/s]'
