@@ -16,7 +16,7 @@ prat=0.4 #0.1 0.5 0.6
 flux=2
 limiter=2
 beta_lim=2.0
-shock=0 #0 1
+shock=1 #0 1
 ramp=0 #0 1
 cfl=0.1 #0.1 0.5 0.9
 eps_roe=0.05
@@ -25,7 +25,7 @@ kappa_MUSCL=-1.0
 k2=0.5 #0.5 0.4 0.3 0.25
 k4=0.03125 #0.03125 0.02 0.015625 
 maxk=100000
-Sout=100000
+Sout=10000
 Rout=100
 if [ $shock -eq 0 ]; then
   shock_str="Isentropic"
