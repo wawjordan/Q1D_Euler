@@ -5,7 +5,7 @@ program main_program
   use fluid_constants, only : set_fluid_constants
   use set_inputs, only : set_derived_inputs, read_in
   use set_inputs, only : max_iter, neq, tol, soln_save, res_save
-  use set_inputs, only : leftV, rightV, leftU, rightU
+  use set_inputs, only : leftV, rightV, leftU, rightU, flux_scheme
   use variable_conversion
   use time_integration
   use basic_boundaries, only : enforce_bndry
@@ -65,11 +65,21 @@ program main_program
   call calculate_sources(soln%V(:,3),grid%dAc,soln%src)
   call calc_time_step(grid%dx,soln%V,soln%asnd,soln%lambda,soln%dt) 
   
-  call MUSCL_extrap( soln%V, leftV, rightV )
-  call prim2cons(leftU,leftV)
-  call prim2cons(rightU,rightV)
-  call flux_fun(leftU,rightU,soln%F)
+  !call MUSCL_extrap( soln%V, leftV, rightV )
+  !call prim2cons(leftU,leftV)
+  !call prim2cons(rightU,rightV)
+  !call flux_fun(leftU,rightU,soln%F)
   
+  if (flux_scheme==1) then
+    call flux_fun(soln%U(i_low-1:i_high,:),soln%U(i_low:i_high+1,:),soln%F)
+    call jst_damping(soln%lambda,soln%U,soln%V,soln%D)
+    soln%F = soln%F + soln%D
+  else
+    call MUSCL_extrap( soln%V, leftV, rightV )
+    call prim2cons(leftU,leftV)
+    call prim2cons(rightU,rightV)
+    call flux_fun(leftU,rightU,soln%F)
+  end if
   !call flux_fun(soln%U(i_low-1:i_high,1:neq),soln%U(i_low:i_high+1,1:neq),soln%F)
   !call flux_fun(leftU(i_low-1:i_high,1:neq),rightU(i_low-1:i_high,1:neq),soln%F)
   !call jst_damping(soln%lambda,soln%U,soln%V,soln%D) 
@@ -92,16 +102,20 @@ program main_program
     call update_states( soln )
     call calculate_sources(soln%V(:,3),grid%dAc,soln%src)
     call calc_time_step(grid%dx,soln%V,soln%asnd,soln%lambda,soln%dt)
-    call MUSCL_extrap( soln%V, leftV, rightV )
-    call prim2cons(leftU,leftV)
-    call prim2cons(rightU,rightV)
-    call flux_fun(leftU,rightU,soln%F)
+    
+    if (flux_scheme==1) then
+      call flux_fun(soln%U(i_low-1:i_high,:),soln%U(i_low:i_high+1,:),soln%F)
+      call jst_damping(soln%lambda,soln%U,soln%V,soln%D)
+      soln%F = soln%F + soln%D
+    else
+      call MUSCL_extrap( soln%V, leftV, rightV )
+      call prim2cons(leftU,leftV)
+      call prim2cons(rightU,rightV)
+      call flux_fun(leftU,rightU,soln%F)
+    end if
     !call flux_fun(soln%U(i_low-1:i_high,1:neq),soln%U(i_low:i_high+1,1:neq),soln%F)
     !call prim2cons(soln%U,soln%V)
     
-    !call jst_damping(soln%lambda,soln%U,soln%V,soln%D)
-    
-    !soln%F = soln%F + soln%D
     
     call explicit_euler(grid,soln%src,soln%dt,soln%F,soln%U,soln%R)
     call update_states( soln )
