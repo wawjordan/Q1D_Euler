@@ -6,7 +6,6 @@ module time_integration
   use grid_type
   use soln_type
   use variable_conversion
-  use fluxes
   
   implicit none
   
