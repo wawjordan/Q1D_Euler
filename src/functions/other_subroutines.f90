@@ -47,10 +47,11 @@ module other_subroutines
   !===========================================================================80
   subroutine MUSCL_extrap( V, left, right )
     
+    use set_inputs, only : limiter_freeze, psi_plus, psi_minus
     real(prec), dimension(ig_low:ig_high,neq), intent(in)  :: V
     real(prec), dimension(i_low-1:i_high,neq), intent(out) :: left, right
+    !real(prec), dimension(i_low-1:i_high,neq), intent(inout) :: psi_plus, psi_minus
     real(prec), dimension(i_low-1:i_high,neq) :: r_plus, r_minus
-    real(prec), dimension(i_low-1:i_high,neq) :: psi_plus, psi_minus
     !real(prec), dimension(neq) :: den
     integer :: i
     
@@ -62,9 +63,13 @@ module other_subroutines
       !write(*,*) i, r_plus(i,1), r_plus(i,2), r_plus(i,3), &
       !         &    r_minus(i,1),r_minus(i,2), r_minus(i,3)
     !end do
-    call calc_consecutive_variations(V,r_plus,r_minus)
-    call limiter_fun(r_plus,psi_plus)
-    call limiter_fun(r_minus,psi_minus)
+    if (limiter_freeze) then
+      continue
+    else
+      call calc_consecutive_variations(V,r_plus,r_minus)
+      call limiter_fun(r_plus,psi_plus)
+      call limiter_fun(r_minus,psi_minus)
+    end if
     
     do i = i_low,i_high-1
       left(i,:) = V(i,:) + fourth*epsM*( &
