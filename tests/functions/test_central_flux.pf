@@ -48,7 +48,7 @@ module test_central_flux
       call flux_fun(U(0:1,1:3),U(1:2,1:3),F)
       
       write(*,*)
-      write(*,*) 'zero velocity test case:'
+      write(*,*) 'zero velocity test case (central):'
       write(*,*) 'F(1)     = ', F(0,1)
       write(*,*) 'F_exp(1) = ', F_expected(1,1)
       @assertequal(F_expected(1,1), F(0,1), toler)
@@ -98,7 +98,7 @@ module test_central_flux
       call flux_fun(U(0:1,:),U(1:2,:),F)
 
       write(*,*)
-      write(*,*) 'supersonic test case:'
+      write(*,*) 'supersonic test case (central):'
       write(*,*) 'F(1)     = ', F(0,1)
       write(*,*) 'F_exp(1) = ', F_expected(1,1)
       @assertequal(1.0_prec, F(0,1)/F_expected(1,1), toler)
