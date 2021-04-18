@@ -14,19 +14,32 @@ module limiter_calc
   procedure( calc_limiter ), pointer :: limiter_fun
    
   abstract interface
+  !============================== calc_limiter ===============================80
+  !>
+  !! Description:
+  !!
+  !! Inputs:      r   : 
+  !!
+  !! Outputs:     psi : 
+  !<
+  !===========================================================================80  
+  subroutine calc_limiter( r, psi )
     
-    subroutine calc_limiter( r, psi )
-      
-      import :: prec, i_low, i_high, neq
-      real(prec), dimension(:,:), intent(in) :: r
-      real(prec), dimension(i_low-1:i_high,neq), intent(out) :: psi
-      
-    end subroutine calc_limiter
+    import :: prec, i_low, i_high, neq
+    real(prec), dimension(:,:), intent(in) :: r
+    real(prec), dimension(i_low-1:i_high,neq), intent(out) :: psi
+    
+  end subroutine calc_limiter
     
   end interface
   
 contains
   
+  !============================== select_limiter =============================80
+  !>
+  !! Description:
+  !<
+  !===========================================================================80  
   subroutine select_limiter()
     
     use set_inputs, only : limiter_scheme
@@ -49,6 +62,15 @@ contains
   
   end subroutine select_limiter
   
+  !=========================== van_leer_limiter ==============================80
+  !>
+  !! Description:
+  !!
+  !! Inputs:      r   : 
+  !!
+  !! Outputs:     psi : 
+  !<
+  !===========================================================================80  
   subroutine van_leer_limiter( r, psi )
     
     real(prec), dimension(:,:), intent(in) :: r
@@ -59,6 +81,15 @@ contains
     
   end subroutine van_leer_limiter
   
+  !======================== van_albada_limiter ===============================80
+  !>
+  !! Description:
+  !!
+  !! Inputs:      r   : 
+  !!
+  !! Outputs:     psi : 
+  !<
+  !===========================================================================80  
   subroutine van_albada_limiter( r, psi )
     
     real(prec), dimension(:,:), intent(in) :: r
@@ -69,6 +100,15 @@ contains
     
   end subroutine van_albada_limiter
 
+  !============================== minmod_limiter =============================80
+  !>
+  !! Description:
+  !!
+  !! Inputs:      r   : 
+  !!
+  !! Outputs:     psi : 
+  !<
+  !===========================================================================80  
   subroutine minmod_limiter( r, psi )
     
     real(prec), dimension(:,:), intent(in) :: r
@@ -79,6 +119,15 @@ contains
     
   end subroutine minmod_limiter
   
+  !============================== beta_limiter ===============================80
+  !>
+  !! Description:
+  !!
+  !! Inputs:      r   : 
+  !!
+  !! Outputs:     psi : 
+  !<
+  !===========================================================================80  
   subroutine beta_limiter( r, psi )
     
     real(prec), dimension(:,:), intent(in) :: r
