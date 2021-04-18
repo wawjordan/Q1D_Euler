@@ -26,8 +26,8 @@
 /
 
 &flux
-  flux_scheme = 3
-  limiter_scheme = 4
+  flux_scheme = 2
+  limiter_scheme = 3
 /
 
 &output
