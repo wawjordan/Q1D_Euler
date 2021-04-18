@@ -27,18 +27,24 @@ module other_subroutines
   !===========================================================================80
   subroutine calculate_sources(P,dA,S)
     
-    !real(prec), dimension(ig_low:ig_high,neq), intent(in) :: V
     real(prec), dimension(i_low:i_high),   intent(in) :: dA
     real(prec), dimension(ig_low:ig_high),   intent(in) :: P
     real(prec), dimension(i_low:i_high),   intent(out) :: S
-    !integer :: i
-    !S(i_low:i_high) = V(i_low:i_high,3)*dA(i_low:i_high)/1000.0_prec
+    
     S(i_low:i_high) = P(i_low:i_high)*dA(i_low:i_high)
-    !do i = i_low,i_high
-    !write(*,*) i, "dA : ",dA(i), "V: ",V(i,:)," S: ",S(i)
-    !end do
+    
   end subroutine calculate_sources
   
+  !================================ MUSCL_extrap =============================80
+  !>
+  !! Description: 
+  !!
+  !! Inputs:      V     : 
+  !!
+  !! Outputs:     left  : 
+  !!              right :
+  !<
+  !===========================================================================80
   subroutine MUSCL_extrap( V, left, right )
     
     real(prec), dimension(ig_low:ig_high,neq), intent(in)  :: V
@@ -56,12 +62,6 @@ module other_subroutines
       !write(*,*) i, r_plus(i,1), r_plus(i,2), r_plus(i,3), &
       !         &    r_minus(i,1),r_minus(i,2), r_minus(i,3)
     end do
-    !write(*,*)
-    !stop
-    !r_plus  = ( V(i_low+1:i_high+2,:) - V(i_low:i_high+1,:) )/&
-    !        & ( V(i_low:i_high+1,:) - V(i_low-1:i_high,:) )
-    !r_minus = ( V(i_low-1:i_high,:) - V(i_low-2:i_high-1,:) )/&
-    !        & ( V(i_low:i_high+1,:) - V(i_low-1:i_high,:) )
     
     call limiter_fun(r_plus,psi_plus)
     call limiter_fun(r_minus,psi_minus)
@@ -148,10 +148,21 @@ module other_subroutines
     !d(i_low-1,:) = 2*d(i_low,:) - d(i_low+1,:)
     !d(i_high-1,:) = 2*d(i_high-2,:) - d(i_high-3,:)
     !d(i_high,:) = 2*d(i_high-1,:) - d(i_high-2,:)
-    
 
   end subroutine jst_damping
   
+  !================================== calc_de ==== ===========================80
+  !>
+  !! Description: 
+  !!
+  !! Inputs:      soln : 
+  !!              exact_soln : 
+  !!              pnorm :
+  !!
+  !! Outputs:     DE     : 
+  !!              DEnorm : 
+  !<
+  !===========================================================================80
   subroutine calc_de( soln, exact_soln, DE, DEnorm, pnorm )
     
     type(soln_t), intent(inout) :: soln
@@ -190,10 +201,10 @@ module other_subroutines
   !!              num_iter : 
   !<
   !===========================================================================80
-subroutine output_file_headers
-
+  subroutine output_file_headers
+    
     use set_inputs, only : imax, CFL, k2, k4, shock, ramp, p_ratio
-
+    
     character(len=1024) :: dirname
     character(len=1024) :: filename
     character(len=64) ::   shock_str
@@ -201,7 +212,7 @@ subroutine output_file_headers
     character(len=64) ::   CFL_str
     character(len=64) ::   kappa2_str
     character(len=64) ::   kappa4_str
-
+    
     ! Set up output directories
     write (ncells_str  , "(A1,I0.3,A1)") "N"  , imax   , "_"
     if (shock.eq.1) then
@@ -225,9 +236,9 @@ subroutine output_file_headers
     &                   trim(kappa4_str)
     
     call execute_command_line ('mkdir -p ../results/' // adjustl(trim(dirname)))
-
-  ! Set up output files (history and solution)
-  ! open(30,file='history.dat',status='unknown')
+    
+    ! Set up output files (history and solution)
+    !open(30,file='history.dat',status='unknown')
     open(30,file= '../results/'//trim(adjustl(dirname))//  &
     &               trim(adjustl(filename))//'_history.dat',status='unknown')
     write(30,*) 'TITLE = "Quasi-1D Nozzle Iterative Residual History"'
@@ -236,8 +247,7 @@ subroutine output_file_headers
     else
       write(30,*) 'variables="Iteration""Res1""Res2""Res3"'
     end if
-
-
+    
     open(40,file= '../results/'//trim(adjustl(dirname))//  &
     &               trim(adjustl(filename))//'_field.dat',status='unknown')
     write(40,*) 'TITLE = "Quasi-1D Nozzle Solution"'
@@ -251,11 +261,9 @@ subroutine output_file_headers
       write(*,*) 'ERROR! shock must equal 0 or 1!!!'
       stop
     endif
-  
+    
   end subroutine output_file_headers
-
-
-
+  
   !============================= output_soln =================================80
   !>
   !! Description: 
@@ -273,25 +281,8 @@ subroutine output_file_headers
     integer,        intent(in) :: num_iter
     
     integer :: i
-
-
-    open(40,status='unknown')
-    !write(40,*) 'TITLE = "Quasi-1D Nozzle Solution"'
-    !write(40,*)' variables="x(m)""Area(m^2)""rho(kg/m^3)""u(m/s)"&
-    !         & "Press(N/m^2)""Mach""U1""U2""U3""F1""F2""F3"'
-    ! Repeat the following each time you want to write out the solution
-    !write(40,*) 'zone T="',num_iter,'" '
-    !write(40,*) 'I=',imax
-    !write(40,*) 'DATAPACKING=POINT'
-    !write(40,*) 'DT=(DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
-    !         & DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE)'
-    !do i = 1, imax
-    !write(40,*)grid%xc(i),grid%Ac(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
-    !         & soln%mach(i),soln%U(i,1),soln%U(i,2),soln%U(i,3),&
-    !         & soln%F(i,1),soln%F(i,2),soln%F(i,3)
-    !enddo
-
     
+    open(40,status='unknown')
     ! Repeat the following each time you want to write out the solution
     write(40,*) 'zone T="',num_iter,'" '
     write(40,*) 'I=',imax
@@ -317,10 +308,7 @@ subroutine output_file_headers
     endif
     
   end subroutine output_soln
-
-
-
-
+  
   !============================= output_res ==================================80
   !>
   !! Description: 
