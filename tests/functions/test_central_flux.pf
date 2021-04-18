@@ -3,7 +3,7 @@ module test_central_flux
   use set_precision,   only : prec
   use fluid_constants, only : gamma
   use set_inputs, only : i_low, i_high, ig_low, ig_high
-  use fluxes, only : central_flux
+  use flux_calc, only : flux_fun, select_flux
   use pfunit_mod
 
   implicit none
@@ -14,10 +14,15 @@ module test_central_flux
 
   @test
     subroutine central_flux_wall_test
-
+      
+      use set_inputs, only : flux_scheme
+      
       real(prec), dimension(0:2,3) :: U
       real(prec), dimension(1,3) :: F_expected
       real(prec), dimension(0:1,3) :: F
+      
+      flux_scheme = 1
+      call select_flux()
       
       i_low = 1
       ig_low = 0
@@ -39,9 +44,9 @@ module test_central_flux
       F_expected(1,1) = 0.0_prec
       F_expected(1,2) = 101325.0_prec
       F_expected(1,3) = 0.0_prec
-
-      call central_flux(U,F)
-
+      
+      call flux_fun(U(0:1,1:3),U(1:2,1:3),F)
+      
       write(*,*)
       write(*,*) 'zero velocity test case:'
       write(*,*) 'F(1)     = ', F(0,1)
@@ -59,10 +64,15 @@ module test_central_flux
   
   @test
     subroutine central_flux_supersonic_test
-
+      
+      use set_inputs, only : flux_scheme
+      
       real(prec), dimension(0:2,3) :: U
       real(prec), dimension(1,3) :: F_expected
       real(prec), dimension(0:1,3) :: F
+      
+      flux_scheme = 1
+      call select_flux()
       
       i_low = 1
       ig_low = 0
@@ -85,8 +95,7 @@ module test_central_flux
       F_expected(1,2) = 537111.1593750_prec
       F_expected(1,3) = 517438309.9606_prec
 
-
-      call central_flux(U,F)
+      call flux_fun(U(0:1,:),U(1:2,:),F)
 
       write(*,*)
       write(*,*) 'supersonic test case:'
