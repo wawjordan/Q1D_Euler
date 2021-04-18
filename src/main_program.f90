@@ -23,7 +23,7 @@ program main_program
   implicit none
   
   character(len=100) :: header_str1
-  integer :: j, pnorm
+  integer :: j, k, pnorm
   !real(prec), dimension(3) :: rnorm
   !real(prec), dimension(3) :: rinit
   !real(prec), dimension(3) :: DEnorm
@@ -32,6 +32,7 @@ program main_program
   type( exact_q1d_t ) :: ex_soln  
   pnorm = 2
   j = 0
+  k = 0
 
   open(50,file='temp.txt',status='unknown')
   
@@ -90,6 +91,7 @@ program main_program
   call update_states( soln )
   
   call residual_norms(soln%R,soln%rinit,pnorm,(/one,one,one/))
+  soln%rold = soln%rinit
   
   write(*,*) 'Residual Norms: Iteration 0'
   write(*,*) header_str1
@@ -135,7 +137,14 @@ program main_program
     
     if (all(soln%rnorm<tol) ) then
       exit
+    !elseif (mod(k,10000)==0) then
+    !  limiter_freeze = .false.
+    !  k = 1
+    elseif (any(soln%rnorm>soln%rold) ) then
+      limiter_freeze = .true.
     end if
+    soln%rold = soln%rnorm
+    !k = k+1
     if (mod(j,10000)==0) then
       write(*,*) header_str1
     end if
