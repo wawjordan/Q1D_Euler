@@ -77,11 +77,12 @@ contains
     
     real(prec), dimension(:,:), intent(in) :: left, right
     real(prec), dimension(i_low-1:i_high,neq), intent(out)   :: F
-    real(prec), dimension(i_low-1:i_high,neq)   :: Ui
+    real(prec), dimension(i_low-1:i_high,neq) :: Ui
+    
     
     Ui(i_low-1:i_high,:) = half*(left + right)
     
-    F(:,1) = Ui(:,2)
+    F(:,1) = Ui(:,2) 
     F(:,2) = half*(three-gamma)*( Ui(:,2)**2 )/Ui(:,1) &
            + (gamma-one)*Ui(:,3)
     F(:,3) = Ui(:,3)*Ui(:,2)/Ui(:,1) &
