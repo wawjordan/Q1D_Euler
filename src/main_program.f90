@@ -10,7 +10,7 @@ program main_program
   use time_integration
   use basic_boundaries, only : enforce_bndry
   use limiter_calc, only : select_limiter
-  use fluxes
+  !use fluxes
   use flux_calc, only : select_flux, flux_fun
   use other_subroutines
   use geometry, only : setup_geometry, teardown_geometry
