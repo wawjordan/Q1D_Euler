@@ -1,5 +1,5 @@
 &grid
-  imax = 128
+  imax = 64
   xmin = -1.0
   xmax = 1.0
   n_ghost_cells = 2
@@ -26,8 +26,8 @@
 /
 
 &flux
-  flux_scheme = 1
-  limiter_scheme = 2
+  flux_scheme = 3
+  limiter_scheme = 4
 /
 
 &output
