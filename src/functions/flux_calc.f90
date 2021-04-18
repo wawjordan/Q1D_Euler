@@ -16,18 +16,33 @@ module flux_calc
    
   abstract interface
     
-    subroutine calc_flux(left_state, right_state, F)
-      
-      import :: prec, i_low, i_high, neq
-      real(prec), dimension(:,:), intent(in) :: left_state, right_state
-      real(prec), dimension(i_low-1:i_high,neq), intent(out) :: F
-      
-    end subroutine calc_flux
+  !================================ calc_flux ================================80
+  !>
+  !! Description:
+  !!
+  !! Inputs:      left_state  :
+  !!              right_state : 
+  !!
+  !! Outputs:     F     :
+  !<
+  !===========================================================================80
+  subroutine calc_flux(left_state, right_state, F)
+    
+    import :: prec, i_low, i_high, neq
+    real(prec), dimension(:,:), intent(in) :: left_state, right_state
+    real(prec), dimension(i_low-1:i_high,neq), intent(out) :: F
+    
+  end subroutine calc_flux
     
   end interface
   
 contains
   
+  !================================ select_flux ==============================80
+  !>
+  !! Description:
+  !<
+  !===========================================================================80
   subroutine select_flux()
     
     use set_inputs, only : flux_scheme
@@ -48,6 +63,16 @@ contains
   
   end subroutine select_flux
   
+  !================================ central_flux =============================80
+  !>
+  !! Description:
+  !!
+  !! Inputs:      left  :
+  !!              right : 
+  !!
+  !! Outputs:     F     :
+  !<
+  !===========================================================================80
   subroutine central_flux(left, right, F)
     
     real(prec), dimension(:,:), intent(in) :: left, right
@@ -65,6 +90,16 @@ contains
   
   end subroutine central_flux
   
+  !============================== van_leer_flux ==============================80
+  !>
+  !! Description:
+  !!
+  !! Inputs:      left  :
+  !!              right : 
+  !!
+  !! Outputs:     F     :
+  !<
+  !===========================================================================80
   subroutine van_leer_flux(left, right, F)
     
     real(prec), dimension(:,:)               , intent(in)  :: left, right
@@ -129,6 +164,16 @@ contains
     
   end subroutine van_leer_flux
   
+  !================================ roe_flux =================================80
+  !>
+  !! Description:
+  !!
+  !! Inputs:      left  :
+  !!              right : 
+  !!
+  !! Outputs:     F     :
+  !<
+  !===========================================================================80
   subroutine roe_flux( left, right, F )
     
     real(prec), dimension(:,:)               , intent(in)  :: left, right
