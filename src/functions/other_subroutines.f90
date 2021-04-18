@@ -6,7 +6,7 @@ module other_subroutines
   use set_inputs, only : epsM, kappaM
   use fluid_constants, only : gamma
   use variable_conversion
-  use limiter_calc, only : limiter_fun
+  use limiter_calc, only : limiter_fun, calc_consecutive_variations
   use soln_type, only : soln_t
   use exact_q1d_type, only : exact_q1d_t
   use grid_type, only : grid_t
@@ -51,18 +51,18 @@ module other_subroutines
     real(prec), dimension(i_low-1:i_high,neq), intent(out) :: left, right
     real(prec), dimension(i_low-1:i_high,neq) :: r_plus, r_minus
     real(prec), dimension(i_low-1:i_high,neq) :: psi_plus, psi_minus
-    real(prec), dimension(neq) :: den
+    !real(prec), dimension(neq) :: den
     integer :: i
     
-    do i = i_low-1,i_high
-      den = V(i+1,:) - V(i,:)
-      den = sign(one,den)*max(abs(den),1e-6_prec)
-      r_plus(i,:)   = ( V(i+2,:) - V(i+1,:) )/den
-      r_minus(i,:)  = ( V(i,:) - V(i-1,:) )/den
+    !do i = i_low-1,i_high
+      !den = V(i+1,:) - V(i,:)
+      !den = sign(one,den)*max(abs(den),1e-6_prec)
+      !r_plus(i,:)   = ( V(i+2,:) - V(i+1,:) )/den
+      !r_minus(i,:)  = ( V(i,:) - V(i-1,:) )/den
       !write(*,*) i, r_plus(i,1), r_plus(i,2), r_plus(i,3), &
       !         &    r_minus(i,1),r_minus(i,2), r_minus(i,3)
-    end do
-    
+    !end do
+    call calc_consecutive_variations(V,r_plus,r_minus)
     call limiter_fun(r_plus,psi_plus)
     call limiter_fun(r_minus,psi_minus)
     
@@ -82,6 +82,8 @@ module other_subroutines
     left(i_high,:)   = V(i_high,:)
     right(i_low-1,:) = V(i_low,:)
     right(i_high,:)  = V(i_high+1,:)
+    call limit_primitives(left)
+    call limit_primitives(right)
     !write(*,*)
     !do i = i_low-1,i_high
     !  write(*,*) i, left(i,1), left(i,2), left(i,3), right(i,1), right(i,2), right(i,3)
