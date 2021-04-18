@@ -16,7 +16,7 @@ module set_inputs
   public :: iSS, shock, ramp, soln_save, res_save
   public :: p0, T0, a0, rho0, pb, p_ratio
   public :: set_derived_inputs, read_in, flux_scheme, limiter_scheme
-  public :: leftV, rightV, leftU, rightU
+  public :: leftV, rightV, leftU, rightU, limiter_freeze, psi_plus, psi_minus
    
   integer :: imax    = 128
   integer :: i_low   = 10
@@ -54,8 +54,9 @@ module set_inputs
   real(prec) :: eps_roe    = 0.1_prec
   real(prec) :: epsM       = zero
   real(prec) :: kappaM     = -one
-  
+  logical :: limiter_freeze = .false.
   real(prec), dimension(:,:), allocatable :: leftV, rightV, leftU, rightU
+  real(prec), dimension(:,:), allocatable :: psi_plus, psi_minus
   
   contains
 
@@ -169,6 +170,8 @@ module set_inputs
     allocate(rightV(i_low-1:i_high,1:neq))
     allocate(leftU(i_low-1:i_high,1:neq))
     allocate(rightU(i_low-1:i_high,1:neq))
+    allocate(psi_plus(i_low-1:i_high,1:neq))
+    allocate(psi_minus(i_low-1:i_high,1:neq))
     
   end subroutine set_derived_inputs
 
