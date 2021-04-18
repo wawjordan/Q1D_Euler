@@ -23,6 +23,7 @@ module soln_type
     real(prec), allocatable, dimension(:,:) :: DE
     real(prec), allocatable, dimension(:)   :: DEnorm
     real(prec), allocatable, dimension(:)   :: rnorm
+    real(prec), allocatable, dimension(:)   :: rold
     real(prec), allocatable, dimension(:)   :: rinit
     
   end type soln_t
@@ -55,6 +56,7 @@ module soln_type
               soln%dt( i_low:i_high ),     &
               soln%lambda( ig_low:ig_high ), &
               soln%rnorm( 1:neq ),        &
+              soln%rold( 1:neq ),        &
               soln%rinit( 1:neq ) )
     
     if (shock.eq.0) then
@@ -76,6 +78,7 @@ module soln_type
     soln%dt  = zero
     soln%lambda = zero
     soln%rnorm = zero
+    soln%rold = zero
     soln%rinit = zero
 
   end subroutine allocate_soln
@@ -108,6 +111,7 @@ module soln_type
                soln%dt,     &
                soln%lambda, &
                soln%rnorm,  &
+               soln%rold,  &
                soln%rinit  )
     
     if (shock.eq.0) then
