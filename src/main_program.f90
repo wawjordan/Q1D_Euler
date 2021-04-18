@@ -6,6 +6,7 @@ program main_program
   use set_inputs, only : set_derived_inputs, read_in
   use set_inputs, only : max_iter, neq, tol, soln_save, res_save
   use set_inputs, only : leftV, rightV, leftU, rightU, flux_scheme
+  use set_inputs, only : limiter_freeze, psi_plus, psi_minus
   use variable_conversion
   use time_integration
   use basic_boundaries, only : enforce_bndry
