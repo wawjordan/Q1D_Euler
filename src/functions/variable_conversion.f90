@@ -24,7 +24,9 @@ module variable_conversion
     
     type(soln_t) :: soln
     call cons2prim(soln%U,soln%V)
-    call limit_primitives(soln%U,soln%V)
+    !call limit_primitives(soln%U,soln%V)
+    call limit_primitives(soln%V)
+    call prim2cons(soln%U, soln%V)
     call speed_of_sound(soln%V(:,3),soln%V(:,1),soln%asnd)
     
     soln%mach = abs(soln%V(:,2))/soln%asnd
@@ -131,9 +133,9 @@ module variable_conversion
   !!              V : 
   !<
   !===========================================================================80
-  subroutine limit_primitives(U,V)
+  subroutine limit_primitives(V)
     
-    real(prec), dimension(:,:), intent(inout) :: U
+    !real(prec), dimension(:,:), intent(inout) :: U
     real(prec), dimension(:,:), intent(inout) :: V
     integer :: i
     !logical, dimension(lbound(U,1):ubound(U,1)) :: mask
@@ -158,7 +160,7 @@ module variable_conversion
       !  call prim2cons(U,V)
       !end if
     end do
-    call prim2cons(U,V)
+    !call prim2cons(U,V)
     
   end subroutine limit_primitives
   
