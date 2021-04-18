@@ -9,7 +9,7 @@ module limiter_calc
   
   private
   
-  public :: limiter_fun, select_limiter
+  public :: calc_consecutive_variations, limiter_fun, select_limiter
   
   procedure( calc_limiter ), pointer :: limiter_fun
    
@@ -62,6 +62,22 @@ contains
   
   end subroutine select_limiter
   
+  subroutine calc_consecutive_variations(V,r_plus,r_minus)
+    
+    real(prec), dimension(ig_low:ig_high,neq), intent(in)  :: V
+    real(prec), dimension(i_low-1:i_high,neq), intent(out) :: r_plus, r_minus
+    real(prec), dimension(neq) :: den
+    integer :: i
+
+    do i = i_low-1,i_high
+      den = V(i+1,:) - V(i,:)
+      den = sign(one,den)*max(abs(den),1e-6_prec)
+      r_plus(i,:)   = ( V(i+2,:) - V(i+1,:) )/den
+      r_minus(i,:)  = ( V(i,:) - V(i-1,:) )/den
+    end do
+    
+  end subroutine calc_consecutive_variations
+
   !=========================== van_leer_limiter ==============================80
   !>
   !! Description:
@@ -115,7 +131,6 @@ contains
     real(prec), dimension(i_low-1:i_high,neq), intent(out)   :: psi
     
     psi = half*(one + sign(one,r))*min(r,one)
-    psi = half*(one-sign(one,psi))
     
   end subroutine minmod_limiter
   
