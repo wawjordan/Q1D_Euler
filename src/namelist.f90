@@ -7,9 +7,9 @@ module namelist
   use set_inputs, only : Astar, area, darea
   use set_inputs, only : CFL, k2, k4, eps, tol, eps_roe, beta_lim, epsM, kappaM
   use set_inputs, only : max_iter, max_newton_iter, newton_tol
-  use set_inputs, only : iSS, shock, ramp, soln_save, res_save
+  use set_inputs, only : iSS, shock, ramp, soln_save, res_save, res_out
   use set_inputs, only : p0, T0, a0, rho0, pb, p_ratio
-  use set_inputs, only : set_derived_inputs, read_in, flux_scheme, limiter_scheme
+  use set_inputs, only : set_derived_inputs, flux_scheme, limiter_scheme
   use set_inputs, only : leftV, rightV, leftU, rightU
   
   implicit none
@@ -19,17 +19,17 @@ module namelist
   
 contains
   
-  subroutine read_namelist()
+  subroutine read_namelist(file_path)
     
-    use set_precision, only : prec
-    use set_constants, only : zero, one
+    !use set_precision, only : prec
+    !use set_constants, only : zero, one
     
-    !character(len=*), intent(in) :: file_path
+    character(len=*), intent(in) :: file_path
     integer :: fstat
     integer :: funit
     logical :: fexist
     logical :: fopen = .false.
-    character(len=20) :: file_path = 'q1d.nml'
+    !character(len=20) :: file_path = 'q1d.nml'
     namelist /grid/ imax, xmin, xmax, n_ghost_cells
     namelist /geometry/ Astar
     namelist /constants/ R_gas, gamma
@@ -38,7 +38,7 @@ contains
             & max_newton_iter, newton_tol, ramp
     namelist /flux/ flux_scheme, limiter_scheme, &
             & k2, k4, eps_roe, beta_lim
-    namelist /output/ soln_save, res_save
+    namelist /output/ soln_save, res_save, res_out
     namelist /reconstruction/ epsM, kappaM
     
     inquire( file=file_path,exist=fexist )
