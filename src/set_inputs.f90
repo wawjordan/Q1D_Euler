@@ -13,9 +13,9 @@ module set_inputs
   public :: Astar, area, darea
   public :: CFL, k2, k4, eps, tol, eps_roe, beta_lim, epsM, kappaM
   public :: max_iter, max_newton_iter, newton_tol
-  public :: iSS, shock, ramp, soln_save, res_save
+  public :: iSS, shock, ramp, soln_save, res_save, res_out
   public :: p0, T0, a0, rho0, pb, p_ratio
-  public :: set_derived_inputs, read_in, flux_scheme, limiter_scheme
+  public :: set_derived_inputs, flux_scheme, limiter_scheme
   public :: leftV, rightV, leftU, rightU, limiter_freeze, psi_plus, psi_minus
    
   integer :: imax    = 128
@@ -51,6 +51,7 @@ module set_inputs
   real(prec) :: beta_lim = 2
   integer :: soln_save     = 150000
   integer :: res_save      = 10
+  integer :: res_out       = 1000
   real(prec) :: eps_roe    = 0.1_prec
   real(prec) :: epsM       = zero
   real(prec) :: kappaM     = -one
@@ -59,52 +60,6 @@ module set_inputs
   real(prec), dimension(:,:), allocatable :: psi_plus, psi_minus
   
   contains
-
-
-  subroutine read_in
-      !integer :: istat
-      !logical :: lexist
-      !logical :: lopen = .false.
-      !character(len=20) :: name = 'input.dat'
-      
-      !openfile: do
-      !  inquire( file=name,exist=lexist )
-      !  exists: if ( .not. lexist ) then
-      !    open(25,file=name,status='new',action='read',iostat=istat)
-      !    lopen = .true.
-      !  else
-      !    write(*,*) 'ERROR: ',trim(name),' does not exist. Aborting'
-      !    stop
-      !  end do
-
-      character(len=10) :: discard              ! ignore character string
-      open(25,file='input.dat',status='old')
-      21 format(A10,F30.15)
-      20 format(A10,I30)
-      read(25,*) discard
-      read(25,*) discard
-      read(25,20) discard, imax
-      read(25,21) discard, p0
-      read(25,21) discard, T0
-      read(25,21) discard, p_ratio
-      read(25,20) discard, flux_scheme
-      read(25,20) discard, limiter_scheme
-      read(25,21) discard, beta_lim
-      read(25,20) discard, shock
-      read(25,20) discard, ramp
-      read(25,21) discard, CFL
-      read(25,21) discard, eps_roe
-      read(25,21) discard, epsM
-      read(25,21) discard, kappaM
-      read(25,21) discard, k2
-      read(25,21) discard, k4
-      read(25,20) discard, max_iter
-      read(25,20) discard, soln_save
-      read(25,20) discard, res_save
-      close(25)
-      pb = p_ratio*p0*1000_prec
-  end subroutine read_in
-
 
   !=================================== area ==================================80
   !>
@@ -146,7 +101,6 @@ module set_inputs
   !=========================== set_derived_inputs ============================80
   !>
   !! Description: Sets derived quantities and prints to STDOUT.
-  !!
   !<
   !===========================================================================80
   subroutine set_derived_inputs
@@ -157,7 +111,7 @@ module set_inputs
     i_high = imax
     ig_low  = 1 - n_ghost_cells
     ig_high = imax + n_ghost_cells
-    !pb = p_ratio*p0*1000_prec
+    pb = p_ratio*p0*1000_prec
     write(*,'(A8,F20.14,A13)') 'R     = ', R_gas, ' [J/(kmol*K)]'
     write(*,'(A8,F20.14)')     'gamma = ', gamma
     write(*,'(A8,F20.14,A6)')  'a_0   = ', a0, ' [m/s]'
