@@ -210,13 +210,20 @@ module other_subroutines
   !===========================================================================80
   subroutine output_file_headers
     
-    use set_inputs, only : imax, CFL, k2, k4, shock, ramp, p_ratio
+    use set_inputs, only : imax, shock, p_ratio
+    use set_inputs, only : flux_scheme, limiter_scheme, beta_lim
+    use set_inputs, only : CFL, k2, k4, epsM
     
-    character(len=1024) :: dirname
+    character(len=1024) :: dirname_hist
+    character(len=1024) :: dirname_field
     character(len=1024) :: filename
-    character(len=64) ::   shock_str
     character(len=64) ::   ncells_str
+    character(len=64) ::   shock_str
     character(len=64) ::   CFL_str
+    character(len=64) ::   flux_str
+    character(len=64) ::   order_str
+    character(len=64) ::   limiter_str
+    character(len=64) ::   kappa_str
     character(len=64) ::   kappa2_str
     character(len=64) ::   kappa4_str
     
@@ -227,26 +234,63 @@ module other_subroutines
     else
       write (shock_str, "(A10)") "isentropic"
     end if
-    if (ramp.eq.1) then
-      write (CFL_str  , "(A4,I0.3,A5)") "CFL-", int(1000*cfl),"-ramp"
+    write (CFL_str  , "(A4,I0.3)") "CFL-", int(1000*cfl)
+    
+    select case(flux_scheme)
+    case(1)
+      write (flux_str,"(A3)") "CTR"
+    case(2)
+      write (flux_str,"(A3)") "V-L"
+    case(3)
+      write (flux_str,"(A3)") "ROE"
+    case default
+    end select
+    if (nint(epsM).eq.0) then
+      write (order_str,"(A1)") "1"
     else
-      write (CFL_str  , "(A4,I0.3,A8)") "CFL-", int(1000*cfl),"-no-ramp"
+      write (order_str,"(A1)") "2"
     end if
+    
+    select case(limiter_scheme)
+    case(1)
+      write (limiter_str,"(A3)") "_VL"
+    case(2)
+      write (limiter_str,"(A3)") "_VA"
+    case(3)
+      write (limiter_str,"(A3)") "_MM"
+    case(4)
+      write (limiter_str,"(A2,I0.2,A1)") "_B",int(10*beta_lim),"_"
+    case default
+    end select
+    
+    write (kappa_str, "(A2,I3.2,A1)") "_K"  , int(10*kappaM),"_"
     write (kappa2_str, "(A4,I0.4)") "_K2-"  , int(1000*k2)
     write (kappa4_str, "(A4,I0.4)") "_K4-"  , int(1000*k4)
-    !write (dirname, *) adjustl(trim(shock_str)),"/"//  &
-    !&                   adjustl(trim(ncells_str))
-    write (dirname, *) adjustl(trim(shock_str)),"/"
-    write (filename,*)  trim(ncells_str)//  &
-    &                   trim(CFL_str)//     &
-    &                   trim(kappa2_str)//  &
-    &                   trim(kappa4_str)
+    write (dirname_hist, *) adjustl(trim(shock_str)),"/hist/"
+    write (dirname_field, *) adjustl(trim(shock_str)),"/field/"
+    if (flux_scheme.eq.1) then
+      write (filename,*)  trim(ncells_str)//  &
+      &                   trim(flux_str)//    &
+      &                   trim(kappa2_str)//  &
+      &                   trim(kappa4_str)//  &
+      &                   trim(CFL_str)
+    else
+      write (filename,*)  trim(ncells_str)//  &
+      &                   trim(flux_str)//    &
+      &                   trim(order_str)//   &
+      &                   trim(limiter_str)// &
+      &                   trim(kappa_str)//   &
+      &                   trim(CFL_str)
+    end if 
     
-    call execute_command_line ('mkdir -p ../results/' // adjustl(trim(dirname)))
+    call execute_command_line ('mkdir -p ../results/' // &
+    & adjustl(trim(dirname_hist)))
     
+    call execute_command_line ('mkdir -p ../results/' // &
+    & adjustl(trim(dirname_field)))
     ! Set up output files (history and solution)
     !open(30,file='history.dat',status='unknown')
-    open(30,file= '../results/'//trim(adjustl(dirname))//  &
+    open(30,file= '../results/'//trim(adjustl(dirname_hist))//  &
     &               trim(adjustl(filename))//'_history.dat',status='unknown')
     write(30,*) 'TITLE = "Quasi-1D Nozzle Iterative Residual History"'
     if(shock.eq.0) then
@@ -255,7 +299,7 @@ module other_subroutines
       write(30,*) 'variables="Iteration""Res1""Res2""Res3"'
     end if
     
-    open(40,file= '../results/'//trim(adjustl(dirname))//  &
+    open(40,file= '../results/'//trim(adjustl(dirname_field))//  &
     &               trim(adjustl(filename))//'_field.dat',status='unknown')
     write(40,*) 'TITLE = "Quasi-1D Nozzle Solution"'
     if(shock.eq.0) then
