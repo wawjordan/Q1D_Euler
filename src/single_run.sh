@@ -18,7 +18,7 @@ flux=2
 limiter=2
 beta_lim=2.0
 shock=1 #0 1
-cfl=0.7 #0.1 0.5 0.9
+cfl=0.1 #0.1 0.5 0.9
 eps_roe=0.05
 eps_MUSCL=1.0
 kappa_MUSCL=-1.0
@@ -28,6 +28,7 @@ maxk=150000
 Sout=10000
 Rout=100
 disp_out=100
+cons=T
 if [ $shock -eq 0 ]; then
   shock_str="isentropic"
 else
@@ -96,6 +97,7 @@ echo "&output" >> $input
 echo "  soln_save = $Sout" >> $input
 echo "  res_save = $Rout" >> $input
 echo "  res_out  = $disp_out" >> $input
+echo "  cons     = $cons" >> $input
 echo "/" >> $input
 echo "" >> $input
 echo "&reconstruction" >> $input
