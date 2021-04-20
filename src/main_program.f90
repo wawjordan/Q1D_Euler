@@ -86,7 +86,7 @@ program main_program
   
   do j = 1,max_iter
     
-    call enforce_bndry( soln )
+    !call enforce_bndry( soln )
     call update_states( soln )
     call calculate_sources(soln%V(:,3),grid%dAc,soln%src)
     call calc_time_step(grid%dx,soln%V,soln%asnd,soln%lambda,soln%dt)
@@ -101,6 +101,7 @@ program main_program
       call prim2cons(rightU,rightV)
       call flux_fun(leftU,rightU,soln%F)
     end if
+    call enforce_bndry( soln )
     
     call explicit_euler(grid,soln%src,soln%dt,soln%F,soln%U,soln%R)
     call update_states( soln )
