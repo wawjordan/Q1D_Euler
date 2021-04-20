@@ -10,9 +10,12 @@ p0=300.0
 T0=600.0
 prat=0.4
 shock=0
+cons=T
 
-flux=3 # 1 2 3
-eps_MUSCL=1.0 #0.0 1.0
+flux=1 # 1 2 3
+limiter=1
+eps_MUSCL=0.0 #0.0 1.0
+kappa_MUSCL=-1.0
 
 eps_roe=0.05
 beta_lim=1.0 #1.0 1.5 2.0
@@ -24,11 +27,17 @@ Sout=200000
 Rout=100
 disp_out=1000
 mkdir -p "$sdir"
-for kappa_MUSCL in -1.0 0.0 0.5 1.0 #-1.0 0.0 0.5 1.0
+#for kappa_MUSCL in -1.0 #0.0 0.5 1.0 #-1.0 0.0 0.5 1.0
+for k2 in 0.5 0.4 0.3 0.25 
 do
- for limiter in 1 2 3 4
+ #for limiter in 1 #2 3 4
+ for k4 in 0.03125 0.02 0.015625
  do
-    summary="${sdir}summary_K${kappa_MUSCL}_lim_${limiter}.dat"
+    if [ $flux -eq 1 ]; then
+      summary="${sdir}summary_K${k2}_K_${k4}.dat"
+    else
+      summary="${sdir}summary_K${kappa_MUSCL}_lim_${limiter}.dat"
+    fi
     touch $summary
     if [ -f $summary ]; then
       rm -f "$summary"
@@ -98,12 +107,15 @@ echo "&flux" >> $input
 echo "  flux_scheme = $flux" >> $input
 echo "  limiter_scheme = $limiter" >> $input
 echo "  beta_lim = $beta_lim" >> $input
+echo "  k2 = $k2" >> $input
+echo "  k4 = $k4" >> $input
 echo "/" >> $input
 echo "" >> $input
 echo "&output" >> $input
 echo "  soln_save = $Sout" >> $input
 echo "  res_save = $Rout" >> $input
 echo "  res_out  = $disp_out" >> $input
+echo "  cons     = $cons" >> $input
 echo "/" >> $input
 echo "" >> $input
 echo "&reconstruction" >> $input
