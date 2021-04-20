@@ -54,7 +54,7 @@ program main_program
     call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm )
   end if
 
-  call output_soln(grid,soln,ex_soln,0)
+  !call output_soln(grid,soln,ex_soln,0)
   
   call enforce_bndry( soln )
   call update_states( soln )
@@ -120,7 +120,7 @@ program main_program
       limiter_freeze = .true.
     end if
     soln%rold = soln%rnorm
-    if (mod(j,10000)==0) then
+    if (mod(j,10*res_out)==0) then
       write(*,*) header_str1
     end if
     if (mod(j,res_out)==0) then
