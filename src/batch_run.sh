@@ -1,46 +1,40 @@
 #!./bin/bash
 input="input.nml"
-summary="../results/summary.dat"
 temp="temp.txt"
+sdir="../results/summaries/"
 start=`date +%s`
 shock_str=""
 cfl_str=""
 limiter_str=""
-touch $summary
-if [ -f $summary ]; then
-  rm -f "$summary"
-fi
-imax=16 #16 32 64 128 256 512
 p0=300.0
 T0=600.0
-prat=0.4 #0.1 0.5 0.6
-#flux=2
-#limiter=2
-beta_lim=2.0
-shock=1 #0 1
-cfl=0.1 #0.1 0.5 0.9
-#eps_roe=0.05
-#eps_MUSCL=1.0
-#kappa_MUSCL=-1.0
+prat=0.4
+shock=0
+
+flux=3 # 1 2 3
+eps_MUSCL=1.0 #0.0 1.0
+
+eps_roe=0.05
+beta_lim=1.0 #1.0 1.5 2.0
+cfl=0.1
 k2=0.5 #0.5 0.4 0.3 0.25
 k4=0.03125 #0.03125 0.02 0.015625
-maxk=150000
-Sout=150000
+maxk=200000
+Sout=200000
 Rout=100
-disp_out=150000
-
-for shock in 1 #0 1
+disp_out=1000
+mkdir -p "$sdir"
+for kappa_MUSCL in -1.0 0.0 0.5 1.0 #-1.0 0.0 0.5 1.0
 do
- for imax in 128 #16 32 64 128 256 512
+ for limiter in 1 2 3 4
  do
-  for flux in 1 #1 2 3
+    summary="${sdir}summary_K${kappa_MUSCL}_lim_${limiter}.dat"
+    touch $summary
+    if [ -f $summary ]; then
+      rm -f "$summary"
+    fi
+  for imax in 16 32 64 128 256 512
   do
-   for limiter in 1 #1 2 3 4
-   do
-    for eps_MUSCL in 1.0 #0.0 1.0
-    do
-     for kappa_MUSCL in -1.0 #0.0 0.5 1.0 #-1.0 0.0 0.5 1.0
-     do
 
 if [ $shock -eq 0 ]; then
   shock_str="isentropic"
@@ -121,9 +115,6 @@ echo "/" >> $input
 #echo "N$imax" >> $summary
 cat "$temp" >> $summary
 
-     done
-    done      
-   done
   done        
  done
 done
