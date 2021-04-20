@@ -5,7 +5,7 @@ module exact_q1d_type
   use fluid_constants    , only : R_gas, gamma
   use set_inputs         , only : imax, neq, n_ghost_cells, Astar, iSS, eps
   use set_inputs         , only : max_newton_iter, newton_tol, i_low, i_high
-  use variable_conversion, only : isentropic_relations
+  use variable_conversion, only : isentropic_relations, prim2cons
   use grid_type
    
   implicit none
@@ -26,6 +26,7 @@ module exact_q1d_type
     real(prec), allocatable, dimension(:)   :: Mc, Mi
     real(prec), allocatable, dimension(:)   :: Tc, Ti
     real(prec), allocatable, dimension(:,:) :: Vc, Vi
+    real(prec), allocatable, dimension(:,:) :: Uc
 
   end type exact_q1d_t
 
@@ -47,13 +48,15 @@ contains
     
     allocate( soln%Mc(i_low:i_high), &
               soln%Tc(i_low:i_high), &
-              soln%Vc(i_low:i_high,neq) )
+              soln%Vc(i_low:i_high,neq), &
+              soln%Uc(i_low:i_high,neq) )
     allocate( soln%Mi(i_low-1:i_high), &
               soln%Ti(i_low-1:i_high), &
               soln%Vi(i_low-1:i_high,neq) )
     
     soln%Mc = zero
     soln%Tc = zero
+    soln%Uc = zero
     soln%Vc = zero
     
     soln%Mi = zero
@@ -75,7 +78,7 @@ contains
     
     type(exact_q1d_t), intent(inout) :: soln
     
-    deallocate( soln%Mc, soln%Tc, soln%Vc )
+    deallocate( soln%Mc, soln%Tc, soln%Vc, soln%Uc )
     deallocate( soln%Mi, soln%Ti, soln%Vi )
     
   end subroutine deallocate_exact_q1d
@@ -122,6 +125,7 @@ contains
     end do
     
     call isentropic_relations( soln%Mc, soln%Vc )
+    call prim2cons(soln%Uc,soln%Vc)
     
 !====================== Solution at cell interfaces =========================80
     
