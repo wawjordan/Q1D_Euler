@@ -9,7 +9,7 @@ module namelist
   use set_inputs, only : max_iter, max_newton_iter, newton_tol
   use set_inputs, only : iSS, shock, ramp, soln_save, res_save, res_out
   use set_inputs, only : p0, T0, a0, rho0, pb, p_ratio
-  use set_inputs, only : set_derived_inputs, flux_scheme, limiter_scheme
+  use set_inputs, only : set_derived_inputs, flux_scheme, limiter_scheme, cons
   use set_inputs, only : leftV, rightV, leftU, rightU
   
   implicit none
@@ -38,7 +38,7 @@ contains
             & max_newton_iter, newton_tol, ramp
     namelist /flux/ flux_scheme, limiter_scheme, &
             & k2, k4, eps_roe, beta_lim
-    namelist /output/ soln_save, res_save, res_out
+    namelist /output/ soln_save, res_save, res_out, cons
     namelist /reconstruction/ epsM, kappaM
     
     inquire( file=file_path,exist=fexist )
