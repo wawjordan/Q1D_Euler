@@ -9,15 +9,15 @@ limiter_str=""
 p0=300.0
 T0=600.0
 prat=0.4
-shock=0
+shock=1
 cons=T
 
-flux=1 # 1 2 3
+flux=3 # 1 2 3
 limiter=1
-eps_MUSCL=0.0 #0.0 1.0
-kappa_MUSCL=-1.0
+eps_MUSCL=1.0 #0.0 1.0
+#kappa_MUSCL=-1.0
 
-eps_roe=0.05
+eps_roe=0.01
 beta_lim=1.0 #1.0 1.5 2.0
 cfl=0.1
 k2=0.5 #0.5 0.4 0.3 0.25
@@ -27,11 +27,11 @@ Sout=200000
 Rout=100
 disp_out=1000
 mkdir -p "$sdir"
-#for kappa_MUSCL in -1.0 #0.0 0.5 1.0 #-1.0 0.0 0.5 1.0
-for k2 in 0.5 0.4 0.3 0.25 
+for kappa_MUSCL in -1.0 0.0 0.5 1.0 #-1.0 0.0 0.5 1.0
+#for k2 in 0.5 0.4 0.3 0.25 
 do
- #for limiter in 1 #2 3 4
- for k4 in 0.03125 0.02 0.015625
+ for limiter in 1 2 3 4
+ #for k4 in 0.03125 0.02 0.015625
  do
     if [ $flux -eq 1 ]; then
       summary="${sdir}summary_K${k2}_K_${k4}.dat"
@@ -42,7 +42,7 @@ do
     if [ -f $summary ]; then
       rm -f "$summary"
     fi
-  for imax in 16 32 64 128 256 512
+  for imax in 128 #16 32 64 128 256 512
   do
 
 if [ $shock -eq 0 ]; then
