@@ -15,7 +15,7 @@ module set_inputs
   public :: max_iter, max_newton_iter, newton_tol
   public :: iSS, shock, ramp, soln_save, res_save, res_out
   public :: p0, T0, a0, rho0, pb, p_ratio
-  public :: set_derived_inputs, flux_scheme, limiter_scheme
+  public :: set_derived_inputs, flux_scheme, limiter_scheme, cons
   public :: leftV, rightV, leftU, rightU, limiter_freeze, psi_plus, psi_minus
    
   integer :: imax    = 128
@@ -45,7 +45,7 @@ module set_inputs
   real(prec) :: p_ratio    = 0.5_prec
   real(prec) :: pb         = 150000_prec
   real(prec) :: k2         = 1.0_prec/2.0_prec
-  real(prec) :: k4         = 1.0_prec/64.0_prec
+  real(prec) :: k4         = 1.0_prec/32.0_prec
   integer :: flux_scheme   = 1
   integer :: limiter_scheme = 2
   real(prec) :: beta_lim = 2
@@ -56,6 +56,7 @@ module set_inputs
   real(prec) :: epsM       = zero
   real(prec) :: kappaM     = -one
   logical :: limiter_freeze = .false.
+  logical :: cons           = .true.
   real(prec), dimension(:,:), allocatable :: leftV, rightV, leftU, rightU
   real(prec), dimension(:,:), allocatable :: psi_plus, psi_minus
   
