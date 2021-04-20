@@ -156,8 +156,10 @@ program main_program
   end if
   
 
-  call output_soln(grid,soln,ex_soln,j+1)
-  call output_res(soln,j)
+  if (mod(j,res_out)/=0) then
+    call output_soln(grid,soln,ex_soln,j+1)
+    call output_res(soln,j)
+  end if
   
   call deallocate_exact_q1d( ex_soln )
   call teardown_geometry(grid,soln)
