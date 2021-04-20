@@ -5,7 +5,7 @@ program main_program
   use set_inputs, only : set_derived_inputs
   use set_inputs, only : max_iter, tol, soln_save, res_save
   use set_inputs, only : leftV, rightV, leftU, rightU, flux_scheme
-  use set_inputs, only : limiter_freeze, res_out
+  use set_inputs, only : limiter_freeze, res_out, cons
   use variable_conversion
   use time_integration
   use basic_boundaries, only : enforce_bndry
@@ -51,7 +51,7 @@ program main_program
   call solve_exact_q1d( ex_soln, grid)
   
   if (shock.eq.0) then
-    call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm )
+    call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm, cons )
   end if
 
   !call output_soln(grid,soln,ex_soln,0)
@@ -107,7 +107,7 @@ program main_program
     
     if (mod(j,soln_save)==0) then
       if (shock.eq.0) then
-        call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm )
+        call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm, cons )
       end if
       call output_soln(grid,soln,ex_soln,j)
     end if
@@ -128,7 +128,7 @@ program main_program
     end if
     if (mod(j,res_save)==0) then
       if (shock.eq.0) then
-        call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm )
+        call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm, cons )
       end if
       call output_res(soln,j)
     end if
@@ -146,13 +146,13 @@ program main_program
   end if
   write(50,*) imax, j, soln%rnorm(1), soln%rnorm(2), soln%rnorm(3)
   if (shock.eq.0) then 
-    call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, 1 )
+    call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, 1, cons )
     write(50,*) imax, 1,soln%DEnorm
-    call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, 2 )
+    call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, 2, cons )
     write(50,*) imax, 2,soln%DEnorm
-    call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, 0 )
+    call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, 0, cons )
     write(50,*) imax, 0,soln%DEnorm
-    call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm )
+    call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm, cons )
   end if
   
 
