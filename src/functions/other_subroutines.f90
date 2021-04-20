@@ -297,22 +297,40 @@ module other_subroutines
     !open(30,file='history.dat',status='unknown')
     open(30,file= '../results/'//trim(adjustl(dirname_hist))//  &
     &               trim(adjustl(filename))//'_history.dat',status='unknown')
-    write(30,*) 'TITLE = "Quasi-1D Nozzle Iterative Residual History"'
+    write(30,*) 'TITLE = "Q1D res hist ('// &
+    & trim(adjustl(filename))//')"'
     if(shock.eq.0) then
-      write(30,*) 'variables="Iteration""Res1""Res2""Res3""DE1""DE2""DE3"'
+      write(30,*) 'variables="Iteration""R<sub>1</sub>""R<sub>2</sub>"&
+      & "R<sub>3</sub>""DE<sub>1</sub>""DE<sub>2</sub>""DE<sub>3</sub>"'
     else
       write(30,*) 'variables="Iteration""Res1""Res2""Res3"'
     end if
     
     open(40,file= '../results/'//trim(adjustl(dirname_field))//  &
     &               trim(adjustl(filename))//'_field.dat',status='unknown')
-    write(40,*) 'TITLE = "Quasi-1D Nozzle Solution"'
+    write(40,*) 'TITLE = "Q1D soln ('// &
+    & trim(adjustl(filename))//')"'
     if(shock.eq.0) then
       write(40,*) 'variables="x(m)""A(m^2)""rho(kg/m^3)""u(m/s)""p(N/m^2)"  &
       & "M""U1""U2""U3""M-exact""rho-exact""u-exact""p-exact""DE1""DE2""DE3"'
+      write(40,*) 'variables="x (m)""A (m<sup>2</sup>)"&
+      & "<greek>r</greek> (kg/m<sup>3</sup>)""u (m/s)"&
+      & "p (N/m<sup>2</sup>)"  &
+      & "M""U<sub>1</sub>""U<sub>2</sub>""U<sub>3</sub>"&
+      & "M<sub>exact</sub>""<greek>r</greek><sub>exact</sub>"&
+      & "u<sub>exact</sub>""p<sub>exact</sub>"&
+      & "DE<sub>1</sub>""DE<sub>2</sub>""DE<sub>3</sub>"'
+      !write(40,*) 'variables="x (m)""<greek>r</greek> (kg/m<sup>3</sup>)"&
+      !&"u (m/s)""p (N/m<sup>2</sup>)""M"&
+      !& "M<sub>exact</sub>""<greek>r</greek><sub>exact</sub>"&
+      !& "u<sub>exact</sub>""p<sub>exact</sub>"'
     elseif(shock.eq.1) then
-      write(40,*) 'variables="x(m)""A(m^2)""rho(kg/m^3)""u(m/s)""p(N/m^2)"&
-      &"M""U1""U2""U3"'
+      !write(40,*) 'variables="x (m)""A (m<sup>2</sup>)"&
+      !& "<greek>r</greek> (kg/m<sup>3</sup>)""u (m/s)"&
+      !& "p (N/m<sup>2</sup>)"&
+      !&"M""U<sub>1</sub>""U<sub>2</sub>""U<sub>3</sub>"'
+      write(40,*) 'variables="x (m)""<greek>r</greek> (kg/m<sup>3</sup>)"&
+      & "u (m/s)""p (N/m<sup>2</sup>)""M"'
     else
       write(*,*) 'ERROR! shock must equal 0 or 1!!!'
       stop
@@ -347,19 +365,27 @@ module other_subroutines
       write(40,*) 'DT=(DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
              & DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
              & DOUBLE)'
+      !write(40,*) 'DT=(DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
+      !       & DOUBLE DOUBLE)'
       do i = i_low,i_high
         write(40,*) grid%xc(i),grid%Ac(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
              & soln%mach(i),soln%U(i,1),soln%U(i,2),soln%U(i,3), &
              & ex_soln%Mc(i), ex_soln%Vc(i,1), ex_soln%Vc(i,2),  &
              & ex_soln%Vc(i,3), soln%DE(i,1), soln%DE(i,2), soln%DE(i,3)
+        !write(40,*) grid%xc(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
+        !     & soln%mach(i), ex_soln%Mc(i), ex_soln%Vc(i,1), ex_soln%Vc(i,2),&
+        !     & ex_soln%Vc(i,3)
       end do
     elseif(shock.eq.1) then
       write(40,*) 'DATAPACKING=POINT'
-      write(40,*) 'DT=(DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
-             & DOUBLE DOUBLE)'
+      !write(40,*) 'DT=(DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE &
+      !       & DOUBLE DOUBLE)'
+      write(40,*) 'DT=(DOUBLE DOUBLE DOUBLE DOUBLE DOUBLE)'
       do i = i_low,i_high
-        write(40,*) grid%xc(i),grid%Ac(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
-             & soln%mach(i),soln%U(i,1),soln%U(i,2),soln%U(i,3)
+        !write(40,*) grid%xc(i),grid%Ac(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
+        !     & soln%mach(i),soln%U(i,1),soln%U(i,2),soln%U(i,3)
+        write(40,*) grid%xc(i),soln%V(i,1),soln%V(i,2),soln%V(i,3),&
+             & soln%mach(i)
       end do
     endif
     
