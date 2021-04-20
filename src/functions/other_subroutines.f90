@@ -170,16 +170,21 @@ module other_subroutines
   !!              DEnorm : 
   !<
   !===========================================================================80
-  subroutine calc_de( soln, exact_soln, DE, DEnorm, pnorm )
+  subroutine calc_de( soln, exact_soln, DE, DEnorm, pnorm, cons )
     
     type(soln_t), intent(inout) :: soln
     type(exact_q1d_t), intent(in) :: exact_soln
+    logical, intent(in) :: cons
     real(prec), dimension(i_low:i_high,1:neq), intent(out) :: DE
     real(prec), dimension(1,1:neq), intent(out) :: DEnorm
     integer, intent(in) :: pnorm
     real(prec) :: Linv
     Linv = one/real(i_high-i_low)
-    DE = soln%V(i_low:i_high,1:neq) - exact_soln%Vc(i_low:i_high,1:neq)
+    if (cons) then
+      DE = soln%U(i_low:i_high,1:neq) - exact_soln%Uc(i_low:i_high,1:neq)
+    else
+      DE = soln%V(i_low:i_high,1:neq) - exact_soln%Vc(i_low:i_high,1:neq)
+    end if
     
     if (pnorm == 0) then
       DEnorm(1,1:neq) = maxval(abs(DE),1)
