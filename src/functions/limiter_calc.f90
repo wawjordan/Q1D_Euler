@@ -93,7 +93,8 @@ contains
     real(prec), dimension(i_low-1:i_high,neq), intent(out)   :: psi
     
     psi = (r + abs(r))/(one + r)
-    psi = half*(one-sign(one,psi))
+    !psi = half*(one-sign(one,psi))
+    psi = half*(one+sign(one,r))*psi
     
   end subroutine van_leer_limiter
   
@@ -112,7 +113,8 @@ contains
     real(prec), dimension(i_low-1:i_high,neq), intent(out)   :: psi
     
     psi = (r**2 + r)/(one + r**2)
-    psi = half*(one-sign(one,psi))
+    !psi = half*(one-sign(one,psi))
+    psi = half*(one+sign(one,r))*psi
     
   end subroutine van_albada_limiter
 
@@ -149,7 +151,7 @@ contains
     real(prec), dimension(i_low-1:i_high,neq), intent(out)   :: psi
     
     psi = maxval((/ zero, min(beta_lim*r,one), min(r,beta_lim) /))
-    psi = half*(one-sign(one,psi))
+    psi = half*(one+sign(one,r))*psi
     
   end subroutine beta_limiter
   
