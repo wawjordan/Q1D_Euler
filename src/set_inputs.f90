@@ -12,7 +12,7 @@ module set_inputs
   public :: i_high, i_low, ig_high, ig_low
   public :: Astar, area, darea
   public :: CFL, k2, k4, eps, tol, eps_roe, beta_lim, epsM, kappaM
-  public :: max_iter, max_newton_iter, newton_tol
+  public :: max_iter, max_newton_iter, newton_tol, counter
   public :: iSS, shock, ramp, soln_save, res_save, res_out
   public :: p0, T0, a0, rho0, pb, p_ratio
   public :: set_derived_inputs, flux_scheme, limiter_scheme, cons
@@ -59,7 +59,7 @@ module set_inputs
   logical :: cons           = .true.
   real(prec), dimension(:,:), allocatable :: leftV, rightV, leftU, rightU
   real(prec), dimension(:,:), allocatable :: psi_plus, psi_minus
-  
+  integer :: counter = 1
   contains
 
   !=================================== area ==================================80
@@ -125,8 +125,10 @@ module set_inputs
     allocate(rightV(i_low-1:i_high,1:neq))
     allocate(leftU(i_low-1:i_high,1:neq))
     allocate(rightU(i_low-1:i_high,1:neq))
-    allocate(psi_plus(i_low-1:i_high,1:neq))
-    allocate(psi_minus(i_low-1:i_high,1:neq))
+    !allocate(psi_plus(i_low-1:i_high,1:neq))
+    !allocate(psi_minus(i_low-1:i_high,1:neq))
+    allocate(psi_plus(ig_low:ig_high,1:neq))
+    allocate(psi_minus(ig_low:ig_high,1:neq))
     
   end subroutine set_derived_inputs
 
