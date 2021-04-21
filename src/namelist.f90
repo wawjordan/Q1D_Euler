@@ -6,7 +6,7 @@ module namelist
   use set_inputs, only : i_high, i_low, ig_high, ig_low
   use set_inputs, only : Astar, area, darea
   use set_inputs, only : CFL, k2, k4, eps, tol, eps_roe, beta_lim, epsM, kappaM
-  use set_inputs, only : max_iter, max_newton_iter, newton_tol
+  use set_inputs, only : max_iter, max_newton_iter, newton_tol, counter
   use set_inputs, only : iSS, shock, ramp, soln_save, res_save, res_out
   use set_inputs, only : p0, T0, a0, rho0, pb, p_ratio
   use set_inputs, only : set_derived_inputs, flux_scheme, limiter_scheme, cons
@@ -35,7 +35,7 @@ contains
     namelist /constants/ R_gas, gamma
     namelist /initial/ p0, T0, p_ratio, shock
     namelist /numerical/ CFL, eps, tol, max_iter, &
-            & max_newton_iter, newton_tol, ramp
+            & max_newton_iter, newton_tol, ramp, counter
     namelist /flux/ flux_scheme, limiter_scheme, &
             & k2, k4, eps_roe, beta_lim
     namelist /output/ soln_save, res_save, res_out, cons
