@@ -86,7 +86,7 @@ program main_program
   
   do j = 1,max_iter
     
-    !call enforce_bndry( soln )
+    call enforce_bndry( soln )
     call update_states( soln )
     call calculate_sources(soln%V(:,3),grid%dAc,soln%src)
     call calc_time_step(grid%dx,soln%V,soln%asnd,soln%lambda,soln%dt)
@@ -99,26 +99,32 @@ program main_program
       call MUSCL_extrap( soln%V, leftV, rightV )
       call prim2cons(leftU,leftV)
       call prim2cons(rightU,rightV)
+      !call enforce_bndry( soln )
       call flux_fun(leftU,rightU,soln%F)
     end if
-    call enforce_bndry( soln )
+    !call enforce_bndry( soln )
     
     call explicit_euler(grid,soln%src,soln%dt,soln%F,soln%U,soln%R)
     call update_states( soln )
     
-    if (mod(j,soln_save)==0) then
-      if (shock.eq.0) then
-        call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm, cons )
-      end if
-      call output_soln(grid,soln,ex_soln,j)
-    end if
+    !if (mod(j,soln_save)==0) then
+    !  if (shock.eq.0) then
+    !    call calc_de( soln, ex_soln, soln%DE, soln%DEnorm, pnorm, cons )
+    !  end if
+    !  call output_soln(grid,soln,ex_soln,j)
+    !end if
     
     call residual_norms(soln%R,soln%rnorm,pnorm,soln%rinit)
     
     if (all(soln%rnorm<tol) ) then
       exit
-    elseif (any(soln%rnorm>soln%rold) ) then
-      limiter_freeze = .true.
+    elseif (any(soln%rnorm>soln%rold)) then
+        limiter_freeze = .true.
+      !if (limiter_freeze) then
+      !  limiter_freeze = .false.
+      !else
+      !  limiter_freeze = .true.
+      !end if
     end if
     soln%rold = soln%rnorm
     if (mod(j,10*res_out)==0) then
