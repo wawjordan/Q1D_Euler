@@ -65,7 +65,8 @@ contains
   subroutine calc_consecutive_variations(V,r_plus,r_minus)
     
     real(prec), dimension(ig_low:ig_high,neq), intent(in)  :: V
-    real(prec), dimension(i_low-1:i_high,neq), intent(out) :: r_plus, r_minus
+    !real(prec), dimension(i_low-1:i_high,neq), intent(out) :: r_plus, r_minus
+    real(prec), dimension(ig_low:ig_high,neq), intent(out)   :: r_plus, r_minus
     real(prec), dimension(neq) :: den
     integer :: i
 
@@ -75,6 +76,12 @@ contains
       r_plus(i,:)   = ( V(i+2,:) - V(i+1,:) )/den
       r_minus(i,:)  = ( V(i,:) - V(i-1,:) )/den
     end do
+    
+    r_plus(i_low-2,:) = r_plus(i_low-1,:)
+    r_minus(i_low-2,:) = r_minus(i_low-1,:)
+    
+    r_plus(i_high+1,:) = r_plus(i_high,:)
+    r_minus(i_high+1,:) = r_minus(i_high,:)
     
   end subroutine calc_consecutive_variations
 
@@ -90,10 +97,10 @@ contains
   subroutine van_leer_limiter( r, psi )
     
     real(prec), dimension(:,:), intent(in) :: r
-    real(prec), dimension(i_low-1:i_high,neq), intent(out)   :: psi
+    !real(prec), dimension(i_low-1:i_high,neq), intent(out)   :: psi
+    real(prec), dimension(ig_low:ig_high,neq), intent(out)   :: psi
     
     psi = (r + abs(r))/(one + r)
-    !psi = half*(one-sign(one,psi))
     psi = half*(one+sign(one,r))*psi
     
   end subroutine van_leer_limiter
@@ -110,10 +117,10 @@ contains
   subroutine van_albada_limiter( r, psi )
     
     real(prec), dimension(:,:), intent(in) :: r
-    real(prec), dimension(i_low-1:i_high,neq), intent(out)   :: psi
+    !real(prec), dimension(i_low-1:i_high,neq), intent(out)   :: psi
+    real(prec), dimension(ig_low:ig_high,neq), intent(out)   :: psi
     
     psi = (r**2 + r)/(one + r**2)
-    !psi = half*(one-sign(one,psi))
     psi = half*(one+sign(one,r))*psi
     
   end subroutine van_albada_limiter
@@ -130,7 +137,8 @@ contains
   subroutine minmod_limiter( r, psi )
     
     real(prec), dimension(:,:), intent(in) :: r
-    real(prec), dimension(i_low-1:i_high,neq), intent(out)   :: psi
+    !real(prec), dimension(i_low-1:i_high,neq), intent(out)   :: psi
+    real(prec), dimension(ig_low:ig_high,neq), intent(out)   :: psi
     
     psi = half*(one + sign(one,r))*min(r,one)
     
@@ -148,7 +156,8 @@ contains
   subroutine beta_limiter( r, psi )
     
     real(prec), dimension(:,:), intent(in) :: r
-    real(prec), dimension(i_low-1:i_high,neq), intent(out)   :: psi
+    !real(prec), dimension(i_low-1:i_high,neq), intent(out)   :: psi
+    real(prec), dimension(ig_low:ig_high,neq), intent(out)   :: psi
     
     psi = maxval((/ zero, min(beta_lim*r,one), min(r,beta_lim) /))
     psi = half*(one+sign(one,r))*psi
