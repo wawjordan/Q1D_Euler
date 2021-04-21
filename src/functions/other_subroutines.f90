@@ -51,7 +51,8 @@ module other_subroutines
     real(prec), dimension(ig_low:ig_high,neq), intent(in)  :: V
     real(prec), dimension(i_low-1:i_high,neq), intent(out) :: left, right
     !real(prec), dimension(i_low-1:i_high,neq), intent(inout) :: psi_plus, psi_minus
-    real(prec), dimension(i_low-1:i_high,neq) :: r_plus, r_minus
+    !real(prec), dimension(i_low-1:i_high,neq) :: r_plus, r_minus
+    real(prec), dimension(ig_low:ig_high,neq)  :: r_plus, r_minus
     !real(prec), dimension(neq) :: den
     integer :: i
     
@@ -71,7 +72,7 @@ module other_subroutines
       call limiter_fun(r_minus,psi_minus)
     end if
     
-    do i = i_low,i_high-1
+    do i = i_low-1,i_high
       left(i,:) = V(i,:) + fourth*epsM*( &
          & (one-kappaM)*psi_plus(i-1,:)*(V(i,:)-V(i-1,:)) + &
          & (one+kappaM)*psi_minus(i,:)*(V(i+1,:)-V(i,:)) )
@@ -83,10 +84,15 @@ module other_subroutines
     !left(i_high,:)   = two*left(i_high-1,:) - left(i_high-2,:)
     !right(i_low-1,:) = two*right(i_low,:) - right(i_low+1,:)
     !right(i_high,:)  = two*right(i_high-1,:) - right(i_high-2,:)
-    left(i_low-1,:)  = V(i_low-1,:)
-    left(i_high,:)   = V(i_high,:)
-    right(i_low-1,:) = V(i_low,:)
-    right(i_high,:)  = V(i_high+1,:)
+    !left(i_low-1,:)  = V(i_low-1,:)
+    !left(i_high,:)   = V(i_high,:)
+    !right(i_low-1,:) = V(i_low,:)
+    !right(i_high,:)  = V(i_high+1,:)
+    
+    !left(i_low-1,:)  = V(i_low-1,:)
+    !left(i_high,:)   = V(i_high,:)
+    !right(i_low-1,:) = V(i_low-1,:)
+    !right(i_high,:)  = V(i_high,:)
     call limit_primitives(left)
     call limit_primitives(right)
     !write(*,*)
@@ -349,6 +355,8 @@ module other_subroutines
   !===========================================================================80
   subroutine output_soln(grid,soln,ex_soln,num_iter)
     
+    use set_inputs, only : counter
+    
     type( grid_t ), intent(in) :: grid
     type( soln_t ), intent(in) :: soln
     type( exact_q1d_t ), intent(in) :: ex_soln
@@ -358,7 +366,8 @@ module other_subroutines
     
     open(40,status='unknown')
     ! Repeat the following each time you want to write out the solution
-    write(40,*) 'zone T="',num_iter,'" '
+    !write(40,*) 'zone T="',num_iter,'" '
+    write(40,*) 'zone T="',counter,'" '
     write(40,*) 'I=',imax
     if(shock.eq.0) then
       write(40,*) 'DATAPACKING=POINT'
